@@ -1,0 +1,5 @@
+{
+  "majority_binary_macro_f1": 0.33635614179719703,
+  "majority_category_macro_f1": 0.09994121105232216,
+  "tfidf_lr_binary_macro_f1": 0.7358923884514436
+}

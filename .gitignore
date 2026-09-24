@@ -47,3 +47,12 @@ logs/
 .Trashes
 ehthumbs.db
 Thumbs.db
+.venv/
+.venv312/
+__pycache__/
+*.pyc
+.env
+models/*.pt
+data/raw/
+data/processed/
+data/splits/
