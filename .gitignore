@@ -1,12 +1,31 @@
+# =========================
 # Python
+# =========================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
+
+# =========================
+# Virtual environments
+# =========================
+.venv/
+.venv312/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# =========================
+# Environment / secrets
+# =========================
+.env
+
+# =========================
+# Build / packaging
+# =========================
 build/
-develop-eggs/
 dist/
 downloads/
 eggs/
@@ -23,23 +42,33 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+# =========================
+# CSHSM data
+# =========================
+data/raw/
+data/processed/
+data/splits/
 
-# Project Specific
-data/
-*.index  # FAISS indexes
-models/  # Local model weights
+# =========================
+# CSHSM model artifacts
+# =========================
+models/*.pt
+models/*.bin
+models/*.safetensors
+
+# FAISS indexes
+*.index
+
+# =========================
+# Logs / caches
+# =========================
 logs/
 *.log
+.pytest_cache/
 
-# OS specific
+# =========================
+# OS-specific
+# =========================
 .DS_Store
 .DS_Store?
 ._*
@@ -47,12 +76,3 @@ logs/
 .Trashes
 ehthumbs.db
 Thumbs.db
-.venv/
-.venv312/
-__pycache__/
-*.pyc
-.env
-models/*.pt
-data/raw/
-data/processed/
-data/splits/
