@@ -5,12 +5,15 @@ import numpy as np
 import time
 
 class MultitaskTrainer:
-    def __init__(self, model, train_loader, val_loader, device, category_weights=None, lr=2e-5, lambda_cat=1.0):
+    def __init__(self, model, train_loader, val_loader, device, category_weights=None, lr=2e-5, lambda_cat=1.0, accumulation_steps=1, use_fp16=False):
         self.model = model.to(device)
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.device = device
         self.lambda_cat = lambda_cat
+        self.accumulation_steps = accumulation_steps
+        self.use_fp16 = use_fp16 and (device.type == "cuda")
+        self.scaler = torch.cuda.amp.GradScaler(enabled=self.use_fp16)
 
         self.optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.01)
 
@@ -24,28 +27,32 @@ class MultitaskTrainer:
         self.model.train()
         total_loss, total_bin_loss, total_cat_loss = 0, 0, 0
 
-        for batch in self.train_loader:
-            self.optimizer.zero_grad()
+        self.optimizer.zero_grad()
 
+        for idx, batch in enumerate(self.train_loader):
             input_ids = batch["input_ids"].to(self.device)
             attention_mask = batch["attention_mask"].to(self.device)
             bin_labels = batch["binary_label"].to(self.device)
             cat_labels = batch["category_label"].to(self.device)
 
-            bin_logits, cat_logits = self.model(input_ids, attention_mask)
+            autocast_device = "cuda" if self.device.type == "cuda" else "cpu"
+            with torch.autocast(device_type=autocast_device, enabled=self.use_fp16):
+                bin_logits, cat_logits = self.model(input_ids, attention_mask)
+                bin_loss = self.binary_criterion(bin_logits, bin_labels)
+                cat_loss = self.category_criterion(cat_logits, cat_labels)
+                loss = bin_loss + self.lambda_cat * cat_loss
+                loss = loss / self.accumulation_steps
 
-            bin_loss = self.binary_criterion(bin_logits, bin_labels)
+            self.scaler.scale(loss).backward()
+            
+            if (idx + 1) % self.accumulation_steps == 0 or (idx + 1) == len(self.train_loader):
+                self.scaler.step(self.optimizer)
+                self.scaler.update()
+                self.optimizer.zero_grad()
+                if hasattr(self, 'scheduler') and self.scheduler is not None:
+                    self.scheduler.step()
 
-            # Masked category loss (ignore_index=-1 handles the masking automatically)
-            cat_loss = self.category_criterion(cat_logits, cat_labels)
-
-            loss = bin_loss + self.lambda_cat * cat_loss
-            loss.backward()
-            self.optimizer.step()
-            if hasattr(self, 'scheduler') and self.scheduler is not None:
-                self.scheduler.step()
-
-            total_loss += loss.item()
+            total_loss += loss.item() * self.accumulation_steps
             total_bin_loss += bin_loss.item()
             total_cat_loss += cat_loss.item()
 
@@ -66,11 +73,13 @@ class MultitaskTrainer:
                 bin_labels = batch["binary_label"].to(self.device)
                 cat_labels = batch["category_label"].to(self.device)
 
-                bin_logits, cat_logits = self.model(input_ids, attention_mask)
+                autocast_device = "cuda" if self.device.type == "cuda" else "cpu"
+                with torch.autocast(device_type=autocast_device, enabled=self.use_fp16):
+                    bin_logits, cat_logits = self.model(input_ids, attention_mask)
 
-                bin_loss = self.binary_criterion(bin_logits, bin_labels)
-                cat_loss = self.category_criterion(cat_logits, cat_labels)
-                loss = bin_loss + self.lambda_cat * cat_loss
+                    bin_loss = self.binary_criterion(bin_logits, bin_labels)
+                    cat_loss = self.category_criterion(cat_logits, cat_labels)
+                    loss = bin_loss + self.lambda_cat * cat_loss
 
                 total_loss += loss.item()
                 total_bin_loss += bin_loss.item()

@@ -1,0 +1,27 @@
+{
+  "blocker": "No real LLM evaluator available (API keys or local model config missing).",
+  "accounting": {
+    "m52": {
+      "input": 19436,
+      "approved": 0,
+      "human_review_required": 0,
+      "rejected": 0,
+      "eligible_deferred": 0,
+      "blocked_eval": 19436
+    },
+    "m53": {
+      "input": 18,
+      "approved": 0,
+      "human_review_required": 18,
+      "rejected": 0,
+      "eligible_deferred": 0,
+      "blocked_eval": 0
+    }
+  },
+  "evaluations_real": 0,
+  "evaluations_simulated_in_v2": 0,
+  "human_review_actual": 0,
+  "human_review_pending": 18,
+  "final_approved_count": 0,
+  "audit_results": "Blocked (No candidates auto-approved to audit)"
+}

@@ -1,0 +1,43 @@
+{
+  "stats": {
+    "multitarget-conan": {
+      "raw": 5003,
+      "candidate": 5003,
+      "empty": 0,
+      "unmapped": 220,
+      "duplicates": 1,
+      "conflicts": 103,
+      "one_to_many": 1866,
+      "rejected": 58,
+      "filtered_candidate": 4621
+    },
+    "conan": {
+      "raw": 14988,
+      "candidate": 14988,
+      "empty": 0,
+      "unmapped": 0,
+      "duplicates": 8,
+      "conflicts": 103,
+      "one_to_many": 14817,
+      "rejected": 62,
+      "filtered_candidate": 14815
+    },
+    "total": {
+      "raw": 19991,
+      "candidate": 19991,
+      "empty": 0,
+      "unmapped": 220,
+      "duplicates": 9,
+      "conflicts": 206,
+      "one_to_many": 16683,
+      "rejected": 120,
+      "filtered_candidate": 19436
+    }
+  },
+  "rejection_reasons": {
+    "hate reinforcement": 88,
+    "threats or violent escalation": 18,
+    "discriminatory language": 13,
+    "counter-hate": 1
+  }
+}

@@ -1,0 +1,1909 @@
+{
+  "overall_total": 805,
+  "overall_errors": 305,
+  "by_category": {
+    "Gender": {
+      "total": 170,
+      "errors": 59,
+      "error_rate": 0.34705882352941175
+    },
+    "Political": {
+      "total": 70,
+      "errors": 33,
+      "error_rate": 0.4714285714285714
+    },
+    "Religion": {
+      "total": 49,
+      "errors": 24,
+      "error_rate": 0.4897959183673469
+    },
+    "Geo-political": {
+      "total": 23,
+      "errors": 8,
+      "error_rate": 0.34782608695652173
+    },
+    "Violence": {
+      "total": 28,
+      "errors": 23,
+      "error_rate": 0.8214285714285714
+    },
+    "Others": {
+      "total": 57,
+      "errors": 39,
+      "error_rate": 0.6842105263157895
+    }
+  },
+  "by_language_profile": {
+    "Kannada-heavy": {
+      "total": 0,
+      "errors": 0,
+      "error_rate": 0.0
+    },
+    "English-heavy": {
+      "total": 803,
+      "errors": 305,
+      "error_rate": 0.37982565379825656
+    },
+    "Code-mixed": {
+      "total": 2,
+      "errors": 0,
+      "error_rate": 0.0
+    }
+  },
+  "by_text_length": {
+    "Short (<15 words)": {
+      "total": 623,
+      "errors": 213,
+      "error_rate": 0.3418940609951846
+    },
+    "Long (>=15 words)": {
+      "total": 182,
+      "errors": 92,
+      "error_rate": 0.5054945054945055
+    }
+  },
+  "by_emoji": {
+    "Contains Emoji": {
+      "total": 125,
+      "errors": 23,
+      "error_rate": 0.184
+    },
+    "No Emoji": {
+      "total": 680,
+      "errors": 282,
+      "error_rate": 0.4147058823529412
+    }
+  },
+  "qualitative_errors": [
+    {
+      "type": "Category_Error",
+      "text": "BTV Video grapher, Anchordu thode, Sonu thode, matthu yede Bahagana highlite maadi video coverage maadidane, amele ivrgala olaa udupu andre Kaacha kaano haage video maadidane ee BTV Video grapher mele Under A+ Adult videos Case haakbeku.. Naachke aagbeku ivru janmakke",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "Unnata shikshana sachivanaagi Tippu bagge apaprachaara madtanalri bhosudimaga..ivnu pakkad maneyevarige. Huttidaunu.",
+      "true_cat": 1,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Kerala state 10 years hodra complete agi Muslim state agita antha ali maji CM hediru egina terrorism activities and terrorism ga highest members join agtirodu Kerala state enda na eda saku e fim nali erodu correct agi naditida antha heloka",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Vikas hego hage avnu video madirodu.<br>Think madi vikas ginta jasthi dailog hodidane aduke batte bichirodu.",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ind vs afghanistan series irbeku avaga neveen ge 😅🤣😂💥",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Bandhugale... Congress is a anti Hindu,anti nation &amp; Dalal party...idanna nivarisabekadre modiji adiji ge support madbeku",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Bjp mulla gala film",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Kannada mathdi sayoku roga thuuu adhu yan bandidiyo evghlghya yestu haldhru astya thuuu Never ever change",
+      "true_cat": 0,
+      "pred_cat": 3
+    },
+    {
+      "type": "Binary_Error",
+      "text": "SWAMY NIMANTHARU DESH DALLI HECHCHU NAYAKARAGALLY JAI HIND",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Secular andre doongi",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Jai bheem ,artical 15, movie baggage ee madhyama anuvadigalu yaru mathadlilla",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "band bandarige kand kandarige kannada gotta, Kannada Mattadi, Kannada dialog heli, anta yaka keli kannada mariyade yaka kalitira, avrige bandre matadare, illa Andre illa, Don&#39;t ask any outsiders to speak kannada,",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "yaru support madbedi saniya mirzzja ge kannadigare",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Yav bisinu mutalla.modlella horata madidru yen prayojana aglilla.practical yochne madodu olledu.",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Khadar Yaa sha... chali nu bidsilla,bari olu kathe...",
+      "true_cat": 1,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Vayassadru buddi illa....idu Hindustan...Jai BjP.......Jai Hindustan 👏👏👏",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "KACHADA NAYIGALIGE ENTHA KETTA WORD AKIDRU NANGE SAMADANA AGOLA.. KOCHI KOCHI AKBEKU.",
+      "true_cat": 4,
+      "pred_cat": 3
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Hiriyare nimma muslimarige namma besada kaanunu talebagalikke heli aamele baasana maabi",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Innu yaru ennu madake agthaila enno avrinda yarigo labba agthaide",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "6 ne maduve thathange....agiii thumba lucky",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Avn sikkidre nin hen madbeku antha ankondiya andhna madi thirsko nin kopa bejaru nin alu na hella nu bidle beda anthavrna.....",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Neer rajakarani galu bitbittu nilsake cinema davru road ge barbeka? ?? hogu modlu news channel na sarige nadsu, Siddaramaullah khan ge kelu hogu",
+      "true_cat": 2,
+      "pred_cat": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Tamil nadalli ee sarti olle male agide..aadru yak hinge saytavre beku beku anta",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Ella kittodoure kurigalu doddi idu",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "TV9 chappali end hodideku first",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Please Back word and dalitharu don&#39;t vote bjp mata hakabedi",
+      "true_cat": 2,
+      "pred_cat": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Congras pakshakke taru modalu dosisiddare aa mlagalannu kareyabedi yenu prayojana illa, b jp yavarige eega Karnataka dalli nele kadine.",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Tagalrappa avattu jaggesh avr athra hogi kshame kelu kelu anta hegradtidda gnaniyulla abhimaanigale indrajith du ivaga en madtiraaaa abhimaanigale (celebrities)??????devridaane guru avattu jaggesh avrige avr vaysige bele kodde ast maadudralla ivattu nimig tirgide iste jivna tilkolro ??",
+      "true_cat": 5,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nan sayovargu congress ge vote hakalla. Jai hindu",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Court aadeshyavannu palisa beku",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Avr kasta ning gotthidre neen ninna artha maadkolthidde....",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Munne nivu uda da bagge heliddeeeri <br>(Monitor lizard Thane English nalli heluvudu) shivaji kaladalli upayogisuva reethi adara sontakke hagga katti hagga sametha udavannu koteya melbagakke yeseyuthiddaru aa udavu koteya mele thalupidaga alliruva kanbakke sutthu baruvtittu . Aa reethiya training udakke kodalagutittu.",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "justice yar kodstare aa families galige..avara property and land ella vapas beku",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ex :- Hettavarige hegananu muddu",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "India ge Kashmir gintha e kerala and punjab very dangerous,",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Bigg Boss Na Eno Ankondowle <br>Howlu Enadru Achieve Madbeku Anthe nija hogilla Kardidira Anthe Hogidale",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Supreme court namage bekilla, parliament bekilla, Karnataka swathanthra desha madi,yavanige beku parliament",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "E thara kithod vlog ge 2.5k likes shabhash viewers who were like her vedio this is very bad to do vedio",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "Thap evr dalla.<br>Nam state alli evlnu follow mado lakshagatle jana edaralla ??.<br>Nam desha entourinda uddara adange.",
+      "true_cat": 3,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nin tamanu video nodidana ?",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Mundaite mari habba ellaranna hodedu bisaktane evanu bandre",
+      "true_cat": 4,
+      "pred_cat": 2
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Dov rani🤣🤣🤣🤣",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "HINDHU DESHA DALLI HINDHUTHVA MATHRA MERIBEKU JAI BHARATH MATHE",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "dk sahodarara krutyakke pinanayi bembala",
+      "true_cat": 0,
+      "pred_cat": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "mumbai attack hinde congress kaivada ide anta yake innu prove madta illa",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "[USER] kulkarni kashmiri paditarige aadre desha dalitarige aadre adjust madkolli? Idu humanity aagirbeku only Hindu muslim alla ,aa kashmiri paditarigu nyaya sigbeku ,yarella anyayakke olagagiddaro avrellargu nyaya sigbeku",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Prithi konda kolegathi",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "yaru maadabarad tappe maadiddu avlu , idu India . usa alla ella torskondu duddu madoke",
+      "true_cat": 0,
+      "pred_cat": 3
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Aunty heavy Dove madtidare",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Idyavudo congi...mangi company",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Loo.. Akbar kattida red court Mele.. Sawtantra dinada bahuta harisodu",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Edu modle planning madidare 🤣 all parties are just drama",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Naveen ul hq avrna keythivi saryagi avn amun king VK kanale",
+      "true_cat": 0,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Duplicate kathe bidthavle",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nin tinnodanna nodidre navu tindage enu",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "alla guru swalpa nadru ivagle ond intrview Li eng behave madbeku annode gotila en guru ivalu yappa",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Sonu Gowda duddigagi madida video Rakesh Adiga obbane namba beku. Avanobbane simpathi torisabeku",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "[USER] Kumar Narayanappa Shiroorkar kashta pattu dudi.. ningu barutte property..",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "AP former CM Chandra Babu Naidu helping congress in KA to defeat Bjp. Everyone step out and vote for bjp.",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Sudeep ge maryade illa",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Yako uritidiya",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Hugiri Makke",
+      "true_cat": 0,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nivu nima kelsa nodi hogri",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "What a match now Pakistan says that indian are cheater. Sootamele ivradd ond kvatle ??",
+      "true_cat": 5,
+      "pred_cat": 3
+    },
+    {
+      "type": "Binary_Error",
+      "text": "... Nim matu kelo yoggatenu illa sir avrige..",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Pork thunni doole amskla",
+      "true_cat": 2,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Pok India ge serlebeku",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Eee soo.....na modlu orgade aki",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "ivalu yene dove madli ,nijavadha kannadigaru yaaru vote hakala ivalige .<br>First of all naav ee season bigg Boss nodtane ella????",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "40 percnt commission corona commission oxygen commission hindu musilm madya dwesha ide blujp avra kelsa....bele yerike thu sakapa bjp adikara",
+      "true_cat": 2,
+      "pred_cat": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "edu.40.cm.kaala.<br>Yallaru.shante.yaage",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Idella sadhane andre sadhane ge yen anbeko gothila kasta pattu belisid mele ivlu heg igirbeku gothila samajakke olledu agilla andru paravagilla kettudu matra madbardu...",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nannage thilida hage modalu jana sankya niyantrana 2 rinda 3 kke kadime madbeku avaga step by step yella sari hogittade jothege hi jaladalli yar yar invol agidaro avarnella bedusbeku",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Non vengetebal beku yestu retu gotha one vara tarakari tinbavudu",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ee vishya da bagge Siddaramaiah enadru avr paravagi mathadudre naan avn abhimani annodunna avathe marithini ..",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Akka chennagi vivaravaagi jihadi gala bagge helidira, jai hindh ,",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "shataa madusko . Turki tunne unnu",
+      "true_cat": 2,
+      "pred_cat": 3
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Achor kuda battebecche achor agadale anusuthe",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Speeker waste fellow 😂😂😂sumne kutkollodu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Documents idre torsidre elru sumnirtare adu bittu bari sullu helodu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Election time canvas ge stars baroke agutte...cauvery protest banni andre...a film hit aitu a film hit anta matadtare...I agree ppl should encourge our films than other films...also these stars should remeber they have become stars because of kannada ppl before speaking about ppl.",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Sir ondu prashne cinema nodiye tiliyebeka nanu house wife 1990 ralli nadeda eevishayadalli navu tilida eesathya vannu nanna mak kalige tiliya padissidene idu namma karthvya sir, iga hogi noduva dhayar ayavilla sir, adare eegina youth galu deshkagijivana koduva gyana viddar e awaru ottu seridre yaru namma virudda kaiettuva dhairya virutta sir modalu ottagi seri sir berenu beda navu kuda ade saraswati tiradavaru adare namma purvajaru alli ideritiya kashtavadaga allind Goa kke hode vu allikuda porchughesarathondare tadeyalagade alliand South canara, north canara, Kerala border alli hogi jivisedevu igalu namma kuladeru kuda Goa dalliyesir, idu namma hindugala kathe sukshma vagi heliddini.",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Lo sudeepa yako Nayi balu baltidiya. ? E daridra bigboss show enda janakke yenu msg kodtidiya amikkond maneli kudu film madoke dam ella andre.. saniya matte Roopesh ge yenu byiyodilla e mindri maga",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "Correctagi helidri yakendre kidnap iga shuru madiddala kangress avaru keraladalli pratiyonda sarkaradalli ivar kaivada vide yakendre videshiyara dollers gagi enu madalu hesadavaru namma deshvasi galu namma virodi galadru hindu galu idu pakka da hudugi yalve anta summanaguttare ondu vote nivu hakide namma balannu halu madalu nave bali",
+      "true_cat": 1,
+      "pred_cat": 2
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Muchkondu irale mudadya",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "​​​​​​[USER] de janairohowdu guru kranti Robert average aagi itthu dboss recent movies yevdhu kooda astu chennagi hogthila modilinante jailer bandu kranti ginta sumaraagi idhe anta helabhodu aaha guru neen heltairodhu nija ne namage samase irodu bashelala neerali machi.",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Chappall mali hali meravanige madabeku &amp; sent haryatira sulemakklu",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Adukke utra nimmane henmakluge kelu heltare",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Mostly ee btv sonu relative avr channel ansutte???? adeng ivlna oglutare sadane sadane anta,oo god, channel avrge maryade idiya ,en kit dabakidald aa sonu , yav seeme celebrity avlu aa",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Stodio dalli kunthri nimma name goth illa wondhu mathu helathine kelhi .newo yakh coat hakiri newo simple dress hakhoundh Kunder beko.",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Hello MR Newz reader.. First nevu manage hele nimge intha nonsense script kottidu yaru.. daridra vagi kutkondu daridra news nodidre heege agodu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Bagni guta andre edu ????????????",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Navu AA MATCH fixing madkolak AGBAHUDU",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "kathe chennagide",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Congress secularglu.buddhi jeevi galu dham idre uttara kudli",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Antha olle hudganna miss madikonde yalla ninge eno ansodilva thu. Miss u Chinnu you r my fevarate Actor",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Third umpire is third class umpire fine avrge hakbeku",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "bro kennkerodu kanjii penjii them all royal challengers Bangalore them na adrallu king kholi na in bedthara in melle lsg yavde karnnaku bedogee illa ??",
+      "true_cat": 5,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "[USER] Fire neevu hindu gala??? Hindu dharma odiyak ninthoru neevu galu...brahmins adunna ulisthavre...",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Yavan bandru nem hanebaraha este kandro tarle mundeva yar bandru nemmanna manel Erok bettu evru kule madok hogtara",
+      "true_cat": 5,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Aggbeku avamana thu yar guru RCB management.",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ene agli namma maneya hennumakkalige modalu samskara kalisbeku ,<br>En muslims nam desha na islamic country madoke hodre avra kanasallu adu agolla ,ellaru onde ,ellaru onde antha nam hindugalanna thappu daarili nedustidare ,<br>Idrinda namma hindu sangatanegalu ecchettukollabeku <br>Jai Hind <br>Jai Sri Ram",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Fst nettuge Kannada matadodu khali amele e mane nindhena torsovante nimmamma ninnantolu jothe yen matadodu anta matadirala aste nimmamma evlu yak enge adtaidale anta think madtaidare nanug e Tara maglu huttudlala anta yochne paapa ammange",
+      "true_cat": 0,
+      "pred_cat": 3
+    },
+    {
+      "type": "Category_Error",
+      "text": "Bitre avr ammange hodiyo thara kanthidale",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Congress hindugalu ee cinema bagge enoo mathadthilla",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Olle hudgun kalkondalle 🤨🤨🤨",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Karnataka king only siddhu congress anta ankondu bedkota idivi",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Enthavaru yala interview madthirla b tv thagondu odebekuu helbekalaaa ?????????? odebekuu adurstaaa a�thaa halka lovdii",
+      "true_cat": 4,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "Cha marid yav aadharagalilla keva drama sury yembh sulemaga keval komuvad kall Yilikke helodu supari kole madisode Evan kelasa sullin saradaararu",
+      "true_cat": 1,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "nanu felam.noduthene",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Darshan belita iddare avrige hechhu fans followers iddare annode ivatt darshan avrige kaarana hinta avamana......modlu indrajith sir sandhesh sir modlu obra vishya na innobra hatra helodanna bidiii......yesht clear aaagi heltiddira modlu nimm ibrigu baibeku.......",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Yellinda barthiro modi hesaru helkondu cricket na modi adidna tarle baktharu",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Bosude magana first nenaga chappli hodebaku idu film kono",
+      "true_cat": 4,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "I dagrn live karsiddu yaru avran metttale hodibek",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "bari bramins are Hindus in India anstide, OBC, SC ST janagala savige belene illa.jai Kuvempu, jai basavanna, jai budda, jai Ambedkar.",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "shilpa sister awalige nachike maan maryade yenila bidi yala bitakidale aa lofar Munde,tho awal jammke",
+      "true_cat": 0,
+      "pred_cat": 2
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Inthavaranna namma kannadadavaru viw madodu bidbeku",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nin hogi muslim ge seru namgela yake heltiya<br>Nin maneyavarela muslim convert agi",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Avella madodilla bro bari name heli election time alli vote akuskothare",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "[USER] D edu Bitre yeno gottilla anisutte, edarinda ningenu labha Ella ,",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Anchor next biggboss......... Adrusta nin batte noodi.... Kodtare chance",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nonage ijab ninda enu. Thundrae sistr",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Batte ella",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Nan kaili gun kodi avan hutte illa anno haage madtini.",
+      "true_cat": 4,
+      "pred_cat": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Nim channel ge mettalli odibeku bari fake news",
+      "true_cat": 4,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "[USER] Kumar Narayanappa Shiroorkar who the hell are you, nimmouna maatalli atra irli",
+      "true_cat": 0,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "ellara kannu teresiddakku sarthaka vaytu",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nanna hindugaligaagi bajrangigalu directaagii protect madbodu aadre illi hindugale hindugala shatru aagidare",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nim gee trol madthare halva.... Nim Amma nim thamma... En helthare",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Alla a keeper ge no ball antanu gottagalwa 3 run tigedidu lekka barta ilva anta keltane. First of all pak nawrige rulls e gottilla cricket indu indians ge cheaters anta heltare ??",
+      "true_cat": 5,
+      "pred_cat": 4
+    },
+    {
+      "type": "Category_Error",
+      "text": "Nayi galukachadyave..sadanakke maryade illa.",
+      "true_cat": 1,
+      "pred_cat": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "E nan na maga mudhuka gaa sabru jothela kalsro sabru manella adga madkondu thinnu sullla magnna nen thayna thalla edka",
+      "true_cat": 2,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Aythu swami neevu helidahage navella cinema nodutheve. Eega yara mele dwesh karuthira? Nimma dvesha swalpa controlnalli idi swami. Kashmiri panditharu anubhavisidakje nammellarigu dukka untu. Eega neevu yarige buddi kalisalikkehoratiddirii. Nodi swmi namma purvajaru inthadde thara kasta anubhavisiddare. Avara baggenu yochisi. Eega janaralli dvesha huttisi jana jeevana kedisslikke hogabedi. Nimma manege hogi nimage estu beko adtu kanniru haski. Deshakke thorisabedi.",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Ivalna swalpa Dina Ruchi nodi, next marriage ge ready agthane Naresh????",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Tayi...neenu naav tumba rich family rich family annod keli nim mane eno mysore palace ankondidde nam mane kelsuk baror mane edukku doddage ede???????????????????",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Dboss kichcha ....bandre saaku bisi muttutte.....adre bartara ?😢",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Sir. Bari cinema mathrana ne ondhu industry na. Delivery jobs madorige, civil engineers ge, road side alli vyapara madorige yenu support elva anna. Bari cinema cinema cinema cinema. Thu sak aiythu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Satthodnaa",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "They first convert. Admele fake passport madi dubai or Saudi ge kalisthare, allinda ellige kalisthare antha god knows. baaddi maklubsulerige huttidav ivu",
+      "true_cat": 2,
+      "pred_cat": 3
+    },
+    {
+      "type": "Category_Error",
+      "text": "Kapi mundeve nimma nodudre asayya agutte sariyagi batte hakondu kuthko haage nimm thaayi ninu eno sadhane madilo thara heltidare istella buildup beka ninge ri inthavna bittu modhlu ollolle sadhkarannu thilisi kodri kachada channel gala",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "nimm channel na Unsubcribe madidini",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Even she don&#39;t hve respect on her mother... Yappa etaranu eratta character... Trp ge yen bekidru madtira...",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ogoru ogro ..bjp ge enu loss illa kasa..kasakkey ogbeku agee kasa ogli",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "I&#39;d movei Maadi brain wash madtha irodu enu kooda reality illa Ella kelsa illadavaru madtha irodu aste muslims hindu enu illa ellar chennagi iddare sumne kelsa illa Alva auru matra hindu muslms sari illa helidu aste",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Hoooo thatha namdu Hindu rashtra madbeku howdu yake andre muslims ge thumba country&#39;s ide Hindu galige Namma Bharatha onde thilkoli navu muslims na navu dura madilla but avra achara vicharagalanna Namma mele yake akthira antha keltha irodu aste",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Virat Kohli Kachadda!",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Ayyo suke magane. Enne rate hechhadaga tika mucchikondu iruttira",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Bjp ge jatka cut madbeku 😂",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Kalla siddu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "kaveri neeru karnatakada hitha kapadbeku neerilladhe tamilnadige neeru bidbekagilla Supreme Court tamilnadu paravagirbahudu belege bere vyavaste madkollali karnatakada neeru nambi bele beleyuvudhu yava dharma drohigalige dayavittu kaveri neeru bidbedi supreme adhesha anta neeru bidbedi",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Faruk Abdullah and Indira Gandhi cousins anta ello odiddene evru Afganistan enda bandu seriro muslim anta dayavittu edra bage swalpa vishaya kale haki thilisi please 🙏",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Pak ge dhairya idare mukha mukhi agi barabeku e thara naei galanna chu bittu bennige churi akodu hedigala kelasa",
+      "true_cat": 3,
+      "pred_cat": 2
+    },
+    {
+      "type": "Binary_Error",
+      "text": "nijaa helidre Siddu ge mai ella uri 😅😅",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Avru sagni tindidru avaga niv avrginna swalpa munde hogi helne tintidiri aste",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Haif.sule.magna.aiklu.batu. yammia.tanu",
+      "true_cat": 0,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Sule ge sari bairi anna",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Namge answer madoke gontu galige country ne illa😂🤣😂🤣",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Super guru nanu munche ninu mafhadidhu Keli bejar hagithu sariyag entte",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ramesh tu ninajanmake Benki yav tara raja karnino ninu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Useless pratam anta ella ankondidare",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Shame on vk pans 🤣🤣",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Dharshan olledh maddhaga chappale hoditira like madtira sanna Putta tappagutte, Elli sule maklu indrajit and sandesh ata hadtavre",
+      "true_cat": 0,
+      "pred_cat": 2
+    },
+    {
+      "type": "Category_Error",
+      "text": "Nimgella Jana e thara andru hegh muka thorusthira",
+      "true_cat": 0,
+      "pred_cat": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Shatta kelaka Siddaramaullah khan ge vote haki gelisidhu",
+      "true_cat": 1,
+      "pred_cat": 2
+    },
+    {
+      "type": "Category_Error",
+      "text": "Thikalu baddetadu gundittu saysi ivaranna",
+      "true_cat": 4,
+      "pred_cat": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Mudkua w/s muduki",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Nin yava heloke bevarsi nayi namm mannu namm niru nindenale",
+      "true_cat": 3,
+      "pred_cat": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "India na secular madidu doddu thoppu...Namma olle thana na asahayakate ankondidare...",
+      "true_cat": 1,
+      "pred_cat": 3
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Aswath embha nalyak mathadu manga neena hethawaru dharadaru",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Annadaatar bagge yen madiddiyyappa? Tushtikaran rajakarani neevu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Bro nivella yen gotta<br>Virat nam avnu anta avnu kole mad bandru samartane madkoltira<br>Nan naveen correct anta heltilla but virat Indian nam avnu anta over ag samrtane madkolbardu<br>Tappu yar madedru tappe<br>Virat ge 200 million support ede but who in front of him don&#39;t have it and that of afghani how can he<br>Nim yelr prakaran adikara hana eravr yen madudru eldavr muchkond erbeku alva<br>Ed yavt egu badlagolla",
+      "true_cat": 0,
+      "pred_cat": 3
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ella kade ninna videos famous aagi avna friends elru nodirtare, Avnu adenge mukha thorsitane paapa. Avna friends yaaru teeke maadalva",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Supreme court love marriage virodhi asali",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "hey thikka muchkomdu hogi stady madi edu yela election gimiki avru avru amount thagothare kirik start madthare eli nim life allluagodu degree mugiyothanaka yela chennagi eruthe adu admele ede real life adana best madoke nimge school college ge kalsodu edake alla eeeeeeee hijab kirik na nim school clg princi galu nodkothare court rules na follow madodna yar adru break madudre avrge en madbeku adana madthare hogi stady madi edake neev thale hakodu bittu",
+      "true_cat": 1,
+      "pred_cat": 2
+    },
+    {
+      "type": "Category_Error",
+      "text": "Hogo tharle burule dongi ramaya ninu heluvudalla reel sutoklo Sitha ramaya",
+      "true_cat": 1,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "Ninag sudubeku mudaka",
+      "true_cat": 4,
+      "pred_cat": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "ivaga nodi ee daridra congress navru enu madtare anta",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "ISLAM DHARMA HEGIDIYO ADANNE ISLAM DHARMA HELUTTE ASTE TAYI....NEENU THU KACHDA BJP JANMAKKE BENKI HAAKA DESHA",
+      "true_cat": 2,
+      "pred_cat": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Idhella thappu cinema bere Cauvery issue bere... modhlu cinemadhavarnella involve maadi maathadodhe thappu... idhella modhlu nilsi ondhu theermana maadi Cauvery issue mugsbeku.. bari idhrindha ne bele baiskothiro sarakara haagu kelavarella bari bogle bidodhe aithu.... Modhlu yake ee samasye antha artha maadkondi solution tharli.. idhella mugibeku.. Desha bhavya Bharathavagabeku... Jai Bharath Jai Kannadambe❤️ please don&#39;t hate any one..🙏",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Super bro da enadru madkond halag hogu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Aa video nanu nodidini bro hardu muru bagalu agide papa.....",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "namma akka Laxmi hebbalkar ollede madidale avara kshetradalli",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ene erli bro edunella start madidde lsg chinnaswamy alli, avru summe edidure estu en agtirlilla, kushi enandre avru nam fans ursiddu , fans agiduke kholi revenge tagonda adhuke avna king anodhuu",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Edaralli ududda mathadidra avara maklu Saturday Sunday ede btm or Koramangala pub nalli sikthare ,nodi evara avathara 😂",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Hogu sabrud ungy",
+      "true_cat": 2,
+      "pred_cat": 4
+    },
+    {
+      "type": "Category_Error",
+      "text": "Shame on u meghana harish badlu neen hogbekittu",
+      "true_cat": 0,
+      "pred_cat": 4
+    },
+    {
+      "type": "Category_Error",
+      "text": "Bucket sulemakla, avlden interview madtidira. Video leak madkondu bigg boss shata show ge hogi barodu en dodd vishya na. Interviewer ??snana aadru madtala",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "Naresh du samanu kelsa madalla Pavithra akkandu urbaglu agide yak bek ivrge madve",
+      "true_cat": 0,
+      "pred_cat": 4
+    },
+    {
+      "type": "Category_Error",
+      "text": "Kathhe ge vayassagide but buddi beledilla",
+      "true_cat": 5,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Drag agoke sadya 😂ne illa yakendre avrige fans ila bala kadime idare",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "All devils are one onde kade serkondu devva adidang adtave",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ist cheap mentality Muslims nam india dalli idare andre che",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Darshan sarino ? thappo? gothagthilla, but idukku modle wife vichardalli issues adaga adunna public munde tharbardittu.. ishtella adru thayi chamundeshwari krupe bachav agi en punyano eno sikapatte fans adru, ಸಾರಥಿ movie nu chenagi hit aithu...ishtella admele ushargi nadkobeku anno vicharanu yochuslilva.. e thara aham madidko eno darshan virudda shadyanthara anthu nadithide adu darshan madkondiro thappindale..inmunde abhimanigala abhimana uluskolo prayathna madi..<br>Drinks adella avoid madi swalpa yoga, adyathmada kade gamana kodi..<br>Punith sudeep yash is always dedicated persons... adunna alavadiskobeku.. thappu ellaru madthare yaru enu saacha alla.. neevu dodda celebrity agirodrinda dodda news ashte.. inmunde thap agde irothara nadkoli nim wife maga jothe chenagiri..<br>Abhimanigalna galusbekadre eshtu struggle irutte antha nimgu gothu adunna uluskoli dayavittu.. ashtilde Dr Rajkumar avaru sumne anthidra abhimani devarugalu antha..🙏🙏... kashta pattidira adunna kapadkoli.. yar ene kithadudru nam kannada industry maryadine hogodu.. <br>My favourite hero APPU...😍",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Matte hudugi shoki shuruvaithu, name fame bandmele swalpanadru mana maryade itkondu samajadalli irbeku illa andre ondalla ondu Dina publicnalli ee thara maana haraj hagutte. Sandesh obba olle snehitha agirodakke darshan safe agi idare illa andre jail nalli irbekagithu.",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Muslims yake terrorists aagthare, bere avranna yake force madthare.. Amar sir idhar bagge kuda heli pls.",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Revenge adare idu😂❤ RCB",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Fine,fine antey ??????bargeytta English evldu",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "Hucha 😂magane nin mathalli artha illa su magane cm na kelo thikla😂",
+      "true_cat": 0,
+      "pred_cat": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Yappa e bevarsi channel...e bevarsi munde.....yen karma guru edella nodbeka navu",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "Satha nayi Ashwath gandu even vokkaliga anokke nachige aguthe",
+      "true_cat": 2,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "BOODA.BOMMAI.",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Hi turuk mindri how r u... This is why shoiab fucked and sent u back?????????? hogi tirpe ettu louda nin lifenallli singlesnalli ond Wimbledon kuda illa ond us ooen geddilla ond grand slam illa tu nin janma ivattinda naayi nari tinno hag agli??????????",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "first night coverage yavaga haaktiraaa ???",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "bad kettoytu kala en kharma",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Ashwatha nin akkan Chapple tagond hodiri",
+      "true_cat": 1,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "It&#39;s only provoke all hindhu r very strong dhayaviittu biryanige hase padbedi",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Sonu sood real hero covid time nalli esht help madidru",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Jihadigalanna oddu pakistanakke kalsi Ella problem solve agatte ..",
+      "true_cat": 2,
+      "pred_cat": 3
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Sumakka bega banni",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ananth Nag sir correct agi mathadavre, Congress party ge manushyathva yilla",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "modi sir plz nangu ond chance kodi nanu hogtini rdx ita kalsi na nana deshakagi sayoku ready adre nava kodo shock henga irbekaandre idi hadargiti pakistana suttu sarvanash agbeku",
+      "true_cat": 4,
+      "pred_cat": 3
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Please see this movie tumba nija galanna tilsatte mivie yaru ban madbeku antaro avar bayalli mannu hakbeku",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nin bathroom gottu bidu... Yes same bathroom....",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "F I R haaki station alli kaachadalli nillisi ee boli maganige",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "bjp govt inda matra sadhya idanna tadegattodu",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Evanobba Congress agent",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "<br>Kashmirakke hogi Horata madoke yenadru Sangatane madthiya elvalla...? <br> Yella Samaanya jana Yaro barbeku bandu Namnella Uddara madbeku anno brame alle kaala kalithivi... Ade Politicians ge Vote Bank..",
+      "true_cat": 5,
+      "pred_cat": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Vikruta manassina Terrorists madiro karanakke: ella Muslims galanna target madtidare: navu elle huttidivi elle saytivi we are indians",
+      "true_cat": 4,
+      "pred_cat": 2
+    },
+    {
+      "type": "Binary_Error",
+      "text": "She&#39;s my fav too... I love her and i stand by her .. yarsa madad thappu yenu Sonu madlilla we are living in 21 century grow up",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Avl ammn ? Mukha muti kittu",
+      "true_cat": 4,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Badavara bagge,,yuvakar bagge kalaji iru Nayaka adu Siddaramaiah obbare",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "I think one show madobekadare closing thanka a set le erbeku ila andare serial nodake interest erala",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Bosadike aswat nayi..",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "P o k mele India attack madidre yenaguthe ebru bagge in information kodi",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nam sakre pakad guru pakistanad paaka thagabitaaa",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "namma hemmeya bharatiya .. matte hutti baa",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Medam intornella karsi interview madthiralla ad yen sadane sadane madiro nam D BOSS na ban madidiralla idu nam Indians odiri capalee??????????????",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "[USER] ley maari gdp per capita nodo",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "radhika elli taglakondlu ivanoge antane gottagtilla",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Thika muchkond hogo buddda",
+      "true_cat": 0,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ninge video madtha edd kushi ega Elva",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Don&#39;t worry shoiab malik hatra matadistivi dr Sania mam",
+      "true_cat": 0,
+      "pred_cat": 2
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Vote BJP<br>Vote Hindus<br><br>Avagle olle policies barutte<br>Ellru safe aagi irbahudi",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Congress ge nan ee janmadalli nanu nanna athi amulyavada vote hakallla .....kanasinallu hakalla 😂",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Gudugidha siddhu va? Ye bogaltha idhe ashte",
+      "true_cat": 1,
+      "pred_cat": 2
+    },
+    {
+      "type": "Category_Error",
+      "text": "T muci. Kondu Allaregu tket kodisu Swatantra horatagararu Ede deasha ka astu k�sta paterabeku narameda modiya bage yake estandu aluve",
+      "true_cat": 1,
+      "pred_cat": 3
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Shaadi bhagya 2 beku sir, hindugalu sayali namgenu alva",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Guru ivlna ,, bigboss editor stpny kanroooo,,,",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ohhhh agle 57 paaki TERRORIST DISLIKE madbitidhare😧",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Sikandar raza a shot hoditane antha torsidane, allinda field tegdirod a ball ige. ella script tara ansathe.",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Yappa dove ranira",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Mannige anna ??",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "100% sathya. Yella Hindugalu nodale bekada Cinema. Secularist cpartiyavarella idannu allgaledu, adu isolated incident, idee Islam community aathara illa anta, sabara manege hogi bandu, sabara ghandasarannu maneyalli serisidare, ade ghandasu ondu dina nimma magalu, hendati, soseyarannu harisikonda hoda mele nimage gottaguttade. Astorolagagale, kala meeriruttade. Neevu sayuva varegu kanneridutta koragi sayutteeri",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nimmantha aadarsha sikshakaru nadina thumbella beku",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Very good Vikas bro eantha chapper munde gale ban age beku we all karnataka support Vikas bro.....",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "How cruel these peacefulls ?? eedi prapanchakke ketta hulugalu",
+      "true_cat": 2,
+      "pred_cat": 4
+    },
+    {
+      "type": "Category_Error",
+      "text": "intharavarennalla public munde galligerasbeku",
+      "true_cat": 4,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "Tu students West ,Bari aligetion🤫🤫🤫🤫",
+      "true_cat": 4,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Hitler neina appa",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Congress thata",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "LongsulimakLu eaga bandare mudiya sulimaga",
+      "true_cat": 0,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Matadi sir, murkharante matanadabedi. Vayassu mugitide. Innadaru nimma duralochane bidi. Yava muslim bhandavaru?tax collected from hindus while buying halal goes to kill hindus.",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Thu lofer Nan makla TRP goskara innu enen madbekro batte bicchi bettale torsodu sadhane ???? <br>Sadhane padada arthane kedsudru ea Btv avru thu.. ivr yogyatege",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nivugalu idanna yaaru shuru madidre avarige helbeku, etige ediretu idde itatte. Idu Sanatan Hindu rashtra, namma sanatana dharamada bagge matanaduvashtu prabhuddate ivaryarigu illa..",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Hindugalu ivagaladru yechetgondila andre , nale HINDUSTAN FILES antha film bandru ascharya illa .",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Pust B tv ankarige metta takand hodibeku guru vikash Anna super guru",
+      "true_cat": 4,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Yella bittavu big boss ge doddavu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Olleee child chapathi thara adthiya",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Aa ugragamiyannu hididu gallu shikshe kodabeku",
+      "true_cat": 4,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Jai sri ram <br>Bevarsi BABAR <br>Kothnanmaga AKBAR<br>JAI HINDU",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Kelage cut madisko mudiya",
+      "true_cat": 4,
+      "pred_cat": 2
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nale first night full josh naresh",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "loafer NANN maga bolimaga sidda ivanu namma desha haalu matane",
+      "true_cat": 1,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Kiccha Sudeep sir and big boss director Parma ge.. yavdralli gunna hodibeku heli.. yaro evella taradugalu... nam deshada karma evella",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Lo gandhu stop ur stupid mouth nimmajji",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "aagadare bjp ya intelligence failure aagideyo ? Bjp Rss leaders nayakarugala yennu makkalu muslimara jothe maduye aadare love jihada illa kevala bada hindu yennu makkalu mathra muslim ara jothe maduve aagabharadu idu yava kanoon",
+      "true_cat": 1,
+      "pred_cat": 2
+    },
+    {
+      "type": "Binary_Error",
+      "text": "namm dam irodu ivarige neer kodakkalla",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Rohit Sharma dhu out irila edake en anthiya bro edru bagge mathu adu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Randi ninu sulene ninage sule annada Garathi antara .....ninnatha 3 bittolana interview madata eddare all e tv yavaru first evarige ogeebeku",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "BTV en professional news channel or sonu goobe avr mane na",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Estella adru hakond bandiro batte nodu maryadi bittavalu",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Binary_Error",
+      "text": "COVID barodakke ivare karana",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "<a href=\"[URL] anchor be like &#39;adu avl hanebaraha&#39; ante????",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "devru anta idre ningr satta melu Elli nemmadi kodade ietane",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "So called Bhikaatigalu 10 kg Akki ge Baliyagbardu , Adrallo benglurigalu secularigalige vote haakbardu modiji kodu Akkige Tamma Lebell Antisi Naau kotteu antha Bogalu bhattrige ban madi",
+      "true_cat": 3,
+      "pred_cat": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "And vishya gottilde en eno hakod alla shaaaaakle beku video antha.. this was reported during Ind vs Aus series.",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Nehru madida yedavatininda indigu india novu anubavisutide",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Aruna kumarina kalsi elli papa umapthinu ivre blackmail madsirbeku papa umapathi sir",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Randdig hoti daur <br>Newo na LHANGA PULKA <br>UTKUND BARI NIMAUN HADA",
+      "true_cat": 0,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ivattu correct aagi matadidiya maga",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Yaaru maatadbardu.........e mudiya siddange",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "1 run ninu nu hodibodu",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Avanu yentha supreme court judge guru.... muchkondu Karnataka bandh madi one week.... bagillu muchhhi sariyagi",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Sidramayya mathu chanagide antha nammbakke hogbedi",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Mannig yen tintare ante ????yenta maat guru",
+      "true_cat": 5,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ban maadi 5yrs ajji admele nodona",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Sidramulla kaan annta helltiyalla nim avvan name onnde nim appandhuke helu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Evarige The Kashmir Files movie torasi",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Category_Error",
+      "text": "Pratham nin avvan...elli narasipura elli kashmira...pratham akkan dengi",
+      "true_cat": 0,
+      "pred_cat": 3
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Sonu yaru enadru ankollalli bidama bejar madkobeda",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Ayogya nannamagane yav hengsu hettidalo ninna",
+      "true_cat": 0,
+      "pred_cat": 4
+    },
+    {
+      "type": "Binary_Error",
+      "text": "kettad madidre congress jds,olledu madidre bjp😂",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Bolimaklu nimge dum idre jatka cut tindu torisi..",
+      "true_cat": 4,
+      "pred_cat": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Intavrinda desha haalaagtirodu.stop fantasizing babar,akbar,tippu. Saaku nillisi.<br>Aavattu bere vidhi illa convert aadavaru ivattu naanu Islam ge huttidavnu ankondu hindu galla avahelana maadtidaare.<br>Islam illi bandiddu hege first tillkolli.<br>Dharma nimmista,aadre nimma roots tillkollodu nimma kartavya.",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "BJP government first badukiro aa ugragaamina gallige erisi",
+      "true_cat": 4,
+      "pred_cat": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "[USER] Yerihakkal hu zee5 alli nodi",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Kashmira da bagge.Hindu pandithara. Narameda.agithu.antha kelthane Beledidevu.ega. sampoorna.Artha.agide.thumba.Bejar.aguthe",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Yantha magalige jalama kotte antha think madatirthare😂",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Chandan , machine inda cut madirodu satya but adakku munche aa woman mele gang rape thumba bayankara agide adanna thorisilla , rape nantara they cut her 2 piece with machine .",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Ega petrol bunknalli kelasa madiddu saku. Ega neenyen madbekandre cy le odibeku one year . Manege hogi hagilla gotaytha puneeth",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "Bere yaru sikkilva nimge interview maddake entha poligale beka",
+      "true_cat": 0,
+      "pred_cat": 5
+    },
+    {
+      "type": "Category_Error",
+      "text": "boli maga tanu bp jasti madkondu namdu jasti madtane",
+      "true_cat": 0,
+      "pred_cat": 1
+    },
+    {
+      "type": "Binary_Error",
+      "text": "40% golmall govt. Jai siddu",
+      "true_label": 1,
+      "pred_label": 0
+    },
+    {
+      "type": "Binary_Error",
+      "text": "Yes love jihad ide. Adu namma karnataka dallu ide. E varadiyalli neevu love jihad ge sambanda patta news paper cuttings collect Madi helidre innu channagitthu....",
+      "true_label": 0,
+      "pred_label": 1
+    },
+    {
+      "type": "Category_Error",
+      "text": "ivella yavu nayigalu",
+      "true_cat": 5,
+      "pred_cat": 0
+    }
+  ]
+}

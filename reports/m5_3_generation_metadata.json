@@ -1,0 +1,18 @@
+{
+  "model": "mock-llm-script (Deterministic implementation)",
+  "prompt_template_version": "V1",
+  "prompt_template": "You are an expert counter-speech generator.\nTask: Generate constructive counter-speech for the provided hate speech context.\nConstraints:\n- Must be constructive and de-escalating.\n- No counter-hate or attacking the speaker.\n- No threats or violent escalation.\n- No discriminatory language.\n- Do not reinforce the hateful premise.\n- Be factual and empathetic where appropriate.\n\nHate Speech Context: {hate_text}\nCategory: {category}",
+  "timestamp": "2026-10-04T16:32:23.996206Z",
+  "stats": {
+    "generated": 21,
+    "rejected_safety": 3,
+    "rejected_leakage": 0,
+    "rejected_duplicate": 0,
+    "retained": 18
+  },
+  "rejection_reasons": {
+    "hate reinforcement": 1,
+    "threats or violent escalation": 1,
+    "discriminatory language": 1
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "accounting": {
+    "m52": {
+      "input": 19436,
+      "approved": 1153,
+      "human_review": 17309,
+      "rejected": 974
+    },
+    "m53": {
+      "input": 18,
+      "approved": 18,
+      "human_review": 0,
+      "rejected": 0
+    }
+  },
+  "category_distribution": {
+    "Religion": 400,
+    "Gender": 352,
+    "Geo-political": 230,
+    "Others": 171,
+    "Political": 11,
+    "Violence": 7
+  },
+  "provenance_distribution": {
+    "existing-dataset": 1153,
+    "llm-assisted": 18
+  },
+  "safety_rejection_reasons": {
+    "LLM safety score < 4": 974
+  },
+  "quality_rejection_reasons": {},
+  "human_review_outcomes": {
+    "approved_llm_assisted": 18,
+    "pending_borderline": 17309
+  },
+  "audit_outcomes": {
+    "passed": 49,
+    "failed": 0
+  },
+  "final_approved_kb_count": 1171
+}
