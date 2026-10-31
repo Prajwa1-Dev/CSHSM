@@ -358,3 +358,28 @@ def test_kb_review_queue_endpoint(client):
     assessment = first["ai_assessment"]
     assert assessment["recommendation"] in ["acceptable_with_caveats", "revise", "reject"]
     assert assessment["human_approved"] is False
+
+
+# =====================================================================
+# Hybrid Gemini Configuration Tests
+# =====================================================================
+
+def test_create_app_with_hybrid_gemini_flag(monkeypatch):
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    app = create_app(test_config={"TESTING": True}, use_live_gemini=True)
+    client = app.test_client()
+
+    res = client.get("/api/health")
+    assert res.status_code == 200
+    data = res.get_json()
+    assert data["status"] == "ok"
+
+
+def test_create_app_with_hybrid_gemini_env_var(monkeypatch):
+    monkeypatch.setenv("CSHSM_USE_LIVE_GEMINI", "true")
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    app = create_app(test_config={"TESTING": True})
+    client = app.test_client()
+
+    res = client.get("/api/health")
+    assert res.status_code == 200

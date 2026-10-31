@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-10-24T18:31:20.583538+00:00",
-  "run_id": "bge_m3_mock_20261024_183120_1f0f5560",
-  "run_dir": "runs\\bge_m3_mock_20261024_183120_1f0f5560",
+  "timestamp": "2026-10-31T20:03:57.931563+00:00",
+  "run_id": "bge_m3_mock_20261031_200357_2a5d29b1",
+  "run_dir": "runs\\bge_m3_mock_20261031_200357_2a5d29b1",
   "model_identifier": "MOCK-EMBEDDER-TEST-ONLY",
   "is_mock": true,
   "embedding_dimension": 1024,
@@ -10,7 +10,7 @@
   "kb_scope": "approved_kb",
   "approval_status": "approved",
   "batch_size": 4,
-  "input_file": "C:\\Users\\user\\AppData\\Local\\Temp\\pytest-of-user\\pytest-46\\test_disk_resolver_fails_close2\\test.jsonl",
+  "input_file": "C:\\Users\\tejaswi\\AppData\\Local\\Temp\\pytest-of-tejaswi\\pytest-11\\test_disk_resolver_fails_close2\\test.jsonl",
   "input_file_sha256": "f613f58d2b77b33b72b343a65d136c1e54bf1174932c681aaac205abf27a0f2a",
   "raw_record_count": 1,
   "skipped_record_count": 0,
@@ -23,11 +23,11 @@
     "vector_file": "bge_m3_mock_dense.npy",
     "vector_sha256": "f75dfb1fa28c1c561a90c2a46fc2a49e7c5d53d5cf6d0ad51eeb20efa23aecc6",
     "manifest_file": "bge_m3_mock_manifest.jsonl",
-    "manifest_sha256": "0c3fc0c196396588e88e72db47ede3185569f44aa388776cf5af0fd8177ca16a",
+    "manifest_sha256": "8d002f004f8a567c689131693992ed3d7b1377f6c05643f97b63981d60ac77df",
     "report_file": "m6_embedding_report.json",
     "commit_marker": "COMMITTED",
     "latest_pointer": "LATEST.json",
-    "authoritative_run_dir": "C:\\Users\\user\\AppData\\Local\\Temp\\pytest-of-user\\pytest-46\\test_disk_resolver_fails_close2\\embeddings\\runs\\bge_m3_mock_20261024_183120_1f0f5560"
+    "authoritative_run_dir": "C:\\Users\\tejaswi\\AppData\\Local\\Temp\\pytest-of-tejaswi\\pytest-11\\test_disk_resolver_fails_close2\\embeddings\\runs\\bge_m3_mock_20261031_200357_2a5d29b1"
   },
   "disclaimer": "APPROVED KB \u2014 Formally evaluated and approved counter-speech knowledge base.",
   "mock_notice": "MOCK EMBEDDINGS \u2014 Strictly for tests and engineering validation.",

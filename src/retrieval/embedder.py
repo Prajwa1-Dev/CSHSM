@@ -27,7 +27,8 @@ def save_npy_f32(filepath: str, data: List[List[float]], shape: Tuple[int, int])
     try:
         import numpy as np
         arr = np.array(data, dtype=np.float32)
-        np.save(filepath, arr)
+        with open(filepath, "wb") as f:
+           np.save(f, arr)
         return
     except ImportError:
         pass

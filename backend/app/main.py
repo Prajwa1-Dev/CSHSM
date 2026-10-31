@@ -22,8 +22,17 @@ from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 from flask import Flask, request, jsonify, Response, render_template
 
-# Add project root to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+# Add project root to sys.path and load environment variables from root .env
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.append(_PROJECT_ROOT)
+
+_ENV_PATH = os.path.join(_PROJECT_ROOT, ".env")
+if os.path.isfile(_ENV_PATH):
+    try:
+        from dotenv import load_dotenv
+        load_dotenv(dotenv_path=_ENV_PATH, override=False)
+    except ImportError:
+        pass
 
 from src.pipeline.orchestrator import (
     PipelineOrchestrator,
@@ -34,7 +43,8 @@ from src.pipeline.orchestrator import (
 
 def create_app(
     orchestrator: Optional[PipelineOrchestrator] = None,
-    test_config: Optional[Dict[str, Any]] = None
+    test_config: Optional[Dict[str, Any]] = None,
+    use_live_gemini: bool = False
 ) -> Flask:
     """
     Application factory for the CSHSM REST API backend.
@@ -45,7 +55,10 @@ def create_app(
 
     # Initialize or inject pipeline orchestrator
     if orchestrator is None:
-        pipeline = create_default_pipeline(use_mock=True, threshold=0.80)
+        enable_gemini = use_live_gemini or (
+            os.getenv("CSHSM_USE_LIVE_GEMINI", "").strip().lower() in ("1", "true", "yes")
+        )
+        pipeline = create_default_pipeline(use_mock=True, threshold=0.80, use_live_gemini=enable_gemini)
     else:
         pipeline = orchestrator
 

@@ -404,7 +404,7 @@ def test_real_providers_unconfigured_credentials_fail_closed(monkeypatch):
     real_adapters = [
         OpenAIAdapter(model_id="gpt-4o-mini"),
         AnthropicAdapter(model_id="claude-3-haiku"),
-        GoogleGeminiAdapter(model_id="gemini-1.5-flash"),
+        GoogleGeminiAdapter(model_id="gemini-3.8-flash"),
         MistralAdapter(model_id="mistral-small"),
         CohereAdapter(model_id="command-r")
     ]
@@ -444,3 +444,85 @@ def test_fan_out_initialization_validations():
     with pytest.raises(ValueError, match="at most 5 adapter slots"):
         too_many = [MockModelAdapter(model_id=f"m-{i}") for i in range(6)]
         GenerationFanOut(adapters=too_many)
+
+
+# =====================================================================
+# 10. Hybrid Gemini-Live Fan-Out Tests
+# =====================================================================
+
+def test_default_fan_out_has_five_mocks():
+    fan_out = create_default_fan_out()
+    assert len(fan_out.adapters) == 5
+    for adapter in fan_out.adapters:
+        assert adapter.is_mock is True
+        assert adapter.provider == "mock"
+
+
+def test_existing_all_live_mode_unchanged():
+    fan_out = create_default_fan_out(use_mock=False)
+    assert len(fan_out.adapters) == 5
+    expected_providers = ["openai", "anthropic", "google", "mistral", "cohere"]
+    for idx, adapter in enumerate(fan_out.adapters):
+        assert adapter.is_mock is False
+        assert adapter.provider == expected_providers[idx]
+
+
+def test_hybrid_fan_out_one_live_gemini_four_mocks():
+    fan_out = create_default_fan_out(use_live_gemini=True)
+    assert len(fan_out.adapters) == 5
+
+    # Slot 1: Mock OpenAI
+    assert fan_out.adapters[0].is_mock is True
+    assert fan_out.adapters[0].provider == "mock"
+    assert fan_out.adapters[0].model_id == "mock-openai-gpt4o-mini"
+
+    # Slot 2: Mock Anthropic
+    assert fan_out.adapters[1].is_mock is True
+    assert fan_out.adapters[1].provider == "mock"
+    assert fan_out.adapters[1].model_id == "mock-anthropic-claude3-haiku"
+
+    # Slot 3: Live GoogleGeminiAdapter (real API)
+    assert fan_out.adapters[2].is_mock is False
+    assert fan_out.adapters[2].provider == "google"
+    assert fan_out.adapters[2].model_id == "gemini-3.8-flash"
+
+    # Slot 4: Mock Mistral
+    assert fan_out.adapters[3].is_mock is True
+    assert fan_out.adapters[3].provider == "mock"
+    assert fan_out.adapters[3].model_id == "mock-mistral-small"
+
+    # Slot 5: Mock Cohere
+    assert fan_out.adapters[4].is_mock is True
+    assert fan_out.adapters[4].provider == "mock"
+    assert fan_out.adapters[4].model_id == "mock-cohere-command-r"
+
+    # Exact counts: exactly 1 live, 4 mocks
+    live_count = sum(1 for a in fan_out.adapters if not a.is_mock)
+    mock_count = sum(1 for a in fan_out.adapters if a.is_mock)
+    assert live_count == 1
+    assert mock_count == 4
+
+
+def test_hybrid_fan_out_missing_gemini_credentials_fails_closed(monkeypatch):
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+
+    fan_out = create_default_fan_out(use_live_gemini=True)
+    req = GenerationRequest(query_text="Sample hate context", category="Religion")
+    result = fan_out.execute(req)
+
+    # 4 mocks succeed, 1 live fails closed due to missing credentials
+    assert result.total_slots == 5
+    assert result.successful_slots == 4
+    assert result.failed_slots == 1
+    assert result.status == "PARTIAL_SUCCESS"
+    assert len(result.safe_candidates) == 4
+
+    # Slot 3 record must report UNCONFIGURED_CREDENTIALS / AUTH_ERROR
+    gemini_rec = result.execution_records[2]
+    assert gemini_rec.slot_index == 2
+    assert gemini_rec.model_id == "gemini-3.8-flash"
+    assert gemini_rec.provider == "google"
+    assert gemini_rec.is_mock is False
+    assert gemini_rec.status == "UNCONFIGURED_CREDENTIALS"
+    assert gemini_rec.error_category == "AUTH_ERROR"
+    assert "Missing credentials" in gemini_rec.error_message

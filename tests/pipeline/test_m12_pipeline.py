@@ -444,3 +444,38 @@ def test_pipeline_result_serialization_and_immutability(standard_pipeline):
     assert "component_statuses" in loaded
     assert "provenance" in loaded
     assert "disclaimer" in loaded
+
+
+# =====================================================================
+# Hybrid Gemini-Live Pipeline Tests
+# =====================================================================
+
+def test_hybrid_pipeline_keeps_mock_components_and_allow_mock_true(mock_retriever):
+    pipeline = create_default_pipeline(retriever=mock_retriever, use_live_gemini=True)
+
+    assert pipeline.allow_mock is True
+    assert isinstance(pipeline.classifier, MockClassifier)
+    assert isinstance(pipeline.ranker.evaluator, MockCandidateEvaluator)
+    assert pipeline.router.retriever.embedder.is_mock is True
+
+    # Fan-out: exactly slot 3 is real Google, others mock
+    adapters = pipeline.fan_out.adapters
+    assert len(adapters) == 5
+    assert adapters[2].is_mock is False
+    assert adapters[2].provider == "google"
+    assert all(adapters[i].is_mock for i in (0, 1, 3, 4))
+
+
+def test_hybrid_pipeline_with_unconfigured_gemini_fails_closed_safely(mock_retriever, monkeypatch):
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+
+    pipeline = create_default_pipeline(retriever=mock_retriever, use_live_gemini=True, threshold=0.99)
+    # High threshold forces fallback to generation fan-out
+    result = pipeline.process("Hateful query that routes to generation")
+
+    assert result.outcome == "GENERATED_RESPONSE"
+    assert result.safe_fallback_triggered is False
+    assert result.candidate_id is not None
+    # Provenance tracks generation fan-out with partial success
+    assert "fan_out_result" in result.provenance
+    assert result.provenance["fan_out_result"]["status"] == "PARTIAL_SUCCESS"

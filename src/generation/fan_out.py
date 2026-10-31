@@ -511,31 +511,50 @@ class GenerationFanOut:
 
 def create_default_fan_out(
     use_mock: bool = True,
-    mock_responses: Optional[List[str]] = None
+    mock_responses: Optional[List[str]] = None,
+    use_live_gemini: bool = False
 ) -> GenerationFanOut:
     """
     Constructs a standard 5-model fan-out instance.
 
-    If use_mock is True, initializes 5 distinct deterministic mock adapters:
-      Slot 1: mock-openai-gpt4o-mini
-      Slot 2: mock-anthropic-claude3-haiku
-      Slot 3: mock-google-gemini15-flash
-      Slot 4: mock-mistral-small
-      Slot 5: mock-cohere-command-r
+    Modes:
+      - All-Mock (default: use_mock=True, use_live_gemini=False):
+          5 distinct deterministic mock adapters:
+            Slot 1: mock-openai-gpt4o-mini
+            Slot 2: mock-anthropic-claude3-haiku
+            Slot 3: mock-google-gemini15-flash
+            Slot 4: mock-mistral-small
+            Slot 5: mock-cohere-command-r
 
-    If use_mock is False, initializes genuine provider adapters configured via environment variables.
+      - Hybrid Gemini-Live (use_live_gemini=True):
+          Slot 1: mock-openai-gpt4o-mini (mock)
+          Slot 2: mock-anthropic-claude3-haiku (mock)
+          Slot 3: GoogleGeminiAdapter (real live API, reads GOOGLE_API_KEY)
+          Slot 4: mock-mistral-small (mock)
+          Slot 5: mock-cohere-command-r (mock)
+
+      - All-Live (use_mock=False, use_live_gemini=False):
+          5 genuine provider adapters configured via environment variables.
     """
-    if use_mock:
-        default_responses = [
-            "Diversity of perspectives strengthens society. Respectful discussion is always more productive than hatred.",
-            "Dehumanizing entire groups harms everyone. Let us focus on individual actions rather than broad prejudice.",
-            "Constructive disagreement is natural, but hostility and slurs only deepen misunderstandings.",
-            "Everyone deserves dignity and safety regardless of their background or identity.",
-            "Stereotyping creates unnecessary divisions. Empathy and factual understanding build healthier communities."
-        ]
-        responses = mock_responses or default_responses
+    default_responses = [
+        "Diversity of perspectives strengthens society. Respectful discussion is always more productive than hatred.",
+        "Dehumanizing entire groups harms everyone. Let us focus on individual actions rather than broad prejudice.",
+        "Constructive disagreement is natural, but hostility and slurs only deepen misunderstandings.",
+        "Everyone deserves dignity and safety regardless of their background or identity.",
+        "Stereotyping creates unnecessary divisions. Empathy and factual understanding build healthier communities."
+    ]
+    responses = mock_responses or default_responses
 
+    if use_live_gemini:
         adapters: List[BaseModelAdapter] = [
+            MockModelAdapter(model_id="mock-openai-gpt4o-mini", provider="mock", canned_response=responses[0 % len(responses)]),
+            MockModelAdapter(model_id="mock-anthropic-claude3-haiku", provider="mock", canned_response=responses[1 % len(responses)]),
+            GoogleGeminiAdapter(model_id="gemini-3.8-flash"),
+            MockModelAdapter(model_id="mock-mistral-small", provider="mock", canned_response=responses[3 % len(responses)]),
+            MockModelAdapter(model_id="mock-cohere-command-r", provider="mock", canned_response=responses[4 % len(responses)])
+        ]
+    elif use_mock:
+        adapters = [
             MockModelAdapter(model_id="mock-openai-gpt4o-mini", provider="mock", canned_response=responses[0 % len(responses)]),
             MockModelAdapter(model_id="mock-anthropic-claude3-haiku", provider="mock", canned_response=responses[1 % len(responses)]),
             MockModelAdapter(model_id="mock-google-gemini15-flash", provider="mock", canned_response=responses[2 % len(responses)]),
@@ -546,7 +565,7 @@ def create_default_fan_out(
         adapters = [
             OpenAIAdapter(model_id="gpt-4o-mini"),
             AnthropicAdapter(model_id="claude-3-haiku-20240307"),
-            GoogleGeminiAdapter(model_id="gemini-1.5-flash"),
+            GoogleGeminiAdapter(model_id="gemini-3.8-flash"),
             MistralAdapter(model_id="mistral-small-latest"),
             CohereAdapter(model_id="command-r")
         ]

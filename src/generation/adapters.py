@@ -526,16 +526,16 @@ class AnthropicAdapter(BaseModelAdapter):
 
 class GoogleGeminiAdapter(BaseModelAdapter):
     """
-    Slot 3: Google Gemini API Adapter (e.g., gemini-1.5-flash).
+    Slot 3: Google Gemini API Adapter (e.g., gemini-3.8-flash).
     Reads GOOGLE_API_KEY from environment. Fails closed if unconfigured.
     """
 
     def __init__(
         self,
-        model_id: str = "gemini-1.5-flash",
+        model_id: str = "gemini-3.8-flash",
         api_key_env_var: str = "GOOGLE_API_KEY",
         base_url: str = "https://generativelanguage.googleapis.com/v1beta",
-        timeout: float = 10.0
+        timeout: float = 60.0
     ):
         self._model_id = model_id
         self._api_key_env_var = api_key_env_var

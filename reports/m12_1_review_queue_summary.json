@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-24T17:04:27.398060+00:00",
+  "timestamp": "2026-10-31T18:14:04.905336+00:00",
   "input_file": "data/counter_speech_kb/filtered_candidates.jsonl",
   "output_file": "data/counter_speech_kb/review_queue.jsonl",
   "total_records_sampled": 28,

@@ -625,21 +625,58 @@ def create_default_pipeline(
     classifier: Optional[BaseClassifier] = None,
     use_mock: bool = True,
     threshold: float = 0.80,
-    fallback_message: str = PipelineOrchestrator.DEFAULT_FALLBACK_MESSAGE
+    fallback_message: str = PipelineOrchestrator.DEFAULT_FALLBACK_MESSAGE,
+    cleaner: Optional[TextCleaner] = None,
+    use_live_gemini: bool = False
 ) -> PipelineOrchestrator:
     """
-    Factory creating a fully wired CSHSM pipeline.
+    Factory constructing a fully wired PipelineOrchestrator.
 
-    If use_mock is True:
-      - Uses MockClassifier, MockRetriever (if retriever not provided), Mock Fan-Out,
-        MockCandidateEvaluator, and FinalSafetyGate with allow_mock=True.
-    If use_mock is False:
-      - Attempts to load production XLM-R classifier, committed M6 retriever run,
-        live LLM evaluators, and enforces allow_mock=False.
+    Modes:
+      - All-Mock (default: use_mock=True, use_live_gemini=False):
+          Mock classifier, mock retriever, mock fan-out (5 mocks), mock evaluator.
+      - Hybrid Gemini-Live (use_live_gemini=True):
+          Retains mock classifier, mock retriever, mock evaluator, and allow_mock=True,
+          but activates hybrid fan-out (1 live Gemini in slot 3 + 4 mocks).
+      - All-Live (use_mock=False, use_live_gemini=False):
+          Production XLMR classifier, committed FAISS retriever, all-live fan-out, LLM judge evaluator.
     """
-    cleaner = TextCleaner()
+    cleaner = cleaner or TextCleaner()
 
-    if use_mock:
+    if use_live_gemini:
+        if classifier is None:
+            canned = {
+                "Have a wonderful, peaceful, and blessed day with your family!": ClassifierOutput(
+                    is_hate=False,
+                    category=None,
+                    confidence=0.99,
+                    model_id="mock-xlmr-multitask",
+                    is_mock=True,
+                    metadata={"reason": "preset_non_hate"}
+                ),
+                "Have a wonderful and blessed day with your family!": ClassifierOutput(
+                    is_hate=False,
+                    category=None,
+                    confidence=0.99,
+                    model_id="mock-xlmr-multitask",
+                    is_mock=True,
+                    metadata={"reason": "preset_non_hate"}
+                ),
+            }
+            classifier = MockClassifier(
+                default_is_hate=True,
+                default_category="religion",
+                default_confidence=0.95,
+                canned_predictions=canned
+            )
+        if retriever is None:
+            retriever = create_mock_retriever()
+        fan_out = create_default_fan_out(use_mock=True, use_live_gemini=True)
+        evaluator = MockCandidateEvaluator()
+        ranker = CandidateRanker(evaluator=evaluator)
+        final_gate = FinalSafetyGate(fallback_message=fallback_message)
+        allow_mock = True
+    elif use_mock:
         if classifier is None:
             canned = {
                 "Have a wonderful, peaceful, and blessed day with your family!": ClassifierOutput(
@@ -671,6 +708,7 @@ def create_default_pipeline(
         evaluator = MockCandidateEvaluator()
         ranker = CandidateRanker(evaluator=evaluator)
         final_gate = FinalSafetyGate(fallback_message=fallback_message)
+        allow_mock = True
     else:
         if classifier is None:
             from src.pipeline.classifier import XLMROracleClassifier
@@ -682,6 +720,7 @@ def create_default_pipeline(
         evaluator = LLMJudgeEvaluator()
         ranker = CandidateRanker(evaluator=evaluator)
         final_gate = FinalSafetyGate(fallback_message=fallback_message)
+        allow_mock = False
 
     router = FallbackRouter(retriever=retriever, default_threshold=threshold)
 
@@ -692,7 +731,7 @@ def create_default_pipeline(
         ranker=ranker,
         final_gate=final_gate,
         cleaner=cleaner,
-        allow_mock=use_mock,
+        allow_mock=allow_mock,
         threshold=threshold,
         fallback_message=fallback_message
     )
