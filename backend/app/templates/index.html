@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSHSM — Counter-Speech Research System</title>
+  <style>
+    :root {
+      --bg-base: #0b0f17;
+      --bg-surface: #111827;
+      --bg-card: #1f2937;
+      --bg-card-hover: #283548;
+      --border-subtle: #374151;
+      --border-focus: #6366f1;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --accent-indigo: #6366f1;
+      --accent-indigo-bg: rgba(99, 102, 241, 0.15);
+      --accent-emerald: #10b981;
+      --accent-emerald-bg: rgba(16, 185, 129, 0.15);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-bg: rgba(6, 182, 212, 0.15);
+      --accent-amber: #f59e0b;
+      --accent-amber-bg: rgba(245, 158, 11, 0.15);
+      --accent-rose: #f43f5e;
+      --accent-rose-bg: rgba(244, 63, 94, 0.15);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-stack);
+      line-height: 1.5;
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+      width: 100%;
+    }
+
+    /* Header */
+    header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 18px 0;
+    }
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+    }
+    .brand-title h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .brand-title p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .system-badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .badge-mock {
+      background: var(--accent-amber-bg);
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .badge-live {
+      background: var(--accent-emerald-bg);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .badge-retrieved {
+      background: var(--accent-cyan-bg);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+    .badge-generated {
+      background: var(--accent-indigo-bg);
+      color: var(--accent-indigo);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    .badge-fallback {
+      background: var(--accent-amber-bg);
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .badge-nonhate {
+      background: var(--accent-emerald-bg);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Disclaimer Banner */
+    .banner-mock {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 13px;
+      color: #fbbf24;
+    }
+    .banner-mock strong { font-weight: 700; color: #fef3c7; }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 24px;
+    }
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .nav-btn:hover { color: var(--text-main); }
+    .nav-btn.active {
+      color: var(--accent-indigo);
+      border-bottom-color: var(--accent-indigo);
+    }
+
+    /* Grid Layout */
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    @media (min-width: 900px) {
+      .layout-grid { grid-template-columns: 1.15fr 0.85fr; }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Preset Buttons */
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .preset-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .preset-btn:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+      border-color: var(--accent-indigo);
+    }
+
+    /* Textarea & Controls */
+    textarea {
+      width: 100%;
+      height: 120px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    textarea:focus { border-color: var(--border-focus); }
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+    }
+    .char-count { font-size: 12px; color: var(--text-dim); }
+    .btn-submit {
+      background: var(--accent-indigo);
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: #4f46e5;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Pipeline Trace (DAG) */
+    .dag-container {
+      margin-top: 24px;
+    }
+    .dag-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+    .dag-node {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      transition: all 0.2s ease;
+    }
+    .dag-node.active-pass {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(16, 185, 129, 0.05);
+    }
+    .dag-node.active-skip {
+      border-color: rgba(156, 163, 175, 0.3);
+      opacity: 0.65;
+    }
+    .dag-node.active-fail {
+      border-color: rgba(244, 63, 94, 0.5);
+      background: rgba(244, 63, 94, 0.05);
+    }
+    .dag-node-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .dag-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .dag-name { font-size: 14px; font-weight: 600; color: #fff; }
+    .dag-desc { font-size: 12px; color: var(--text-muted); }
+    .dag-status { font-size: 12px; font-weight: 700; }
+
+    /* Results Card */
+    .result-banner {
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .result-banner.RETRIEVED_RESPONSE { background: var(--accent-cyan-bg); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
+    .result-banner.GENERATED_RESPONSE { background: var(--accent-indigo-bg); color: var(--accent-indigo); border: 1px solid rgba(99, 102, 241, 0.3); }
+    .result-banner.NON_HATE_EARLY_EXIT { background: var(--accent-emerald-bg); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .result-banner.SAFE_FALLBACK { background: var(--accent-amber-bg); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    .response-box {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .response-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 6px; }
+    .response-text { font-size: 15px; color: #fff; line-height: 1.6; }
+
+    .meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .meta-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .meta-pill strong { color: var(--text-main); }
+
+    .disclaimer-box {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid var(--accent-amber);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    /* JSON Drawer */
+    details {
+      margin-top: 18px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    summary {
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+    summary:hover { color: var(--text-main); }
+    pre {
+      padding: 14px;
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #93c5fd;
+      overflow-x: auto;
+      max-height: 300px;
+      background: #090d14;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    /* Review Queue Table */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    th {
+      background: var(--bg-card);
+      padding: 12px 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      vertical-align: top;
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    .rec-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .rec-acceptable_with_caveats { background: var(--accent-emerald-bg); color: var(--accent-emerald); }
+    .rec-revise { background: var(--accent-amber-bg); color: var(--accent-amber); }
+    .rec-reject { background: var(--accent-rose-bg); color: var(--accent-rose); }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      padding: 24px 0;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      font-size: 12px;
+      color: var(--text-dim);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="container header-content">
+      <div class="brand">
+        <div class="brand-icon">CS</div>
+        <div class="brand-title">
+          <h1>CSHSM — Counter-Speech Research System</h1>
+          <p>Hybrid Adaptive Hate Speech Detection & Counter-Speech Orchestration</p>
+        </div>
+      </div>
+      <div class="system-badges">
+        <span class="badge badge-mock">
+          <span class="dot"></span> MOCK RESEARCH PROTOTYPE
+        </span>
+        <span class="badge badge-live" id="health-badge">
+          <span class="dot"></span> Connecting...
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+
+    <!-- Mock Mode Notice Banner -->
+    <div class="banner-mock">
+      <div style="font-size: 18px;">⚠️</div>
+      <div>
+        <strong>Research Simulation Active (₹0 Budget Protocol):</strong>
+        This research prototype is executing in deterministic mock mode. Hate classification, vector retrieval, and 5-model generation fan-out are simulated locally to prevent API costs. Knowledge base records remain <em>pending human review</em> and are not authorized for real production delivery.
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="nav-btn active" onclick="switchTab('tab-pipeline')">Live Pipeline & Trace</button>
+      <button class="nav-btn" onclick="switchTab('tab-kb')">Knowledge Base & AI Quality Review</button>
+      <button class="nav-btn" onclick="switchTab('tab-architecture')">System Architecture & Invariants</button>
+    </div>
+
+    <!-- TAB 1: Live Pipeline & Trace -->
+    <div id="tab-pipeline" class="tab-pane">
+      <div class="layout-grid">
+
+        <!-- Left Column: Input & DAG -->
+        <div>
+          <div class="card">
+            <div class="card-title">
+              <span>Input Comment</span>
+              <span style="font-size: 12px; font-weight: normal; color: var(--text-muted);">Select sample or enter text</span>
+            </div>
+
+            <!-- Presets -->
+            <div class="presets">
+              <button class="preset-btn" onclick="setPreset('non_hate')">1. Non-Hate Sample</button>
+              <button class="preset-btn" onclick="setPreset('retrieval')">2. Retrieval Match</button>
+              <button class="preset-btn" onclick="setPreset('generation')">3. Generation Fan-Out</button>
+              <button class="preset-btn" onclick="setPreset('toxic')">4. Safety Rejection</button>
+              <button class="preset-btn" onclick="setPreset('empty')">5. Empty Input</button>
+            </div>
+
+            <textarea id="comment-input" placeholder="Type or paste social media text here to analyze for hate speech and retrieve/generate counter-speech..."></textarea>
+
+            <div class="action-row">
+              <span class="char-count" id="char-count">0 characters</span>
+              <button class="btn-submit" id="btn-analyze" onclick="analyzeComment()">
+                <span id="btn-text">Analyze Comment</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pipeline Execution DAG -->
+          <div class="card dag-container">
+            <div class="card-title">
+              <span>Execution Pipeline Trace (DAG)</span>
+              <span id="trace-summary" style="font-size: 12px; font-weight: normal; color: var(--text-muted);">Awaiting submission</span>
+            </div>
+
+            <div class="dag-steps">
+              <div class="dag-node" id="dag-cleaner">
+                <div class="dag-node-info">
+                  <div class="dag-num">1</div>
+                  <div>
+                    <div class="dag-name">Text Preprocessing</div>
+                    <div class="dag-desc">Conservative unicode normalization & URL/mention masking (TextCleaner)</div>
+                  </div>
+                </div>
+                <div class="dag-status" id="status-cleaner">IDLE</div>
+              </div>
+
+              <div class="dag-node" id="dag-classifier">
+                <div class="dag-node-info">
+                  <div class="dag-num">2</div>
+                  <div>
+                    <div class="dag-name">Hate Classification</div>
+                    <div class="dag-desc">Multitask XLM-R / Mock Classifier (Hate vs Non-Hate & Category)</div>
+                  </div>
+                </div>
+                <div class="dag-status" id="status-classifier">IDLE</div>
+              </div>
+
+              <div class="dag-node" id="dag-router">
+                <div class="dag-node-info">
+                  <div class="dag-num">3</div>
+                  <div>
+                    <div class="dag-name">Vector Retrieval & Routing</div>
+                    <div class="dag-desc">Top-1 similarity evaluated against threshold &tau; (FallbackRouter)</div>
+                  </div>
+                </div>
+                <div class="dag-status" id="status-router">IDLE</div>
+              </div>
+
+              <div class="dag-node" id="dag-generation">
+                <div class="dag-node-info">
+                  <div class="dag-num">4</div>
+                  <div>
+                    <div class="dag-name">Generation Fan-Out</div>
+                    <div class="dag-desc">Concurrent 5-Model Fan-Out (OpenAI, Anthropic, Gemini, Mistral, Cohere)</div>
+                  </div>
+                </div>
+                <div class="dag-status" id="status-generation">IDLE</div>
+              </div>
+
+              <div class="dag-node" id="dag-ranking">
+                <div class="dag-node-info">
+                  <div class="dag-num">5</div>
+                  <div>
+                    <div class="dag-name">Evaluation & Ranking</div>
+                    <div class="dag-desc">Multi-criteria scoring & mandatory safety/relevance hard gates</div>
+                  </div>
+                </div>
+                <div class="dag-status" id="status-ranking">IDLE</div>
+              </div>
+
+              <div class="dag-node" id="dag-final_gate">
+                <div class="dag-node-info">
+                  <div class="dag-num">6</div>
+                  <div>
+                    <div class="dag-name">Final Safety Gate</div>
+                    <div class="dag-desc">Independent defense-in-depth safety filter & candidate integrity check</div>
+                  </div>
+                </div>
+                <div class="dag-status" id="status-final_gate">IDLE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Results & Provenance -->
+        <div>
+          <div class="card" id="results-card">
+            <div class="card-title">
+              <span>Pipeline Outcome & Response</span>
+              <span id="exec-time" style="font-size: 12px; font-weight: normal; color: var(--text-muted);">-- ms</span>
+            </div>
+
+            <div id="results-placeholder" style="padding: 40px 20px; text-align: center; color: var(--text-dim);">
+              <div style="font-size: 32px; margin-bottom: 12px;">⚡</div>
+              Submit a comment or click a sample preset above to execute the pipeline trace.
+            </div>
+
+            <div id="results-content" style="display: none;">
+              <!-- Outcome Banner -->
+              <div class="result-banner" id="outcome-banner">
+                <span id="outcome-badge" class="badge">--</span>
+                <span id="outcome-text">--</span>
+              </div>
+
+              <!-- Counter-Speech Response Box -->
+              <div class="response-box" id="response-box">
+                <div class="response-label" id="response-type-label">Response Text</div>
+                <div class="response-text" id="response-text-content">--</div>
+              </div>
+
+              <!-- Metadata Pills -->
+              <div class="meta-pills" id="meta-pills">
+                <div class="meta-pill">Is Hate: <strong id="meta-is-hate">--</strong></div>
+                <div class="meta-pill">Category: <strong id="meta-category">--</strong></div>
+                <div class="meta-pill">Confidence: <strong id="meta-confidence">--</strong></div>
+                <div class="meta-pill">Source: <strong id="meta-source">--</strong></div>
+                <div class="meta-pill">Quality: <strong id="meta-quality">--</strong></div>
+                <div class="meta-pill">Human Audited: <strong id="meta-human-audited">false</strong></div>
+              </div>
+
+              <!-- Disclaimer -->
+              <div class="disclaimer-box" id="disclaimer-content">
+                --
+              </div>
+
+              <!-- Full JSON Drawer -->
+              <details>
+                <summary>Inspect Raw JSON Telemetry & Provenance</summary>
+                <pre><code id="json-telemetry">{}</code></pre>
+              </details>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: Knowledge Base & Review Queue -->
+    <div id="tab-kb" class="tab-pane" style="display: none;">
+      <div class="card">
+        <div class="card-title">
+          <span>Knowledge Base Metrics & CSHSM Review Queue</span>
+          <span class="badge badge-mock">28 Sampled Candidates</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="font-size: 12px; color: var(--text-dim);">Source Candidates</div>
+            <div style="font-size: 24px; font-weight: 700; color: #fff;">19,436</div>
+            <div style="font-size: 11px; color: var(--text-muted);">CONAN & Multitarget-CONAN</div>
+          </div>
+          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="font-size: 12px; color: var(--text-dim);">Review Queue Sample</div>
+            <div style="font-size: 24px; font-weight: 700; color: var(--accent-indigo);">28</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Stratified Across 4 Categories</div>
+          </div>
+          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="font-size: 12px; color: var(--text-dim);">Human Approved KB</div>
+            <div style="font-size: 24px; font-weight: 700; color: var(--accent-amber);">0</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Pending Human Audit Session</div>
+          </div>
+          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="font-size: 12px; color: var(--text-dim);">AI Assessment Triage</div>
+            <div style="font-size: 24px; font-weight: 700; color: var(--accent-emerald);">23 Accept / 3 Rev / 2 Rej</div>
+            <div style="font-size: 11px; color: var(--text-muted);">reports/m12_1_ai_quality_review.json</div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>KB ID</th>
+                <th>Category</th>
+                <th>Hate Speech Prompt</th>
+                <th>Candidate Counter-Speech</th>
+                <th>AI Quality Recommendation</th>
+              </tr>
+            </thead>
+            <tbody id="queue-table-body">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading review queue data from backend...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: System Architecture & Invariants -->
+    <div id="tab-architecture" class="tab-pane" style="display: none;">
+      <div class="card">
+        <div class="card-title">
+          <span>CSHSM Frozen Architecture & Research Invariants</span>
+        </div>
+        <div style="font-size: 14px; color: var(--text-muted); line-height: 1.7;">
+          <p style="margin-bottom: 14px;">
+            The CSHSM (Counter-Speech Generation for Hate Content on Social Media) system implements a hybrid adaptive routing architecture designed to balance factual precision, retrieval reliability, and generation flexibility under strict safety gating.
+          </p>
+
+          <h3 style="color: #fff; font-size: 15px; margin: 18px 0 8px 0;">1. Non-Hate Early Exit</h3>
+          <p style="margin-bottom: 12px;">When input text is classified as non-hate by the multitask classifier, the pipeline halts immediately without executing vector retrieval or generation fan-out, returning <code>NON_HATE_EARLY_EXIT</code>.</p>
+
+          <h3 style="color: #fff; font-size: 15px; margin: 18px 0 8px 0;">2. High-Similarity Retrieval vs Generation Fan-Out</h3>
+          <p style="margin-bottom: 12px;">If hate is detected, top-1 cosine similarity <em>s<sub>1</sub></em> is evaluated against calibrated threshold <em>&tau;</em>:</p>
+          <ul style="margin-left: 20px; margin-bottom: 12px;">
+            <li>If <em>s<sub>1</sub> &ge; &tau;</em>: Routes to <code>RETRIEVAL</code>. Candidate is verified through M11 final safety gate. Retains <code>quality_status="filtered_candidate"</code>.</li>
+            <li>If <em>s<sub>1</sub> &lt; &tau;</em> or error: Routes to <code>FALLBACK_GENERATION</code>. Executes concurrent 5-model fan-out, structural validation, M10 multi-criteria ranking, and M11 safety gating.</li>
+          </ul>
+
+          <h3 style="color: #fff; font-size: 15px; margin: 18px 0 8px 0;">3. Defense-in-Depth Safety Invariant</h3>
+          <p style="margin-bottom: 12px;">Under no circumstances does an unreviewed candidate get automatically approved. Both retrieved and generated candidates pass through the independent final safety gate (<code>safety_filter</code>). Any violation immediately triggers safe fallback (<code>"I cannot respond to this respectfully."</code>).</p>
+
+          <h3 style="color: #fff; font-size: 15px; margin: 18px 0 8px 0;">4. Research Environment Mode</h3>
+          <p>Running on Flask 3.1.3 at ₹0 external API cost. Model adapters, judge evaluators, and dense vector embeddings operate in verified deterministic mock mode.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      CSHSM Prototype • Final-Year Research Project • Running on Flask 3.1.3 • Strict Mock Safety Policy
+    </div>
+  </footer>
+
+  <script>
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).style.display = 'block';
+      event.target.classList.add('active');
+
+      if (tabId === 'tab-kb') {
+        loadReviewQueue();
+      }
+    }
+
+    // Presets
+    const PRESETS = {
+      non_hate: "Have a wonderful, peaceful, and blessed day with your family!",
+      retrieval: "Sample religious hostility query",
+      generation: "This community is destroying traditional cultural values and should not be permitted here.",
+      toxic: "You are an idiot and I hope you die.",
+      empty: "   "
+    };
+
+    function setPreset(key) {
+      const input = document.getElementById('comment-input');
+      input.value = PRESETS[key] || "";
+      updateCharCount();
+    }
+
+    // Character counter
+    const commentInput = document.getElementById('comment-input');
+    commentInput.addEventListener('input', updateCharCount);
+    function updateCharCount() {
+      const len = commentInput.value.length;
+      document.getElementById('char-count').innerText = `${len} character${len === 1 ? '' : 's'}`;
+    }
+
+    // Health check on load
+    async function checkHealth() {
+      const badge = document.getElementById('health-badge');
+      try {
+        const res = await fetch('/api/health');
+        if (res.ok) {
+          const data = await res.json();
+          badge.className = 'badge badge-live';
+          badge.innerHTML = `<span class="dot"></span> Backend Live (${data.framework})`;
+        } else {
+          throw new Error();
+        }
+      } catch (err) {
+        badge.className = 'badge badge-mock';
+        badge.innerHTML = `<span class="dot"></span> Backend Offline`;
+      }
+    }
+    checkHealth();
+
+    // Reset DAG
+    function resetDAG() {
+      const nodes = ['cleaner', 'classifier', 'router', 'generation', 'ranking', 'final_gate'];
+      nodes.forEach(name => {
+        const el = document.getElementById(`dag-${name}`);
+        const status = document.getElementById(`status-${name}`);
+        el.className = 'dag-node';
+        status.innerText = 'PENDING';
+        status.style.color = 'var(--text-dim)';
+      });
+    }
+
+    // Update DAG based on component_statuses
+    function updateDAG(statuses) {
+      for (const [name, status] of Object.entries(statuses)) {
+        const el = document.getElementById(`dag-${name}`);
+        const statusEl = document.getElementById(`status-${name}`);
+        if (!el || !statusEl) continue;
+
+        statusEl.innerText = status;
+
+        if (['SUCCESS', 'PASS_UNAPPROVED', 'SELECTED', 'PASSTHROUGH', 'RETRIEVE'].includes(status)) {
+          el.className = 'dag-node active-pass';
+          statusEl.style.color = 'var(--accent-emerald)';
+        } else if (status.startsWith('SKIPPED') || status === 'FALLBACK_GENERATION') {
+          el.className = 'dag-node active-skip';
+          statusEl.style.color = status === 'FALLBACK_GENERATION' ? 'var(--accent-indigo)' : 'var(--text-dim)';
+        } else if (status.startsWith('REJECTED') || status.startsWith('ERROR') || status === 'EMPTY_INPUT') {
+          el.className = 'dag-node active-fail';
+          statusEl.style.color = 'var(--accent-rose)';
+        }
+      }
+    }
+
+    // Analyze Comment
+    async function analyzeComment() {
+      const input = document.getElementById('comment-input');
+      const text = input.value;
+      const btn = document.getElementById('btn-analyze');
+      const btnText = document.getElementById('btn-text');
+
+      btn.disabled = true;
+      btnText.innerText = 'Analyzing...';
+      resetDAG();
+
+      const startTime = performance.now();
+
+      try {
+        const res = await fetch('/api/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text })
+        });
+
+        const elapsed = Math.round(performance.now() - startTime);
+        document.getElementById('exec-time').innerText = `${elapsed} ms`;
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.message || 'Error processing request');
+        }
+
+        const data = await res.json();
+        renderResults(data);
+      } catch (err) {
+        alert('Request failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = 'Analyze Comment';
+      }
+    }
+
+    // Render Results
+    function renderResults(data) {
+      document.getElementById('results-placeholder').style.display = 'none';
+      document.getElementById('results-content').style.display = 'block';
+
+      // Update DAG
+      if (data.component_statuses) {
+        updateDAG(data.component_statuses);
+      }
+
+      // Outcome Banner
+      const banner = document.getElementById('outcome-banner');
+      const badge = document.getElementById('outcome-badge');
+      const outcomeText = document.getElementById('outcome-text');
+
+      banner.className = `result-banner ${data.outcome}`;
+      badge.innerText = data.outcome;
+
+      const descriptions = {
+        NON_HATE_EARLY_EXIT: 'Early Exit: Non-hate comment detected. No counter-speech generated.',
+        RETRIEVED_RESPONSE: 'High-Similarity Retrieval Match. Validated via M11 final safety gate.',
+        GENERATED_RESPONSE: 'Generated via 5-Model Fan-Out & M10 Multi-Criteria Ranking.',
+        SAFE_FALLBACK: `Safe Fallback Triggered: ${data.fallback_reason || 'Safety boundary activated.'}`
+      };
+      outcomeText.innerText = descriptions[data.outcome] || data.outcome;
+
+      // Response Box
+      const responseBox = document.getElementById('response-box');
+      const typeLabel = document.getElementById('response-type-label');
+      const content = document.getElementById('response-text-content');
+
+      if (data.outcome === 'NON_HATE_EARLY_EXIT') {
+        typeLabel.innerText = 'Early Exit Notice';
+        content.innerText = 'Input does not violate safety policies. No counter-narrative required.';
+      } else {
+        typeLabel.innerText = data.safe_fallback_triggered ? 'Fallback Response' : 'Counter-Speech Output';
+        content.innerText = data.response_text || data.fallback_response || 'I cannot respond to this respectfully.';
+      }
+
+      // Metadata Pills
+      document.getElementById('meta-is-hate').innerText = data.is_hate ? 'True' : 'False';
+      document.getElementById('meta-category').innerText = data.category || 'None';
+      document.getElementById('meta-confidence').innerText = data.confidence ? `${Math.round(data.confidence * 100)}%` : '--';
+      document.getElementById('meta-source').innerText = data.source_origin || 'None';
+      document.getElementById('meta-quality').innerText = data.quality_status || '--';
+      document.getElementById('meta-human-audited').innerText = String(data.human_audited);
+
+      // Disclaimer
+      document.getElementById('disclaimer-content').innerText = data.disclaimer || 'Unapproved candidate.';
+
+      // Raw JSON
+      document.getElementById('json-telemetry').innerText = JSON.stringify(data, null, 2);
+    }
+
+    // Load Review Queue
+    let queueLoaded = false;
+    async function loadReviewQueue() {
+      if (queueLoaded) return;
+      const tbody = document.getElementById('queue-table-body');
+      try {
+        const res = await fetch('/api/kb/review-queue');
+        if (!res.ok) throw new Error('Failed to fetch review queue');
+        const data = await res.json();
+
+        tbody.innerHTML = '';
+        data.candidates.forEach(c => {
+          const tr = document.createElement('tr');
+          const rec = c.ai_assessment ? c.ai_assessment.recommendation : 'pending';
+          const caveats = c.ai_assessment ? c.ai_assessment.caveats : '';
+
+          tr.innerHTML = `
+            <td><code>${c.kb_id}</code></td>
+            <td><strong>${c.category}</strong><br><span style="font-size: 11px; color: var(--text-dim);">${c.target || ''}</span></td>
+            <td style="max-width: 280px; font-size: 12px; color: #e5e7eb;">${escapeHtml(c.hate_text)}</td>
+            <td style="max-width: 320px; font-size: 12px; color: #93c5fd;">${escapeHtml(c.counter_speech)}</td>
+            <td>
+              <span class="rec-badge rec-${rec}">${rec.replace(/_/g, ' ')}</span>
+              ${caveats ? `<br><span style="font-size: 10px; color: var(--text-muted);">${escapeHtml(caveats)}</span>` : ''}
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+        queueLoaded = true;
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color: var(--accent-rose); padding: 16px;">Error loading review queue: ${err.message}</td></tr>`;
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

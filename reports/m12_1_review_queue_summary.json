@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-10-24T17:04:27.398060+00:00",
+  "input_file": "data/counter_speech_kb/filtered_candidates.jsonl",
+  "output_file": "data/counter_speech_kb/review_queue.jsonl",
+  "total_records_sampled": 28,
+  "categories": {
+    "Geo-political": 5,
+    "Religion": 10,
+    "Gender": 8,
+    "Others": 5
+  },
+  "targets": {
+    "Geo-political:MIGRANTS": 5,
+    "Religion:JEWS": 5,
+    "Gender:WOMEN": 4,
+    "Others:POC": 5,
+    "Gender:LGBT+": 4,
+    "Religion:MUSLIMS": 2,
+    "Religion:Islamophobia": 3
+  },
+  "sources": {
+    "multitarget-conan": 25,
+    "conan": 3
+  },
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "human_audited_count": 0,
+  "approved_count": 0,
+  "pending_review_count": 28
+}

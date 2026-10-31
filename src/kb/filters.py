@@ -32,7 +32,14 @@ def safety_filter(counter_speech: str) -> tuple[bool, str]:
 def leakage_filter(hate_text: str, test_set_texts: set, val_set_texts: set) -> tuple[bool, str]:
     """
     Check if the hate_text overlaps exactly with HASTIKA test or validation sets.
+    Raises ValueError if reference sets are missing, None, or empty to prevent
+    unverified reference sets from silently passing leakage audits.
     """
+    if not test_set_texts or not val_set_texts:
+        raise ValueError(
+            "HASTIKA test and validation reference sets must both be non-empty collections to perform leakage filtering."
+        )
+
     ht_norm = hate_text.strip().lower()
     
     if ht_norm in test_set_texts:

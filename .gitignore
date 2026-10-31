@@ -86,3 +86,10 @@ reports/smoke_test/
 data/counter_speech_kb/sources/
 data/counter_speech_kb/*.jsonl
 data/counter_speech_kb/m53_generation/*.jsonl
+
+# M6 generated embedding artifacts
+data/counter_speech_kb/embeddings/
+data/counter_speech_kb/approved_kb.jsonl
+
+# Local backups
+reports/backups/
