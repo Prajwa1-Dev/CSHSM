@@ -1,3 +1,4 @@
+import urllib.request
 import os
 import sys
 import json
@@ -21,6 +22,7 @@ from src.evaluation.schema import (
 from src.evaluation.evaluator import (
     BaseCandidateEvaluator,
     MockCandidateEvaluator,
+    GeminiCandidateEvaluator,
     validate_scores
 )
 from src.evaluation.ranker import CandidateRanker
@@ -35,13 +37,14 @@ def make_test_candidate(
     text: str = "We can debate policy without resorting to insults.",
     model_id: str = "mock-gpt4o-mini",
     is_safe: bool = True,
-    is_struct_valid: bool = True
+    is_struct_valid: bool = True,
+    provider: str = "mock"
 ) -> GeneratedCandidate:
     return GeneratedCandidate(
         candidate_id=candidate_id,
         text=text,
         model_id=model_id,
-        provider="mock",
+        provider=provider,
         is_mock=True,
         query_text="Sample hate context",
         category="Political",
@@ -425,3 +428,117 @@ def test_ranking_result_json_serialization():
     json_str = json.dumps(d)
     assert "c-serial" in json_str
     assert "MOCK" in json_str
+
+
+# =====================================================================
+# 10. Gemini Flash-Lite LLM Judge & Self-Evaluation Guard Tests
+# =====================================================================
+
+def test_gemini_evaluator_unconfigured_credentials_fails_closed(monkeypatch):
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    evaluator = GeminiCandidateEvaluator(model_id="gemini-flash-lite-latest")
+    cand = make_test_candidate(candidate_id="c-groq", provider="groq", model_id="openai/gpt-oss-20b")
+    req = GenerationRequest(query_text="Sample hate speech text")
+
+    res = evaluator.evaluate_candidate(cand, req)
+    assert res.is_eligible is False
+    assert res.evaluation_status == "EVALUATION_ERROR"
+    assert "GOOGLE_API_KEY" in res.ineligibility_reasons[0]
+    assert res.evaluator_type == "LLM_JUDGE"
+    assert res.is_mock is False
+
+
+def test_gemini_evaluator_self_evaluation_rejection():
+    evaluator = GeminiCandidateEvaluator(model_id="gemini-flash-lite-latest")
+    req = GenerationRequest(query_text="Sample hate speech text")
+
+    # Rejection 1: candidate provider is "google"
+    cand_google = make_test_candidate(candidate_id="c-self-1", provider="google", model_id="gemini-flash-lite")
+    with pytest.raises(ValueError, match="Self-evaluation violation"):
+        evaluator.evaluate_candidate(cand_google, req)
+
+    # Rejection 2: candidate model_id contains "gemini"
+    cand_gemini = make_test_candidate(candidate_id="c-self-2", provider="mock", model_id="mock-gemini-model")
+    with pytest.raises(ValueError, match="Self-evaluation violation"):
+        evaluator.evaluate_candidate(cand_gemini, req)
+
+
+def test_gemini_evaluator_malformed_json_fails_closed(monkeypatch):
+    monkeypatch.setenv("GOOGLE_API_KEY", "dummy-gemini-key")
+    evaluator = GeminiCandidateEvaluator(model_id="gemini-flash-lite-latest")
+    cand = make_test_candidate(candidate_id="c-groq-1", provider="groq", model_id="qwen/qwen3.8-27b")
+    req = GenerationRequest(query_text="Sample hate text")
+
+    # Mock response containing invalid scores (out of 1-5 range)
+    mock_payload = {
+        "candidates": [{
+            "content": {
+                "parts": [{
+                    "text": json.dumps({
+                        "scores": {"relevance": 99, "persuasiveness": 3, "de_escalation": 3, "safety": 5},
+                        "reasons": {"relevance": "Out of range"}
+                    })
+                }]
+            }
+        }]
+    }
+
+    class MockHTTPResponse:
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def read(self): return json.dumps(mock_payload).encode("utf-8")
+
+    monkeypatch.setattr(urllib.request, "urlopen", lambda req, timeout=None: MockHTTPResponse())
+
+    res = evaluator.evaluate_candidate(cand, req)
+    assert res.is_eligible is False
+    assert res.evaluation_status == "MALFORMED_SCORES"
+    assert any("Invalid scores" in r for r in res.ineligibility_reasons)
+
+
+def test_gemini_evaluator_valid_scores_passes(monkeypatch):
+    monkeypatch.setenv("GOOGLE_API_KEY", "dummy-gemini-key")
+    evaluator = GeminiCandidateEvaluator(model_id="gemini-flash-lite-latest")
+    cand = make_test_candidate(candidate_id="c-groq-2", provider="groq", model_id="openai/gpt-oss-120b")
+    req = GenerationRequest(query_text="Sample hate text")
+
+    mock_payload = {
+        "candidates": [{
+            "content": {
+                "parts": [{
+                    "text": json.dumps({
+                        "scores": {
+                            "relevance": 4,
+                            "persuasiveness": 4,
+                            "de_escalation": 5,
+                            "safety": 5
+                        },
+                        "reasons": {
+                            "relevance": "Directly counters hateful claim.",
+                            "persuasiveness": "Logical and constructive.",
+                            "de_escalation": "Calm and empathetic tone.",
+                            "safety": "Completely avoids toxic phrases."
+                        }
+                    })
+                }]
+            }
+        }]
+    }
+
+    class MockHTTPResponse:
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def read(self): return json.dumps(mock_payload).encode("utf-8")
+
+    monkeypatch.setattr(urllib.request, "urlopen", lambda req, timeout=None: MockHTTPResponse())
+
+    res = evaluator.evaluate_candidate(cand, req)
+    assert res.is_eligible is True
+    assert res.evaluation_status == "SUCCESS"
+    assert res.scores["relevance"] == 4
+    assert res.scores["persuasiveness"] == 4
+    assert res.scores["de_escalation"] == 5
+    assert res.scores["safety"] == 5
+    assert res.evaluator_type == "LLM_JUDGE"
+    assert res.is_mock is False
+    assert "Directly counters" in res.reasons["relevance"]

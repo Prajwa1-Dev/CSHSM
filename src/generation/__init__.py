@@ -10,7 +10,9 @@ from src.generation.adapters import (
     AnthropicAdapter,
     GoogleGeminiAdapter,
     MistralAdapter,
-    CohereAdapter
+    CohereAdapter,
+    CloudflareWorkersAIAdapter,
+    GroqAdapter
 )
 from src.generation.fan_out import (
     GenerationRequest,
@@ -30,6 +32,8 @@ __all__ = [
     "GoogleGeminiAdapter",
     "MistralAdapter",
     "CohereAdapter",
+    "CloudflareWorkersAIAdapter",
+    "GroqAdapter",
     "GenerationRequest",
     "GeneratedCandidate",
     "AdapterExecutionRecord",

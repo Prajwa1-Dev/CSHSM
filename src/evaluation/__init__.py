@@ -17,6 +17,7 @@ from src.evaluation.schema import (
 from src.evaluation.evaluator import (
     BaseCandidateEvaluator,
     MockCandidateEvaluator,
+    GeminiCandidateEvaluator,
     validate_scores
 )
 from src.evaluation.ranker import CandidateRanker
@@ -31,6 +32,7 @@ __all__ = [
     "RankingResult",
     "BaseCandidateEvaluator",
     "MockCandidateEvaluator",
+    "GeminiCandidateEvaluator",
     "validate_scores",
     "CandidateRanker"
 ]

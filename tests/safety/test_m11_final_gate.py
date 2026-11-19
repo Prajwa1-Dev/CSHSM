@@ -383,7 +383,12 @@ def test_all_ineligible_m10_flows_to_m11_fallback():
         f"mock-anthropic-claude3-haiku": {"relevance": 5, "persuasiveness": 5, "de_escalation": 5, "safety": 2},
         f"mock-google-gemini15-flash": {"relevance": 5, "persuasiveness": 5, "de_escalation": 5, "safety": 2},
         f"mock-mistral-small": {"relevance": 5, "persuasiveness": 5, "de_escalation": 5, "safety": 2},
-        f"mock-cohere-command-r": {"relevance": 5, "persuasiveness": 5, "de_escalation": 5, "safety": 2}
+        f"mock-cohere-command-r": {"relevance": 5, "persuasiveness": 5, "de_escalation": 5, "safety": 2},
+        f"mock-gemma4-26b-it": {"relevance": 5, "persuasiveness": 5, "de_escalation": 5, "safety": 2},
+        f"mock-glm-4.7-flash": {"relevance": 5, "persuasiveness": 5, "de_escalation": 5, "safety": 2},
+        f"mock-gpt-oss-20b": {"relevance": 5, "persuasiveness": 5, "de_escalation": 5, "safety": 2},
+        f"mock-qwen-3.8-27b": {"relevance": 5, "persuasiveness": 5, "de_escalation": 5, "safety": 2},
+        f"mock-gpt-oss-120b": {"relevance": 5, "persuasiveness": 5, "de_escalation": 5, "safety": 2}
     }
     fan_out = create_default_fan_out(use_mock=True)
     req = GenerationRequest(query_text="Hate comment", category="Political")

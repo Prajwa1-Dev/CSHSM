@@ -17,6 +17,7 @@ Flow:
   Safe Fallback (Hardcoded safe response if all candidates fail or execution fails)
 """
 
+import os
 import time
 import uuid
 import hashlib
@@ -36,7 +37,9 @@ from src.generation.adapters import (
     AnthropicAdapter,
     GoogleGeminiAdapter,
     MistralAdapter,
-    CohereAdapter
+    CohereAdapter,
+    CloudflareWorkersAIAdapter,
+    GroqAdapter
 )
 
 
@@ -201,7 +204,7 @@ class GenerationFanOut:
         adapters: List[BaseModelAdapter],
         min_chars: int = 10,
         max_chars: int = 1000,
-        overall_timeout: float = 15.0,
+        overall_timeout: float = 70.0,
         fallback_message: str = DEFAULT_FALLBACK_RESPONSE
     ):
         if not adapters:
@@ -302,18 +305,54 @@ class GenerationFanOut:
                 )
                 return slot_idx, adapter, out
 
-        with ThreadPoolExecutor(max_workers=len(self.adapters)) as executor:
-            futures = [
-                executor.submit(_call_adapter, idx, adapter)
-                for idx, adapter in enumerate(self.adapters)
-            ]
-            for future in as_completed(futures, timeout=self.overall_timeout + 2.0):
+        executor = ThreadPoolExecutor(max_workers=len(self.adapters))
+        futures = {
+            executor.submit(_call_adapter, idx, adapter): (idx, adapter)
+            for idx, adapter in enumerate(self.adapters)
+        }
+        completed_slots = set()
+
+        try:
+            for future in as_completed(futures.keys(), timeout=self.overall_timeout):
+                idx, adapter = futures[future]
                 try:
-                    slot_idx, adapter, out = future.result()
-                    raw_outputs.append((slot_idx, adapter, out))
+                    slot_idx, adapt, out = future.result()
+                    raw_outputs.append((slot_idx, adapt, out))
+                    completed_slots.add(slot_idx)
                 except Exception as exc:
-                    # Thread executor timeout or error
-                    pass
+                    raw_outputs.append((idx, adapter, AdapterOutput(
+                        model_id=adapter.model_id,
+                        provider=adapter.provider,
+                        is_mock=adapter.is_mock,
+                        raw_text=None,
+                        latency_ms=round((time.perf_counter() - start_overall) * 1000, 2),
+                        status="ADAPTER_ERROR",
+                        error_category="UNKNOWN_ERROR",
+                        error_message=str(exc),
+                        metadata={}
+                    )))
+                    completed_slots.add(idx)
+        except TimeoutError:
+            # Hard upper-bound reached: cancel unstarted futures and register timeout for incomplete slots
+            for f in futures.keys():
+                f.cancel()
+            elapsed_ms = round((time.perf_counter() - start_overall) * 1000, 2)
+            for f, (idx, adapter) in futures.items():
+                if idx not in completed_slots:
+                    raw_outputs.append((idx, adapter, AdapterOutput(
+                        model_id=adapter.model_id,
+                        provider=adapter.provider,
+                        is_mock=adapter.is_mock,
+                        raw_text=None,
+                        latency_ms=elapsed_ms,
+                        status="TIMEOUT",
+                        error_category="TIMEOUT",
+                        error_message=f"Fan-out overall timeout ({self.overall_timeout}s) exceeded.",
+                        metadata={"overall_timeout_triggered": True}
+                    )))
+        finally:
+            # Guarantee non-blocking shutdown: cancel pending work and do not hang waiting on unresponsive threads
+            executor.shutdown(wait=False, cancel_futures=True)
 
         # Sort collected outputs by slot_index for determinism
         raw_outputs.sort(key=lambda item: item[0])
@@ -506,35 +545,76 @@ class GenerationFanOut:
 
 
 # =====================================================================
+# Provider Configuration Helpers
+# =====================================================================
+
+def is_cloudflare_configured() -> bool:
+    """
+    Returns True if Cloudflare Workers AI credentials (account ID and API token)
+    are present and non-empty in the environment.
+    """
+    return bool(
+        os.getenv("CLOUDFLARE_API_TOKEN", "").strip()
+        and os.getenv("CLOUDFLARE_ACCOUNT_ID", "").strip()
+    )
+
+
+def is_groq_configured() -> bool:
+    """
+    Returns True if Groq API credentials (API key) are present and non-empty
+    in the environment.
+    """
+    return bool(os.getenv("GROQ_API_KEY", "").strip())
+
+
+# =====================================================================
 # Factory Helper: 5-Model Fan-Out Builder
 # =====================================================================
 
 def create_default_fan_out(
     use_mock: bool = True,
     mock_responses: Optional[List[str]] = None,
-    use_live_gemini: bool = False
+    use_live_gemini: bool = False,
+    use_legacy_models: bool = False,
+    use_live_cloudflare: Optional[bool] = None,
+    use_live_groq: Optional[bool] = None,
+    allow_mock_fallback: bool = False,
+    overall_timeout: float = 70.0
 ) -> GenerationFanOut:
     """
     Constructs a standard 5-model fan-out instance.
 
+    Finalized Shortlist (Default):
+      Slot 1: Gemma 4 26B IT (Cloudflare Workers AI: @cf/google/gemma-4-26b-a4b-it)
+      Slot 2: GLM-4.7-Flash (Cloudflare Workers AI: @cf/zai-org/glm-4.7-flash)
+      Slot 3: GPT-OSS-20B (Groq: openai/gpt-oss-20b)
+      Slot 4: Qwen 3.8 27B (Groq: qwen/qwen3.8-27b)
+      Slot 5: GPT-OSS-120B (Groq: openai/gpt-oss-120b)
+
     Modes:
-      - All-Mock (default: use_mock=True, use_live_gemini=False):
-          5 distinct deterministic mock adapters:
-            Slot 1: mock-openai-gpt4o-mini
-            Slot 2: mock-anthropic-claude3-haiku
-            Slot 3: mock-google-gemini15-flash
-            Slot 4: mock-mistral-small
-            Slot 5: mock-cohere-command-r
+      - All-Mock Shortlist (default: use_mock=True, use_live_gemini=False, use_legacy_models=False):
+          5 deterministic mock adapters matching the finalized shortlist:
+            Slot 1: mock-gemma4-26b-it
+            Slot 2: mock-glm-4.7-flash
+            Slot 3: mock-gpt-oss-20b
+            Slot 4: mock-qwen-3.8-27b
+            Slot 5: mock-gpt-oss-120b
 
-      - Hybrid Gemini-Live (use_live_gemini=True):
-          Slot 1: mock-openai-gpt4o-mini (mock)
-          Slot 2: mock-anthropic-claude3-haiku (mock)
-          Slot 3: GoogleGeminiAdapter (real live API, reads GOOGLE_API_KEY)
-          Slot 4: mock-mistral-small (mock)
-          Slot 5: mock-cohere-command-r (mock)
+      - Full Live Shortlist (use_mock=False):
+          5 genuine Cloudflare & Groq provider adapters.
+          If credentials are missing and allow_mock_fallback is False, adapters fail closed
+          with UNCONFIGURED_CREDENTIALS without masking as mock.
 
-      - All-Live (use_mock=False, use_live_gemini=False):
-          5 genuine provider adapters configured via environment variables.
+      - Partial-Live Execution (use_live_cloudflare / use_live_groq or allow_mock_fallback=True):
+          Slots with verified credentials use genuine live adapters (is_mock=False).
+          Slots with missing credentials fall back to mock adapters (is_mock=True) ONLY
+          when allow_mock_fallback=True, preserving honest provenance.
+
+      - Legacy Hybrid Gemini-Live (use_live_gemini=True):
+          Retained for backwards-compatibility: Slot 3 uses real GoogleGeminiAdapter.
+
+      - Legacy Models (use_legacy_models=True):
+          Retained for backwards-compatibility: OpenAI, Anthropic, Gemini, Mistral, Cohere.
     """
     default_responses = [
         "Diversity of perspectives strengthens society. Respectful discussion is always more productive than hatred.",
@@ -553,21 +633,58 @@ def create_default_fan_out(
             MockModelAdapter(model_id="mock-mistral-small", provider="mock", canned_response=responses[3 % len(responses)]),
             MockModelAdapter(model_id="mock-cohere-command-r", provider="mock", canned_response=responses[4 % len(responses)])
         ]
-    elif use_mock:
-        adapters = [
-            MockModelAdapter(model_id="mock-openai-gpt4o-mini", provider="mock", canned_response=responses[0 % len(responses)]),
-            MockModelAdapter(model_id="mock-anthropic-claude3-haiku", provider="mock", canned_response=responses[1 % len(responses)]),
-            MockModelAdapter(model_id="mock-google-gemini15-flash", provider="mock", canned_response=responses[2 % len(responses)]),
-            MockModelAdapter(model_id="mock-mistral-small", provider="mock", canned_response=responses[3 % len(responses)]),
-            MockModelAdapter(model_id="mock-cohere-command-r", provider="mock", canned_response=responses[4 % len(responses)])
-        ]
+    elif use_legacy_models:
+        if use_mock:
+            adapters = [
+                MockModelAdapter(model_id="mock-openai-gpt4o-mini", provider="mock", canned_response=responses[0 % len(responses)]),
+                MockModelAdapter(model_id="mock-anthropic-claude3-haiku", provider="mock", canned_response=responses[1 % len(responses)]),
+                MockModelAdapter(model_id="mock-google-gemini15-flash", provider="mock", canned_response=responses[2 % len(responses)]),
+                MockModelAdapter(model_id="mock-mistral-small", provider="mock", canned_response=responses[3 % len(responses)]),
+                MockModelAdapter(model_id="mock-cohere-command-r", provider="mock", canned_response=responses[4 % len(responses)])
+            ]
+        else:
+            adapters = [
+                OpenAIAdapter(model_id="gpt-4o-mini"),
+                AnthropicAdapter(model_id="claude-3-haiku-20240307"),
+                GoogleGeminiAdapter(model_id="gemini-3.8-flash"),
+                MistralAdapter(model_id="mistral-small-latest"),
+                CohereAdapter(model_id="command-r")
+            ]
     else:
-        adapters = [
-            OpenAIAdapter(model_id="gpt-4o-mini"),
-            AnthropicAdapter(model_id="claude-3-haiku-20240307"),
-            GoogleGeminiAdapter(model_id="gemini-3.8-flash"),
-            MistralAdapter(model_id="mistral-small-latest"),
-            CohereAdapter(model_id="command-r")
-        ]
+        # Finalized 5-Generator Roster with Per-Provider Live / Mock Granularity
+        want_live_cf = (not use_mock) if use_live_cloudflare is None else use_live_cloudflare
+        want_live_groq = (not use_mock) if use_live_groq is None else use_live_groq
 
-    return GenerationFanOut(adapters=adapters)
+        cf_ready = is_cloudflare_configured()
+        groq_ready = is_groq_configured()
+
+        # Resolve Cloudflare Slots 1 and 2
+        if want_live_cf:
+            if cf_ready or not allow_mock_fallback:
+                slot1 = CloudflareWorkersAIAdapter(model_id="@cf/google/gemma-4-26b-a4b-it")
+                slot2 = CloudflareWorkersAIAdapter(model_id="@cf/zai-org/glm-4.7-flash")
+            else:
+                slot1 = MockModelAdapter(model_id="mock-gemma4-26b-it", provider="mock", canned_response=responses[0 % len(responses)])
+                slot2 = MockModelAdapter(model_id="mock-glm-4.7-flash", provider="mock", canned_response=responses[1 % len(responses)])
+        else:
+            slot1 = MockModelAdapter(model_id="mock-gemma4-26b-it", provider="mock", canned_response=responses[0 % len(responses)])
+            slot2 = MockModelAdapter(model_id="mock-glm-4.7-flash", provider="mock", canned_response=responses[1 % len(responses)])
+
+        # Resolve Groq Slots 3, 4, and 5
+        if want_live_groq:
+            if groq_ready or not allow_mock_fallback:
+                slot3 = GroqAdapter(model_id="openai/gpt-oss-20b")
+                slot4 = GroqAdapter(model_id="qwen/qwen3.8-27b")
+                slot5 = GroqAdapter(model_id="openai/gpt-oss-120b")
+            else:
+                slot3 = MockModelAdapter(model_id="mock-gpt-oss-20b", provider="mock", canned_response=responses[2 % len(responses)])
+                slot4 = MockModelAdapter(model_id="mock-qwen-3.8-27b", provider="mock", canned_response=responses[3 % len(responses)])
+                slot5 = MockModelAdapter(model_id="mock-gpt-oss-120b", provider="mock", canned_response=responses[4 % len(responses)])
+        else:
+            slot3 = MockModelAdapter(model_id="mock-gpt-oss-20b", provider="mock", canned_response=responses[2 % len(responses)])
+            slot4 = MockModelAdapter(model_id="mock-qwen-3.8-27b", provider="mock", canned_response=responses[3 % len(responses)])
+            slot5 = MockModelAdapter(model_id="mock-gpt-oss-120b", provider="mock", canned_response=responses[4 % len(responses)])
+
+        adapters = [slot1, slot2, slot3, slot4, slot5]
+
+    return GenerationFanOut(adapters=adapters, overall_timeout=overall_timeout)

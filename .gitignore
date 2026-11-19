@@ -85,6 +85,7 @@ patch.py
 reports/smoke_test/
 data/counter_speech_kb/sources/
 data/counter_speech_kb/*.jsonl
+!data/counter_speech_kb/cshsm_kannada_english_kb_v2.jsonl
 data/counter_speech_kb/m53_generation/*.jsonl
 
 # M6 generated embedding artifacts

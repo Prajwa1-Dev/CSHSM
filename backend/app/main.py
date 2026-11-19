@@ -50,15 +50,41 @@ def create_app(
     Application factory for the CSHSM REST API backend.
     """
     app = Flask(__name__)
+    app.config.setdefault("MAX_CONTENT_LENGTH", 1 * 1024 * 1024)  # 1 MB max request payload size
     if test_config:
         app.config.update(test_config)
 
+    @app.errorhandler(413)
+    def request_entity_too_large(error):
+        return jsonify({
+            "error": "Payload Too Large",
+            "message": "Request payload exceeds maximum allowed size of 1 MB."
+        }), 413
+
     # Initialize or inject pipeline orchestrator
     if orchestrator is None:
-        enable_gemini = use_live_gemini or (
-            os.getenv("CSHSM_USE_LIVE_GEMINI", "").strip().lower() in ("1", "true", "yes")
-        )
-        pipeline = create_default_pipeline(use_mock=True, threshold=0.80, use_live_gemini=enable_gemini)
+        pipeline_mode = os.getenv("CSHSM_PIPELINE_MODE", "").strip().lower()
+        if pipeline_mode == "m8":
+            from scripts.demonstrate_m8_pipeline import build_m8_pipeline
+            is_mock_env = os.getenv("CSHSM_M8_MOCK", "").strip().lower() in ("1", "true", "yes")
+            is_live_env = os.getenv("CSHSM_M8_LIVE", "").strip().lower() in ("1", "true", "yes")
+            if is_mock_env and is_live_env:
+                raise ValueError(
+                    "Conflicting CSHSM M8 configuration: both CSHSM_M8_LIVE and CSHSM_M8_MOCK are set. "
+                    "Choose exactly one mode."
+                )
+            # Default to completely offline mock execution unless CSHSM_M8_LIVE=1 is explicitly set
+            use_mock = not is_live_env
+            use_real_classifier = os.getenv("CSHSM_M8_USE_REAL_CLASSIFIER", "").strip().lower() in ("1", "true", "yes")
+            pipeline = build_m8_pipeline(use_mock=use_mock, use_real_classifier=use_real_classifier)
+        elif os.getenv("CSHSM_DEMO_PIPELINE", "").strip().lower() in ("1", "true", "yes"):
+            from scripts.demonstrate_phase3 import build_demonstration_pipeline
+            pipeline = build_demonstration_pipeline()
+        else:
+            enable_gemini = use_live_gemini or (
+                os.getenv("CSHSM_USE_LIVE_GEMINI", "").strip().lower() in ("1", "true", "yes")
+            )
+            pipeline = create_default_pipeline(use_mock=True, threshold=0.80, use_live_gemini=enable_gemini)
     else:
         pipeline = orchestrator
 
@@ -78,6 +104,10 @@ def create_app(
     @app.route("/", methods=["GET"])
     def dashboard():
         return render_template("index.html")
+
+    @app.route("/favicon.ico", methods=["GET"])
+    def favicon():
+        return app.send_static_file("favicon.ico")
 
     # -----------------------------------------------------------------
     # Health & Diagnostics Endpoints
@@ -118,6 +148,8 @@ def create_app(
                 "message": "Field 'text' is required in request body."
             }), 400
 
+        MAX_INPUT_LENGTH = 2000
+
         text = payload.get("text")
         if text is None or not isinstance(text, str):
             return jsonify({
@@ -125,11 +157,19 @@ def create_app(
                 "message": "Field 'text' must be a string."
             }), 400
 
+        if len(text) > MAX_INPUT_LENGTH:
+            return jsonify({
+                "error": "Bad Request",
+                "message": f"Field 'text' exceeds maximum allowed length of {MAX_INPUT_LENGTH} characters."
+            }), 400
+
         try:
             result: PipelineResult = pipeline.process(text)
             return jsonify(result.to_dict()), 200
         except Exception as exc:
-            # Top-level fail-closed safety net
+            # Server-side diagnostic logging with full traceback
+            app.logger.error("Unhandled exception in /api/process: %s", exc, exc_info=True)
+            # Top-level fail-closed safety net returning sanitized client-facing response
             now_iso = datetime.now(timezone.utc).isoformat()
             return jsonify({
                 "outcome": "SAFE_FALLBACK",
@@ -146,10 +186,14 @@ def create_app(
                 "review_status": "unreviewed",
                 "human_audited": False,
                 "safe_fallback_triggered": True,
-                "fallback_reason": f"INTERNAL_SERVER_ERROR: {exc}",
+                "fallback_reason": "INTERNAL_SERVER_ERROR: An unexpected error occurred while processing the request.",
                 "fallback_response": pipeline.fallback_message,
                 "component_statuses": {"api": "ERROR"},
-                "provenance": {"error": str(exc), "timestamp": now_iso},
+                "provenance": {
+                    "error": "InternalServerError",
+                    "error_type": type(exc).__name__,
+                    "timestamp": now_iso
+                },
                 "disclaimer": pipeline.DISCLAIMER_FALLBACK
             }), 200
 
@@ -158,12 +202,12 @@ def create_app(
     # -----------------------------------------------------------------
     @app.route("/api/kb/stats", methods=["GET"])
     def kb_statistics():
-        filtered_path = "data/counter_speech_kb/filtered_candidates.jsonl"
-        queue_path = "data/counter_speech_kb/review_queue.jsonl"
-        approved_path = "data/counter_speech_kb/approved_kb.jsonl"
+        filtered_path = os.path.join(_PROJECT_ROOT, "data", "counter_speech_kb", "filtered_candidates.jsonl")
+        queue_path = os.path.join(_PROJECT_ROOT, "data", "counter_speech_kb", "review_queue.jsonl")
+        approved_path = os.path.join(_PROJECT_ROOT, "data", "counter_speech_kb", "approved_kb.jsonl")
 
         filtered_count = 19436
-        if os.path.exists(filtered_path):
+        if os.path.isfile(filtered_path):
             try:
                 with open(filtered_path, "r", encoding="utf-8") as f:
                     filtered_count = sum(1 for _ in f)
@@ -171,7 +215,7 @@ def create_app(
                 pass
 
         queue_count = 0
-        if os.path.exists(queue_path):
+        if os.path.isfile(queue_path):
             try:
                 with open(queue_path, "r", encoding="utf-8") as f:
                     queue_count = sum(1 for _ in f)
@@ -179,7 +223,7 @@ def create_app(
                 pass
 
         approved_count = 0
-        if os.path.exists(approved_path):
+        if os.path.isfile(approved_path):
             try:
                 with open(approved_path, "r", encoding="utf-8") as f:
                     approved_count = sum(1 for _ in f)
@@ -193,6 +237,53 @@ def create_app(
             "Others": 608
         }
 
+        # Dynamically inspect active KB V2 source and metadata relative to project root
+        active_kb_v2_jsonl = os.path.join(_PROJECT_ROOT, "data", "counter_speech_kb", "cshsm_kannada_english_kb_v2.jsonl")
+        active_kb_v2_latest = os.path.join(_PROJECT_ROOT, "data", "counter_speech_kb", "embeddings_v2", "LATEST.json")
+
+        active_kb_v2: Dict[str, Any] = {
+            "status": "unavailable",
+            "record_count": 0,
+            "categories": {},
+            "embedding_model": None,
+            "vector_dimension": None,
+            "index_backend": "FAISS IndexFlatIP",
+            "scope": "development_provisional",
+            "review_status": "unreviewed",
+            "human_approved": False,
+            "disclaimer": "Authoritative KB V2 code-mixed Kannada counter-speech candidates. Unapproved pending human review."
+        }
+
+        if os.path.isfile(active_kb_v2_jsonl):
+            try:
+                cat_distribution: Dict[str, int] = {}
+                v2_total = 0
+                with open(active_kb_v2_jsonl, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line_str = line.strip()
+                        if line_str:
+                            v2_total += 1
+                            item = json.loads(line_str)
+                            cat = item.get("category", "Others")
+                            cat_distribution[cat] = cat_distribution.get(cat, 0) + 1
+                active_kb_v2["status"] = "available"
+                active_kb_v2["record_count"] = v2_total
+                active_kb_v2["categories"] = cat_distribution
+            except Exception as exc:
+                app.logger.warning("Error reading active KB V2 jsonl: %s", exc)
+
+        if os.path.isfile(active_kb_v2_latest):
+            try:
+                with open(active_kb_v2_latest, "r", encoding="utf-8") as f:
+                    latest_meta = json.load(f)
+                    active_kb_v2["embedding_model"] = latest_meta.get("model_identifier")
+                    active_kb_v2["scope"] = latest_meta.get("scope", "development_provisional")
+                    shape = latest_meta.get("matrix_shape")
+                    if isinstance(shape, (list, tuple)) and len(shape) >= 2:
+                        active_kb_v2["vector_dimension"] = shape[1]
+            except Exception as exc:
+                app.logger.warning("Error reading active KB V2 LATEST.json: %s", exc)
+
         return jsonify({
             "total_filtered_candidates": filtered_count,
             "review_queue_count": queue_count,
@@ -200,6 +291,7 @@ def create_app(
             "human_approved": approved_count > 0,
             "approval_status": "approved" if approved_count > 0 else "pending_human_review",
             "categories": categories,
+            "active_kb_v2": active_kb_v2,
             "disclaimer": "All source candidates and review queue items are unapproved. No automated approval.",
             "timestamp": datetime.now(timezone.utc).isoformat()
         }), 200
@@ -209,8 +301,8 @@ def create_app(
     # -----------------------------------------------------------------
     @app.route("/api/kb/review-queue", methods=["GET"])
     def get_review_queue():
-        queue_path = "data/counter_speech_kb/review_queue.jsonl"
-        ai_review_path = "reports/m12_1_ai_quality_review.json"
+        queue_path = os.path.join(_PROJECT_ROOT, "data", "counter_speech_kb", "review_queue.jsonl")
+        ai_review_path = os.path.join(_PROJECT_ROOT, "reports", "m12_1_ai_quality_review.json")
 
         candidates = []
         if os.path.exists(queue_path):

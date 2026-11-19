@@ -88,6 +88,8 @@ class FAISSVectorIndex(BaseVectorIndex):
         arr = np.array(vectors, dtype=np.float32)
         if arr.ndim != 2 or arr.shape[1] != self._dim:
             raise ValueError(f"Vector shape {arr.shape} does not match index dimension {self._dim}")
+        if not np.isfinite(arr).all():
+            raise ValueError("Vector contains non-finite values (NaN or Inf)")
         self._index.add(arr)
 
     def search(
@@ -95,15 +97,34 @@ class FAISSVectorIndex(BaseVectorIndex):
         query_vectors: List[List[float]],
         k: int
     ) -> Tuple[List[List[float]], List[List[int]]]:
-        import numpy as np
+        if self._index.ntotal == 0:
+            raise ValueError("Cannot search an empty index.")
         if k <= 0:
             raise ValueError(f"top_k must be positive, got {k}")
+        import numpy as np
         arr = np.array(query_vectors, dtype=np.float32)
         if arr.ndim != 2 or arr.shape[1] != self._dim:
             raise ValueError(f"Query shape {arr.shape} does not match index dimension {self._dim}")
+        if not np.isfinite(arr).all():
+            raise ValueError("Query vector contains non-finite values (NaN or Inf)")
         effective_k = min(k, self._index.ntotal)
         scores, indices = self._index.search(arr, effective_k)
-        return scores.tolist(), indices.tolist()
+        rounded_scores = [[round(float(s), 6) for s in row] for row in scores.tolist()]
+        return rounded_scores, indices.tolist()
+
+    def save(self, filepath: str) -> None:
+        """Serialize FAISS index to disk."""
+        self._faiss.write_index(self._index, filepath)
+
+    @classmethod
+    def load(cls, filepath: str, dim: int = 1024) -> "FAISSVectorIndex":
+        """Deserialize FAISS index from disk."""
+        instance = cls.__new__(cls)
+        instance._dim = dim
+        import faiss
+        instance._faiss = faiss
+        instance._index = faiss.read_index(filepath)
+        return instance
 
 
 class ExactInnerProductIndex(BaseVectorIndex):
@@ -305,7 +326,7 @@ class CSHSMRetriever:
     @classmethod
     def from_committed_run(
         cls,
-        output_dir: str = "data/counter_speech_kb/embeddings",
+        output_dir: Optional[str] = None,
         scope: Optional[str] = None,
         allow_mock: bool = False,
         embedder: Optional[BaseEmbedder] = None,
@@ -315,6 +336,11 @@ class CSHSMRetriever:
         Loads the authoritative committed run from M6 via EmbeddingPipeline.resolve_latest_run().
         Fails closed if the run is uncommitted, incomplete, or corrupted.
         """
+        if output_dir is None:
+            if os.getenv("CSHSM_KB_VERSION", "").strip().lower() in ("v2", "2"):
+                output_dir = "data/counter_speech_kb/embeddings_v2"
+            else:
+                output_dir = os.getenv("CSHSM_KB_EMBEDDINGS_DIR", "data/counter_speech_kb/embeddings")
         run_data = EmbeddingPipeline.resolve_latest_run(
             output_dir=output_dir,
             expected_scope=scope,
@@ -404,7 +430,10 @@ class CSHSMRetriever:
         ).hexdigest()
 
         # If category filtering is requested, search larger candidate pool then filter
-        search_k = min(self.index.ntotal, top_k * 5 if category_filter else top_k)
+        if category_filter:
+            search_k = min(self.index.ntotal, max(50, top_k * 20))
+        else:
+            search_k = min(self.index.ntotal, top_k)
         scores_batch, indices_batch = self.index.search([normalized_query], k=search_k)
 
         scores = scores_batch[0]
@@ -421,7 +450,7 @@ class CSHSMRetriever:
             # Category filter if specified
             if category_filter:
                 entry_cat = entry.get("category")
-                if entry_cat != category_filter:
+                if entry_cat is None or entry_cat.strip().lower() != category_filter.strip().lower():
                     continue
 
             # Review status guard

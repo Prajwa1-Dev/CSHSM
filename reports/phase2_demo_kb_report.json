@@ -1,0 +1,61 @@
+{
+  "timestamp": "2026-11-01T14:04:50.172031+00:00",
+  "total_generated": 24,
+  "total_accepted": 24,
+  "total_rejected": 0,
+  "category_distribution": {
+    "Gender": 4,
+    "Political": 4,
+    "Religion": 4,
+    "Geo-political": 4,
+    "Violence": 4,
+    "Others": 4
+  },
+  "language_distribution": {
+    "en": 24
+  },
+  "generation_method": "real_google_gemini_flash_lite",
+  "evaluation_method": "real_google_gemini_flash_lite_judge",
+  "safety_filtering": "deterministic_safety_and_leakage_filter",
+  "human_verified": false,
+  "vector_index": {
+    "total_indexed": 24,
+    "dimension": 1024,
+    "backend": "exact_ip_fallback",
+    "model_identifier": "MOCK-EMBEDDER-TEST-ONLY",
+    "is_mock_embedder": true,
+    "faiss_installed": false,
+    "backend_fallback": "ExactInnerProductIndex (pure-Python exact flat inner product)"
+  },
+  "retrieval_demonstrations": [
+    {
+      "query": "Muslims are dangerous radicals threatening peace.",
+      "target_category": "Religion",
+      "top_match_id": "DEMO-KB-00024",
+      "top_match_score": 0.393361,
+      "top_match_counter_speech": "Equality and human dignity are fundamental rights for every individual, regardless of background. Upholding strict hierarchies limits human potential, whereas societies thrive when everyone is treated with equal respect and opportunity."
+    },
+    {
+      "query": "Women are biologically unfit for hard technical careers.",
+      "target_category": "Gender",
+      "top_match_id": "DEMO-KB-00022",
+      "top_match_score": 0.389336,
+      "top_match_counter_speech": "Every human being has inherent worth, and individuals with disabilities contribute uniquely to our communities, culture, and economy. Supporting one another strengthens society rather than draining it."
+    },
+    {
+      "query": "Opposition politicians are unpatriotic foreign stooges.",
+      "target_category": "Political",
+      "top_match_id": "DEMO-KB-00024",
+      "top_match_score": 0.217361,
+      "top_match_counter_speech": "Equality and human dignity are fundamental rights for every individual, regardless of background. Upholding strict hierarchies limits human potential, whereas societies thrive when everyone is treated with equal respect and opportunity."
+    },
+    {
+      "query": "We must lynch these criminals without mercy.",
+      "target_category": "Violence",
+      "top_match_id": "DEMO-KB-00016",
+      "top_match_score": 0.310218,
+      "top_match_counter_speech": "Fleeing violence and persecution is a human right protected by international law. Treating vulnerable refugees with hostility ignores our shared humanity and legal obligations to offer protection."
+    }
+  ],
+  "execution_time_seconds": 237.99
+}

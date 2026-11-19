@@ -28,6 +28,8 @@ from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any, Union
 from dataclasses import dataclass, asdict
 
+from src.generation.prompts import build_chat_messages
+
 
 # =====================================================================
 # Adapter Output Model
@@ -317,7 +319,8 @@ class OpenAIAdapter(BaseModelAdapter):
             data=json.dumps(payload).encode("utf-8"),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {api_key}"
+                "Authorization": f"Bearer {api_key}",
+                "User-Agent": "CSHSM-Client/1.0"
             },
             method="POST"
         )
@@ -753,7 +756,8 @@ class MistralAdapter(BaseModelAdapter):
             data=json.dumps(payload).encode("utf-8"),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {api_key}"
+                "Authorization": f"Bearer {api_key}",
+                "User-Agent": "CSHSM-Client/1.0"
             },
             method="POST"
         )
@@ -892,7 +896,8 @@ class CohereAdapter(BaseModelAdapter):
             data=json.dumps(payload).encode("utf-8"),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {api_key}"
+                "Authorization": f"Bearer {api_key}",
+                "User-Agent": "CSHSM-Client/1.0"
             },
             method="POST"
         )
@@ -946,6 +951,327 @@ class CohereAdapter(BaseModelAdapter):
             return AdapterOutput(
                 model_id=self._model_id,
                 provider="cohere",
+                is_mock=False,
+                raw_text=None,
+                latency_ms=latency_ms,
+                status="ADAPTER_ERROR",
+                error_category="UNKNOWN_ERROR",
+                error_message=str(exc),
+                metadata={"error_type": type(exc).__name__}
+            )
+
+
+# =====================================================================
+# Cloudflare Workers AI Adapter (Slots 1 & 2)
+# =====================================================================
+
+class CloudflareWorkersAIAdapter(BaseModelAdapter):
+    """
+    Cloudflare Workers AI REST API Adapter.
+    Supports:
+      - Gemma 4 26B IT (@cf/google/gemma-4-26b-a4b-it)
+      - GLM-4.7-Flash (@cf/zai-org/glm-4.7-flash)
+
+    Reads CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN from environment.
+    Fails closed if unconfigured. Never logs secrets.
+    """
+
+    def __init__(
+        self,
+        model_id: str = "@cf/google/gemma-4-26b-a4b-it",
+        account_id_env_var: str = "CLOUDFLARE_ACCOUNT_ID",
+        api_token_env_var: str = "CLOUDFLARE_API_TOKEN",
+        base_url: str = "https://api.cloudflare.com/client/v4/accounts",
+        timeout: float = 25.0
+    ):
+        self._model_id = model_id
+        self._account_id_env_var = account_id_env_var
+        self._api_token_env_var = api_token_env_var
+        self._base_url = base_url.rstrip("/")
+        self._timeout = timeout
+
+    @property
+    def model_id(self) -> str:
+        return self._model_id
+
+    @property
+    def provider(self) -> str:
+        return "cloudflare"
+
+    @property
+    def is_mock(self) -> bool:
+        return False
+
+    @property
+    def timeout(self) -> float:
+        return self._timeout
+
+    def generate(
+        self,
+        prompt: str,
+        category: Optional[str] = None,
+        timeout: Optional[float] = None,
+        **kwargs: Any
+    ) -> AdapterOutput:
+        account_id = os.getenv(self._account_id_env_var)
+        api_token = os.getenv(self._api_token_env_var)
+
+        if not account_id or not account_id.strip() or not api_token or not api_token.strip():
+            return AdapterOutput(
+                model_id=self._model_id,
+                provider="cloudflare",
+                is_mock=False,
+                raw_text=None,
+                latency_ms=0.0,
+                status="UNCONFIGURED_CREDENTIALS",
+                error_category="AUTH_ERROR",
+                error_message=(
+                    f"Missing credentials: '{self._account_id_env_var}' or "
+                    f"'{self._api_token_env_var}' is not set in environment."
+                ),
+                metadata={"credentials_configured": False}
+            )
+
+        eff_timeout = timeout if timeout is not None else self._timeout
+        start_time = time.perf_counter()
+
+        messages = build_chat_messages(hateful_comment=prompt, category=category)
+
+        payload = {
+            "messages": messages,
+            "max_completion_tokens": kwargs.get("max_tokens", 250),
+            "temperature": kwargs.get("temperature", 0.7),
+            "chat_template_kwargs": {"enable_thinking": False}
+        }
+
+        url = f"{self._base_url}/{account_id}/ai/run/{self._model_id}"
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_token}",
+                "User-Agent": "CSHSM-Client/1.0"
+            },
+            method="POST"
+        )
+
+        try:
+            with urllib.request.urlopen(req, timeout=eff_timeout) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+
+                text = ""
+                result = data.get("result", {})
+                if isinstance(result, dict):
+                    if "response" in result and result["response"]:
+                        text = str(result["response"]).strip()
+                    elif "choices" in result and result["choices"]:
+                        text = result["choices"][0].get("message", {}).get("content", "").strip()
+                elif isinstance(result, str):
+                    text = result.strip()
+
+                return AdapterOutput(
+                    model_id=self._model_id,
+                    provider="cloudflare",
+                    is_mock=False,
+                    raw_text=text,
+                    latency_ms=latency_ms,
+                    status="SUCCESS" if text else "EMPTY_OUTPUT",
+                    error_category=None if text else "OUTPUT_PARSING",
+                    error_message=None if text else "Empty text emitted by Cloudflare Workers AI.",
+                    metadata={"success": data.get("success", True)}
+                )
+        except urllib.error.HTTPError as he:
+            latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+            category_err = "AUTH_ERROR" if he.code in (401, 403) else ("RATE_LIMIT" if he.code == 429 else "NETWORK_ERROR")
+            return AdapterOutput(
+                model_id=self._model_id,
+                provider="cloudflare",
+                is_mock=False,
+                raw_text=None,
+                latency_ms=latency_ms,
+                status="ADAPTER_ERROR",
+                error_category=category_err,
+                error_message=f"HTTP {he.code}: {he.reason}",
+                metadata={"status_code": he.code}
+            )
+        except urllib.error.URLError as ue:
+            latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+            is_timeout = "timed out" in str(ue.reason).lower()
+            return AdapterOutput(
+                model_id=self._model_id,
+                provider="cloudflare",
+                is_mock=False,
+                raw_text=None,
+                latency_ms=latency_ms,
+                status="TIMEOUT" if is_timeout else "ADAPTER_ERROR",
+                error_category="TIMEOUT" if is_timeout else "NETWORK_ERROR",
+                error_message=str(ue.reason),
+                metadata={}
+            )
+        except Exception as exc:
+            latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+            return AdapterOutput(
+                model_id=self._model_id,
+                provider="cloudflare",
+                is_mock=False,
+                raw_text=None,
+                latency_ms=latency_ms,
+                status="ADAPTER_ERROR",
+                error_category="UNKNOWN_ERROR",
+                error_message=str(exc),
+                metadata={"error_type": type(exc).__name__}
+            )
+
+
+# =====================================================================
+# Groq API Adapter (Slots 3, 4, 5)
+# =====================================================================
+
+class GroqAdapter(BaseModelAdapter):
+    """
+    Groq OpenAI-Compatible Chat Completions Adapter.
+    Supports:
+      - GPT-OSS-20B (openai/gpt-oss-20b)
+      - Qwen 3.8 27B (qwen/qwen3.8-27b)
+      - GPT-OSS-120B (openai/gpt-oss-120b)
+
+    Reads GROQ_API_KEY from environment. Fails closed if unconfigured.
+    Never logs secrets.
+    """
+
+    def __init__(
+        self,
+        model_id: str = "openai/gpt-oss-20b",
+        api_key_env_var: str = "GROQ_API_KEY",
+        base_url: str = "https://api.groq.com/openai/v1",
+        timeout: float = 25.0
+    ):
+        self._model_id = model_id
+        self._api_key_env_var = api_key_env_var
+        self._base_url = base_url.rstrip("/")
+        self._timeout = timeout
+
+    @property
+    def model_id(self) -> str:
+        return self._model_id
+
+    @property
+    def provider(self) -> str:
+        return "groq"
+
+    @property
+    def is_mock(self) -> bool:
+        return False
+
+    @property
+    def timeout(self) -> float:
+        return self._timeout
+
+    def generate(
+        self,
+        prompt: str,
+        category: Optional[str] = None,
+        timeout: Optional[float] = None,
+        **kwargs: Any
+    ) -> AdapterOutput:
+        api_key = os.getenv(self._api_key_env_var)
+        if not api_key or not api_key.strip():
+            return AdapterOutput(
+                model_id=self._model_id,
+                provider="groq",
+                is_mock=False,
+                raw_text=None,
+                latency_ms=0.0,
+                status="UNCONFIGURED_CREDENTIALS",
+                error_category="AUTH_ERROR",
+                error_message=f"Missing credentials: '{self._api_key_env_var}' is not set in environment.",
+                metadata={"api_key_configured": False}
+            )
+
+        eff_timeout = timeout if timeout is not None else self._timeout
+        start_time = time.perf_counter()
+
+        messages = build_chat_messages(hateful_comment=prompt, category=category)
+
+        payload = {
+            "model": self._model_id,
+            "messages": messages,
+            "max_completion_tokens": kwargs.get("max_tokens", 500),
+            "temperature": kwargs.get("temperature", 0.7),
+            "reasoning_effort": "low"
+        }
+
+        req = urllib.request.Request(
+            f"{self._base_url}/chat/completions",
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+                "User-Agent": "CSHSM-Client/1.0"
+            },
+            method="POST"
+        )
+
+        try:
+            with urllib.request.urlopen(req, timeout=eff_timeout) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+                choices = data.get("choices", [])
+                text = ""
+                finish_reason = None
+                if choices:
+                    text = choices[0].get("message", {}).get("content", "").strip()
+                    finish_reason = choices[0].get("finish_reason")
+
+                return AdapterOutput(
+                    model_id=self._model_id,
+                    provider="groq",
+                    is_mock=False,
+                    raw_text=text,
+                    latency_ms=latency_ms,
+                    status="SUCCESS" if text else "EMPTY_OUTPUT",
+                    error_category=None if text else "OUTPUT_PARSING",
+                    error_message=None if text else "Empty content from Groq API.",
+                    metadata={
+                        "finish_reason": finish_reason,
+                        "usage": data.get("usage", {})
+                    }
+                )
+        except urllib.error.HTTPError as he:
+            latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+            category_err = "AUTH_ERROR" if he.code in (401, 403) else ("RATE_LIMIT" if he.code == 429 else "NETWORK_ERROR")
+            return AdapterOutput(
+                model_id=self._model_id,
+                provider="groq",
+                is_mock=False,
+                raw_text=None,
+                latency_ms=latency_ms,
+                status="ADAPTER_ERROR",
+                error_category=category_err,
+                error_message=f"HTTP {he.code}: {he.reason}",
+                metadata={"status_code": he.code}
+            )
+        except urllib.error.URLError as ue:
+            latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+            is_timeout = "timed out" in str(ue.reason).lower()
+            return AdapterOutput(
+                model_id=self._model_id,
+                provider="groq",
+                is_mock=False,
+                raw_text=None,
+                latency_ms=latency_ms,
+                status="TIMEOUT" if is_timeout else "ADAPTER_ERROR",
+                error_category="TIMEOUT" if is_timeout else "NETWORK_ERROR",
+                error_message=str(ue.reason),
+                metadata={}
+            )
+        except Exception as exc:
+            latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+            return AdapterOutput(
+                model_id=self._model_id,
+                provider="groq",
                 is_mock=False,
                 raw_text=None,
                 latency_ms=latency_ms,

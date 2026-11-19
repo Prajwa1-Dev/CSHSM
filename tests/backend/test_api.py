@@ -98,8 +98,8 @@ def test_dashboard_serves_html(client):
 
     html = res.get_data(as_text=True)
     # Header & Badges
-    assert "Counter-Speech Research System" in html
-    assert "MOCK RESEARCH PROTOTYPE" in html
+    assert "Counter-Speech Generation for Hate Content in Social Media" in html
+    assert ("HYBRID DEMONSTRATION PIPELINE" in html or "MOCK RESEARCH PROTOTYPE" in html)
     assert "Flask 3.1.3" in html
 
     # Input & Controls
@@ -157,6 +157,56 @@ def test_process_non_string_text_returns_400(client):
     assert res.status_code == 400
     data = res.get_json()
     assert "must be a string" in data["message"]
+
+
+def test_process_exceeds_max_length_returns_400(client):
+    """Payloads exceeding 2,000 characters must be rejected with 400 Bad Request."""
+    oversized_text = "x" * 2001
+    res = client.post("/api/process", json={"text": oversized_text})
+    assert res.status_code == 400
+    data = res.get_json()
+    assert data["error"] == "Bad Request"
+    assert "exceeds maximum allowed length of 2000 characters" in data["message"]
+
+
+def test_process_request_entity_too_large_returns_413():
+    """Payloads exceeding MAX_CONTENT_LENGTH trigger HTTP 413 Payload Too Large."""
+    app = create_app(test_config={"TESTING": True, "MAX_CONTENT_LENGTH": 128})
+    client = app.test_client()
+    res = client.post("/api/process", json={"text": "x" * 500})
+    assert res.status_code == 413
+    data = res.get_json()
+    assert data["error"] == "Payload Too Large"
+
+
+def test_process_unhandled_exception_sanitizes_details(mock_retriever):
+    """Unhandled internal pipeline exceptions must be logged and return sanitized SAFE_FALLBACK without leaking paths."""
+    class FailingOrchestrator:
+        fallback_message = "I cannot respond to this respectfully."
+        DISCLAIMER_FALLBACK = "SAFE FALLBACK — Pipeline triggered safe fallback; candidate rejected or unavailable."
+        allow_mock = True
+        threshold = 0.80
+
+        def process(self, text: str):
+            raise RuntimeError("Database connection failed at C:/CSHSM/private/vault/credentials.db")
+
+    app = create_app(orchestrator=FailingOrchestrator(), test_config={"TESTING": True})
+    client = app.test_client()
+
+    res = client.post("/api/process", json={"text": "Sample hate comment triggering error"})
+    assert res.status_code == 200
+    data = res.get_json()
+
+    assert data["outcome"] == "SAFE_FALLBACK"
+    assert data["safe_fallback_triggered"] is True
+    assert data["fallback_response"] == "I cannot respond to this respectfully."
+    assert data["fallback_reason"] == "INTERNAL_SERVER_ERROR: An unexpected error occurred while processing the request."
+    assert data["provenance"]["error_type"] == "RuntimeError"
+
+    # Crucial security assertion: server file system paths must NOT leak to client
+    raw_response = res.get_data(as_text=True)
+    assert "C:/CSHSM/private/vault" not in raw_response
+    assert "credentials.db" not in raw_response
 
 
 # =====================================================================
@@ -322,11 +372,12 @@ def test_all_five_dashboard_presets(client):
 # =====================================================================
 
 def test_kb_stats_endpoint(client):
-    """GET /api/kb/stats must return source candidate counts, review status, and categories."""
+    """GET /api/kb/stats must return source candidate counts, review status, and active KB V2 telemetry."""
     res = client.get("/api/kb/stats")
     assert res.status_code == 200
     data = res.get_json()
 
+    # Historical candidate pool assertions (backwards compatibility)
     assert data["total_filtered_candidates"] == 19436
     assert data["review_queue_count"] == 28
     assert data["approved_kb_count"] == 0
@@ -334,6 +385,21 @@ def test_kb_stats_endpoint(client):
     assert data["approval_status"] == "pending_human_review"
     assert "Religion" in data["categories"]
     assert "Gender" in data["categories"]
+
+    # Active KB V2 dynamic metadata assertions
+    assert "active_kb_v2" in data
+    active_v2 = data["active_kb_v2"]
+    assert active_v2["status"] == "available"
+    assert active_v2["record_count"] == 300
+    assert active_v2["categories"]["Gender"] == 50
+    assert active_v2["categories"]["Political"] == 50
+    assert active_v2["categories"]["Religion"] == 50
+    assert active_v2["categories"]["Geo-political"] == 50
+    assert active_v2["categories"]["Violence"] == 50
+    assert active_v2["categories"]["Others"] == 50
+    assert active_v2["vector_dimension"] == 1024
+    assert active_v2["embedding_model"] == "BAAI/bge-m3"
+    assert active_v2["human_approved"] is False
 
 
 def test_kb_review_queue_endpoint(client):

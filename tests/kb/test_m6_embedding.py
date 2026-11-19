@@ -442,7 +442,7 @@ def test_skipped_records_cleanup_when_subsequent_run_has_zero_skips(tmp_path):
     backup_skipped = os.path.join(backup_base, backup_dirs[0], "m6_skipped_records.jsonl")
     assert os.path.exists(backup_skipped)
 
-def test_mock_vs_real_embedder_guard():
+def test_mock_vs_real_embedder_guard(monkeypatch):
     mock_emb = MockEmbedder(dim=1024)
     assert mock_emb.is_mock is True
     assert "MOCK" in mock_emb.model_identifier
@@ -451,8 +451,8 @@ def test_mock_vs_real_embedder_guard():
     assert real_emb.is_mock is False
     assert real_emb.model_identifier == "BAAI/bge-m3"
 
-    # In the current environment where sentence-transformers is not installed,
-    # attempting to embed must raise ImportError and not silently generate mock vectors
+    # Simulate missing sentence-transformers to test the dependency guard
+    monkeypatch.setitem(sys.modules, "sentence_transformers", None)
     with pytest.raises(ImportError, match="sentence-transformers is required"):
         real_emb.embed_batch(["test text"])
 

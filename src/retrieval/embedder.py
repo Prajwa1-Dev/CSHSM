@@ -1,4 +1,7 @@
 import os
+# Default to offline Hugging Face mode to ensure fast, socket-free local model loading
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 import re
 import json
 import math
@@ -116,6 +119,11 @@ class BaseEmbedder(ABC):
         """Compute dense vectors for a batch of strings, returned L2-normalized."""
         pass
 
+    def embed_text(self, text: str) -> List[float]:
+        """Compute dense vector for a single string; returned L2-normalized."""
+        results = self.embed_batch([text])
+        return results[0] if results else []
+
 
 class MockEmbedder(BaseEmbedder):
     """
@@ -173,16 +181,19 @@ class BGE_M3_Embedder(BaseEmbedder):
     def __init__(
         self,
         model_name: str = "BAAI/bge-m3",
-        device: str = "cpu",
+        device: Optional[str] = None,
         batch_size: int = 4,
         max_length: int = 512,
-        revision: Optional[str] = None
+        revision: Optional[str] = None,
+        local_files_only: bool = True
     ):
         self._model_name = model_name
-        self._device = device
+        self._device_arg = device
+        self._device = None
         self._batch_size = batch_size
         self._max_length = max_length
         self._revision = revision
+        self._local_files_only = local_files_only
         self._model = None
         self._dim = 1024
 
@@ -198,6 +209,18 @@ class BGE_M3_Embedder(BaseEmbedder):
     def is_mock(self) -> bool:
         return False
 
+    @property
+    def device(self) -> str:
+        if self._device is not None:
+            return self._device
+        if self._device_arg is not None:
+            return self._device_arg
+        try:
+            import torch
+            return "cuda" if torch.cuda.is_available() else "cpu"
+        except ImportError:
+            return "cpu"
+
     def _load_model(self):
         if self._model is not None:
             return
@@ -209,25 +232,61 @@ class BGE_M3_Embedder(BaseEmbedder):
                 "Install with: pip install sentence-transformers"
             ) from e
 
+        import torch
+        if self._device_arg is None or self._device_arg == "cuda":
+            self._device = "cuda" if torch.cuda.is_available() else "cpu"
+        else:
+            self._device = self._device_arg
+
         kwargs = {"device": self._device}
         if self._revision:
             kwargs["revision"] = self._revision
-        self._model = SentenceTransformer(self._model_name, **kwargs)
+
+        if self._local_files_only:
+            os.environ.setdefault("HF_HUB_OFFLINE", "1")
+            os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+            kwargs["model_kwargs"] = {"local_files_only": True}
+
+        try:
+            self._model = SentenceTransformer(self._model_name, **kwargs)
+        except Exception:
+            if "model_kwargs" in kwargs:
+                kwargs.pop("model_kwargs", None)
+            self._model = SentenceTransformer(self._model_name, **kwargs)
+
         self._model.max_seq_length = self._max_length
 
     def embed_batch(self, texts: List[str]) -> List[List[float]]:
+        if not texts:
+            return []
         self._load_model()
         import torch
+        cleaned_texts = [t if (t and t.strip()) else " " for t in texts]
         with torch.no_grad():
             outputs = self._model.encode(
-                texts,
+                cleaned_texts,
                 batch_size=self._batch_size,
                 normalize_embeddings=True,
                 show_progress_bar=False,
                 convert_to_numpy=True
             )
+            if self._device == "cuda":
+                torch.cuda.empty_cache()
             gc.collect()
             return outputs.tolist()
+
+    def embed_text(self, text: str) -> List[float]:
+        """Compute dense vector for a single string; returned L2-normalized."""
+        results = self.embed_batch([text])
+        return results[0] if results else []
+
+    def embed_query(self, query: str) -> List[float]:
+        """Convenience query embedding method."""
+        return self.embed_text(query)
+
+    def embed_document(self, doc: str) -> List[float]:
+        """Convenience document embedding method."""
+        return self.embed_text(doc)
 
 
 # =====================================================================
@@ -330,7 +389,7 @@ class EmbeddingPipeline:
                     continue
                 try:
                     record = json.loads(line)
-                    entry = KBEntry(**record)
+                    entry = KBEntry.from_dict(record) if hasattr(KBEntry, "from_dict") else KBEntry(**record)
                     raw_entries.append(entry)
                 except Exception as e:
                     raise ValueError(f"Malformed JSONL at line {line_no + 1} of {input_path}: {e}") from e

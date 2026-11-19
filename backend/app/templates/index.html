@@ -3,52 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSHSM — Counter-Speech Research System</title>
+  <title>CSHSM — Counter-Speech Generation for Hate Content in Social Media</title>
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/static/favicon-48x48.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
   <style>
     :root {
-      --bg-base: #0b0f17;
-      --bg-surface: #111827;
-      --bg-card: #1f2937;
-      --bg-card-hover: #283548;
-      --border-subtle: #374151;
-      --border-focus: #6366f1;
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --text-dim: #6b7280;
-      --accent-indigo: #6366f1;
-      --accent-indigo-bg: rgba(99, 102, 241, 0.15);
+      --bg-base: #090d16;
+      --bg-surface: #0f172a;
+      --bg-card: #131c31;
+      --bg-card-hover: #18243e;
+      --bg-inset: #0b111e;
+      --border-subtle: #1e293b;
+      --border-muted: #27374f;
+      --border-focus: #3b82f6;
+      
+      --text-main: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      --accent-blue-subtle: rgba(59, 130, 246, 0.08);
       --accent-emerald: #10b981;
-      --accent-emerald-bg: rgba(16, 185, 129, 0.15);
+      --accent-emerald-subtle: rgba(16, 185, 129, 0.08);
       --accent-cyan: #06b6d4;
-      --accent-cyan-bg: rgba(6, 182, 212, 0.15);
+      --accent-cyan-subtle: rgba(6, 182, 212, 0.08);
       --accent-amber: #f59e0b;
-      --accent-amber-bg: rgba(245, 158, 11, 0.15);
-      --accent-rose: #f43f5e;
-      --accent-rose-bg: rgba(244, 63, 94, 0.15);
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 14px;
-      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --accent-amber-subtle: rgba(245, 158, 11, 0.08);
+      --accent-rose: #ef4444;
+      --accent-rose-subtle: rgba(239, 68, 68, 0.08);
+      --accent-indigo: #6366f1;
+      --accent-indigo-subtle: rgba(99, 102, 241, 0.08);
+      
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
       background-color: var(--bg-base);
-      color: var(--text-main);
-      font-family: var(--font-stack);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 13px;
       line-height: 1.5;
-      padding: 0;
-      margin: 0;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* Container */
     .container {
-      max-width: 1200px;
+      max-width: 1320px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 0 24px;
       width: 100%;
     }
 
@@ -56,415 +73,765 @@
     header {
       background: var(--bg-surface);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 18px 0;
+      padding: 13px 0;
     }
     .header-content {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 14px;
     }
     .brand {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
-    .brand-icon {
-      width: 42px;
-      height: 42px;
-      background: linear-gradient(135deg, #4f46e5, #06b6d4);
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 20px;
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      flex-shrink: 0;
+      display: block;
+    }
+    @media (max-width: 480px) {
+      .brand-logo {
+        width: 38px;
+        height: 38px;
+      }
     }
     .brand-title h1 {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: #fff;
+      font-size: 15.5px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
+      line-height: 1.2;
     }
     .brand-title p {
-      font-size: 13px;
+      font-size: 11.5px;
       color: var(--text-muted);
+      margin-top: 2px;
     }
     .system-badges {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
-    /* Badges */
+    /* System Status Badges */
     .badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 12px;
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 500;
       letter-spacing: 0.02em;
+      font-family: var(--font-sans);
     }
     .badge-mock {
-      background: var(--accent-amber-bg);
-      color: var(--accent-amber);
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      background: var(--accent-blue-subtle);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.25);
     }
     .badge-live {
-      background: var(--accent-emerald-bg);
-      color: var(--accent-emerald);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: var(--accent-emerald-subtle);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.25);
     }
     .badge-retrieved {
-      background: var(--accent-cyan-bg);
-      color: var(--accent-cyan);
-      border: 1px solid rgba(6, 182, 212, 0.3);
+      background: var(--accent-cyan-subtle);
+      color: #67e8f9;
+      border: 1px solid rgba(6, 182, 212, 0.25);
     }
     .badge-generated {
-      background: var(--accent-indigo-bg);
-      color: var(--accent-indigo);
-      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: var(--accent-indigo-subtle);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.25);
     }
     .badge-fallback {
-      background: var(--accent-amber-bg);
-      color: var(--accent-amber);
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      background: var(--accent-amber-subtle);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.25);
     }
     .badge-nonhate {
-      background: var(--accent-emerald-bg);
-      color: var(--accent-emerald);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: var(--accent-emerald-subtle);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .badge-subtle {
+      background: var(--bg-inset);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
     }
     .dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: currentColor;
     }
 
-    /* Disclaimer Banner */
-    .banner-mock {
-      background: rgba(245, 158, 11, 0.08);
-      border: 1px solid rgba(245, 158, 11, 0.25);
-      border-radius: var(--radius-md);
-      padding: 12px 18px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      font-size: 13px;
-      color: #fbbf24;
+    /* Main Container */
+    main.container {
+      padding-top: 18px;
+      padding-bottom: 28px;
+      flex: 1;
     }
-    .banner-mock strong { font-weight: 700; color: #fef3c7; }
+
+    /* Demonstration Notice Banner */
+    .banner-mock {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-blue);
+      border-radius: var(--radius-sm);
+      padding: 11px 15px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+    .banner-mock-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    .banner-mock-header svg {
+      width: 13px;
+      height: 13px;
+      color: var(--accent-blue);
+    }
+    .banner-mock strong {
+      font-weight: 600;
+      color: var(--text-main);
+    }
 
     /* Navigation Tabs */
     .nav-tabs {
       display: flex;
-      gap: 8px;
+      gap: 2px;
       border-bottom: 1px solid var(--border-subtle);
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
     .nav-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
-      padding: 10px 18px;
-      font-size: 14px;
-      font-weight: 600;
+      padding: 8px 15px;
+      font-size: 12.5px;
+      font-weight: 500;
       cursor: pointer;
       border-bottom: 2px solid transparent;
-      transition: all 0.15s ease;
+      transition: color 0.15s ease, border-color 0.15s ease;
+      font-family: inherit;
     }
     .nav-btn:hover { color: var(--text-main); }
     .nav-btn.active {
-      color: var(--accent-indigo);
-      border-bottom-color: var(--accent-indigo);
-    }
-
-    /* Grid Layout */
-    .layout-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
-    @media (min-width: 900px) {
-      .layout-grid { grid-template-columns: 1.15fr 0.85fr; }
+      color: var(--accent-blue);
+      border-bottom-color: var(--accent-blue);
     }
 
     /* Cards */
     .card {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 22px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+      border-radius: var(--radius-sm);
+      padding: 16px 18px;
     }
     .card-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 14px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .card-subtitle {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-dim);
     }
 
-    /* Preset Buttons */
-    .presets {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 14px;
+    /* Tab 1: Layout Grid */
+    .pipeline-workspace {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
     }
+    @media (min-width: 960px) {
+      .pipeline-workspace {
+        grid-template-columns: 1fr 1fr;
+        align-items: stretch;
+      }
+    }
+
+    .input-card {
+      display: flex;
+      flex-direction: column;
+    }
+    .results-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 330px;
+    }
+
+    /* Presets — 1-Row Grid on Desktop */
+    .presets-label {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .presets {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 5px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 1120px) {
+      .presets {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      }
+    }
+    @media (max-width: 600px) {
+      .presets {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .preset-btn {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       color: var(--text-muted);
-      padding: 6px 12px;
+      padding: 6px 4px;
       border-radius: var(--radius-sm);
-      font-size: 12px;
+      font-size: 11px;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-family: inherit;
+      min-width: 0;
+      text-align: center;
     }
     .preset-btn:hover {
       background: var(--bg-card-hover);
       color: var(--text-main);
-      border-color: var(--accent-indigo);
+      border-color: var(--border-muted);
+    }
+    .preset-btn:active {
+      background: var(--bg-inset);
+    }
+    .preset-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-blue);
+      background: rgba(59, 130, 246, 0.1);
+      padding: 1px 3px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .preset-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     /* Textarea & Controls */
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
     textarea {
       width: 100%;
-      height: 120px;
-      background: var(--bg-base);
+      flex: 1;
+      min-height: 125px;
+      background: var(--bg-inset);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 14px;
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
       color: var(--text-main);
       font-family: inherit;
-      font-size: 14px;
+      font-size: 13px;
+      line-height: 1.55;
       resize: vertical;
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    textarea:focus { border-color: var(--border-focus); }
+    textarea:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 1px var(--border-focus);
+    }
+    textarea::placeholder {
+      color: var(--text-dim);
+    }
     .action-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 14px;
+      margin-top: 10px;
     }
-    .char-count { font-size: 12px; color: var(--text-dim); }
+    .char-count {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
     .btn-submit {
-      background: var(--accent-indigo);
+      background: var(--accent-blue);
       color: #fff;
-      border: none;
-      padding: 10px 22px;
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      font-weight: 600;
+      border: 1px solid transparent;
+      padding: 7px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      font-weight: 500;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transition: all 0.15s;
+      gap: 6px;
+      transition: background-color 0.15s;
+      font-family: inherit;
     }
     .btn-submit:hover:not(:disabled) {
-      background: #4f46e5;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      background: var(--accent-blue-hover);
     }
     .btn-submit:disabled {
-      opacity: 0.6;
+      opacity: 0.5;
       cursor: not-allowed;
     }
 
-    /* Pipeline Trace (DAG) */
-    .dag-container {
-      margin-top: 24px;
-    }
-    .dag-steps {
+    /* Results Panel */
+    .results-standby {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      position: relative;
-    }
-    .dag-node {
-      display: flex;
       align-items: center;
-      justify-content: space-between;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 12px 16px;
-      transition: all 0.2s ease;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+      flex: 1;
     }
-    .dag-node.active-pass {
-      border-color: rgba(16, 185, 129, 0.5);
-      background: rgba(16, 185, 129, 0.05);
-    }
-    .dag-node.active-skip {
-      border-color: rgba(156, 163, 175, 0.3);
-      opacity: 0.65;
-    }
-    .dag-node.active-fail {
-      border-color: rgba(244, 63, 94, 0.5);
-      background: rgba(244, 63, 94, 0.05);
-    }
-    .dag-node-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .dag-num {
-      width: 26px;
-      height: 26px;
+    .standby-icon {
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      background: var(--bg-base);
+      background: var(--bg-inset);
       border: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-muted);
+      margin-bottom: 11px;
+      color: var(--text-dim);
     }
-    .dag-name { font-size: 14px; font-weight: 600; color: #fff; }
-    .dag-desc { font-size: 12px; color: var(--text-muted); }
-    .dag-status { font-size: 12px; font-weight: 700; }
-
-    /* Results Card */
-    .result-banner {
-      border-radius: var(--radius-md);
-      padding: 14px 18px;
-      margin-bottom: 18px;
+    .standby-title {
+      font-size: 13px;
       font-weight: 600;
-      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .standby-desc {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      max-width: 370px;
+      line-height: 1.5;
+    }
+
+    #results-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .result-banner {
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      margin-bottom: 12px;
+      font-weight: 500;
+      font-size: 12px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
+      border: 1px solid var(--border-subtle);
+      line-height: 1.4;
     }
-    .result-banner.RETRIEVED_RESPONSE { background: var(--accent-cyan-bg); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
-    .result-banner.GENERATED_RESPONSE { background: var(--accent-indigo-bg); color: var(--accent-indigo); border: 1px solid rgba(99, 102, 241, 0.3); }
-    .result-banner.NON_HATE_EARLY_EXIT { background: var(--accent-emerald-bg); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
-    .result-banner.SAFE_FALLBACK { background: var(--accent-amber-bg); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .result-banner.RETRIEVED_RESPONSE {
+      background: var(--accent-cyan-subtle);
+      color: #38bdf8;
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+    .result-banner.GENERATED_RESPONSE {
+      background: var(--accent-indigo-subtle);
+      color: #a5b4fc;
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+    .result-banner.NON_HATE_EARLY_EXIT {
+      background: var(--accent-emerald-subtle);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .result-banner.SAFE_FALLBACK {
+      background: var(--accent-amber-subtle);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
 
     .response-box {
-      background: var(--bg-base);
+      background: var(--bg-inset);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 18px;
-      margin-bottom: 16px;
-      position: relative;
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-bottom: 11px;
     }
-    .response-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 6px; }
-    .response-text { font-size: 15px; color: #fff; line-height: 1.6; }
+    .response-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .response-text {
+      font-size: 13px;
+      color: var(--text-main);
+      line-height: 1.6;
+      word-break: break-word;
+    }
 
     .meta-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+      gap: 5px;
+      margin-bottom: 11px;
     }
     .meta-pill {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
-      padding: 4px 10px;
-      font-size: 12px;
-      color: var(--text-muted);
+      padding: 5px 8px;
+      font-size: 10.5px;
+      color: var(--text-dim);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
-    .meta-pill strong { color: var(--text-main); }
+    .meta-pill strong {
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 11px;
+    }
 
     .disclaimer-box {
-      background: rgba(255, 255, 255, 0.03);
+      background: var(--bg-inset);
       border-left: 3px solid var(--accent-amber);
-      padding: 10px 14px;
-      font-size: 12px;
+      padding: 7px 11px;
+      font-size: 11px;
       color: var(--text-muted);
       border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      line-height: 1.45;
+    }
+
+    /* Full-Width Execution Pipeline Trace (DAG) */
+    .dag-card {
+      margin-bottom: 16px;
+    }
+    .trace-summary {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+    .dag-steps {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 9px;
+    }
+    @media (min-width: 640px) {
+      .dag-steps {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (min-width: 1024px) {
+      .dag-steps {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .dag-node {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 7px;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+      position: relative;
+    }
+    .dag-node.active-pass {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.04);
+    }
+    .dag-node.active-skip {
+      border-color: var(--border-subtle);
+      background: rgba(255, 255, 255, 0.01);
+      opacity: 0.65;
+    }
+    .dag-node.active-fail {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.04);
+    }
+    .dag-node-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .dag-node-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .dag-num {
+      width: 19px;
+      height: 19px;
+      border-radius: 2px;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+    .dag-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .dag-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .dag-status {
+      font-size: 10px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      padding: 2px 5px;
+      border-radius: 2px;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
+      flex-shrink: 0;
     }
 
     /* JSON Drawer */
     details {
-      margin-top: 18px;
-      background: var(--bg-base);
+      margin-top: 12px;
+      background: var(--bg-inset);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       overflow: hidden;
     }
     summary {
-      padding: 12px 16px;
-      font-size: 13px;
-      font-weight: 600;
+      padding: 8px 12px;
+      font-size: 11.5px;
+      font-weight: 500;
       color: var(--text-muted);
       cursor: pointer;
       user-select: none;
+      font-family: var(--font-mono);
     }
     summary:hover { color: var(--text-main); }
     pre {
-      padding: 14px;
-      font-size: 12px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      padding: 11px 13px;
+      font-size: 11px;
+      font-family: var(--font-mono);
       color: #93c5fd;
       overflow-x: auto;
-      max-height: 300px;
-      background: #090d14;
+      max-height: 250px;
+      background: #070b12;
       border-top: 1px solid var(--border-subtle);
+      line-height: 1.5;
     }
 
-    /* Review Queue Table */
+    /* Tab 2: Review Queue Table & Metrics */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+    }
+    .metric-label {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+    .metric-value {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 3px 0 2px 0;
+      font-family: var(--font-mono);
+    }
+    .metric-sub {
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+
     .table-container {
       overflow-x: auto;
-      margin-top: 14px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: 11.5px;
       text-align: left;
     }
     th {
       background: var(--bg-card);
-      padding: 12px 14px;
-      color: var(--text-muted);
+      padding: 9px 12px;
+      color: var(--text-dim);
       font-weight: 600;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 0.04em;
       border-bottom: 1px solid var(--border-subtle);
     }
     td {
-      padding: 12px 14px;
+      padding: 9px 12px;
       border-bottom: 1px solid var(--border-subtle);
-      color: var(--text-main);
+      color: var(--text-secondary);
       vertical-align: top;
+      line-height: 1.5;
     }
-    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.015); }
+    td code {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: #93c5fd;
+      background: var(--bg-inset);
+      padding: 2px 5px;
+      border-radius: 2px;
+      border: 1px solid var(--border-subtle);
+    }
 
     .rec-badge {
       display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 2px;
+      font-size: 9.5px;
+      font-weight: 600;
+      font-family: var(--font-mono);
       text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
-    .rec-acceptable_with_caveats { background: var(--accent-emerald-bg); color: var(--accent-emerald); }
-    .rec-revise { background: var(--accent-amber-bg); color: var(--accent-amber); }
-    .rec-reject { background: var(--accent-rose-bg); color: var(--accent-rose); }
+    .rec-acceptable_with_caveats {
+      background: var(--accent-emerald-subtle);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .rec-revise {
+      background: var(--accent-amber-subtle);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .rec-reject {
+      background: var(--accent-rose-subtle);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* Tab 3: Architecture */
+    .arch-content {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+    .arch-content h3 {
+      color: var(--text-main);
+      font-size: 13.5px;
+      font-weight: 600;
+      margin: 16px 0 8px 0;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .arch-content p {
+      margin-bottom: 10px;
+    }
+    .arch-content ul {
+      margin-left: 18px;
+      margin-bottom: 10px;
+    }
+    .arch-content li {
+      margin-bottom: 5px;
+    }
+    .arch-content code {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #93c5fd;
+      background: var(--bg-inset);
+      padding: 2px 5px;
+      border-radius: 2px;
+      border: 1px solid var(--border-subtle);
+    }
 
     /* Footer */
     footer {
       margin-top: auto;
-      padding: 24px 0;
+      padding: 16px 0;
       border-top: 1px solid var(--border-subtle);
       background: var(--bg-surface);
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-dim);
       text-align: center;
+    }
+    .footer-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   </style>
 </head>
@@ -474,15 +841,15 @@
   <header>
     <div class="container header-content">
       <div class="brand">
-        <div class="brand-icon">CS</div>
+        <img src="/static/cshsm-logo.png" alt="CSHSM Logo" class="brand-logo" width="44" height="44">
         <div class="brand-title">
-          <h1>CSHSM — Counter-Speech Research System</h1>
+          <h1>CSHSM — Counter-Speech Generation for Hate Content in Social Media</h1>
           <p>Hybrid Adaptive Hate Speech Detection & Counter-Speech Orchestration</p>
         </div>
       </div>
       <div class="system-badges">
-        <span class="badge badge-mock">
-          <span class="dot"></span> MOCK RESEARCH PROTOTYPE
+        <span class="badge badge-live">
+          <span class="dot"></span> HYBRID DEMONSTRATION PIPELINE
         </span>
         <span class="badge badge-live" id="health-badge">
           <span class="dot"></span> Connecting...
@@ -494,12 +861,18 @@
   <!-- Main Container -->
   <main class="container">
 
-    <!-- Mock Mode Notice Banner -->
+    <!-- Demonstration Notice Banner -->
     <div class="banner-mock">
-      <div style="font-size: 18px;">⚠️</div>
+      <div class="banner-mock-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>Milestone 8 Hybrid Demonstration Mode &bull; System Disclosures</span>
+      </div>
       <div>
-        <strong>Research Simulation Active (₹0 Budget Protocol):</strong>
-        This research prototype is executing in deterministic mock mode. Hate classification, vector retrieval, and 5-model generation fan-out are simulated locally to prevent API costs. Knowledge base records remain <em>pending human review</em> and are not authorized for real production delivery.
+        Running in <strong>Milestone 8 Hybrid Demonstration Mode</strong> for safe, reproducible presentation. The active pipeline executes <strong>Real Multitask XLM-R neural classification</strong> (<code>models/xlmr_best.pt</code>) and <strong>Real BGE-M3 Dense Embeddings with 300-record FAISS retrieval</strong> over Knowledge Base V2 (<code>data/counter_speech_kb/embeddings_v2</code>). To guarantee strict offline reliability during this demonstration session, the five generation adapters (Gemma 4 26B IT, GLM-4.7-Flash, GPT-OSS-20B, Qwen 3.8 27B, GPT-OSS-120B) and candidate evaluation execute deterministic mock simulations. In the finalized production architecture, Gemini Flash-Lite is the dedicated evaluator judge (not a generation slot). All outputs are unreviewed demonstration candidates pending human review.
       </div>
     </div>
 
@@ -512,27 +885,43 @@
 
     <!-- TAB 1: Live Pipeline & Trace -->
     <div id="tab-pipeline" class="tab-pane">
-      <div class="layout-grid">
 
-        <!-- Left Column: Input & DAG -->
-        <div>
-          <div class="card">
-            <div class="card-title">
-              <span>Input Comment</span>
-              <span style="font-size: 12px; font-weight: normal; color: var(--text-muted);">Select sample or enter text</span>
-            </div>
+      <!-- Balanced Workspace Row (Input & Outcome Side-by-Side) -->
+      <div class="pipeline-workspace">
 
-            <!-- Presets -->
-            <div class="presets">
-              <button class="preset-btn" onclick="setPreset('non_hate')">1. Non-Hate Sample</button>
-              <button class="preset-btn" onclick="setPreset('retrieval')">2. Retrieval Match</button>
-              <button class="preset-btn" onclick="setPreset('generation')">3. Generation Fan-Out</button>
-              <button class="preset-btn" onclick="setPreset('toxic')">4. Safety Rejection</button>
-              <button class="preset-btn" onclick="setPreset('empty')">5. Empty Input</button>
-            </div>
+        <!-- Input Panel -->
+        <div class="card input-card">
+          <div class="card-title">
+            <span>Input Comment</span>
+            <span class="card-subtitle">Benchmark Presets & Direct Input</span>
+          </div>
 
-            <textarea id="comment-input" placeholder="Type or paste social media text here to analyze for hate speech and retrieve/generate counter-speech..."></textarea>
+          <div class="presets-label">Benchmark Samples</div>
+          <div class="presets">
+            <button class="preset-btn" onclick="setPreset('non_hate')" title="Non-Hate Benchmark Sample">
+              <span class="preset-num">1</span>
+              <span class="preset-text">Non-Hate</span>
+            </button>
+            <button class="preset-btn" onclick="setPreset('retrieval')" title="Retrieval Match Benchmark Sample">
+              <span class="preset-num">2</span>
+              <span class="preset-text">Retrieval Match</span>
+            </button>
+            <button class="preset-btn" onclick="setPreset('generation')" title="Generation Fan-Out Benchmark Sample">
+              <span class="preset-num">3</span>
+              <span class="preset-text">Generation Fan-Out</span>
+            </button>
+            <button class="preset-btn" onclick="setPreset('toxic')" title="Safety Rejection Benchmark Sample (English insult - out-of-domain for Kanglish hate classifier)">
+              <span class="preset-num">4</span>
+              <span class="preset-text">Safety Rejection</span>
+            </button>
+            <button class="preset-btn" onclick="setPreset('empty')" title="Empty Input Benchmark Sample">
+              <span class="preset-num">5</span>
+              <span class="preset-text">Empty Input</span>
+            </button>
+          </div>
 
+          <div class="input-container">
+            <textarea id="comment-input" placeholder="Enter social media text here to analyze for hate speech and execute counter-speech orchestration..."></textarea>
             <div class="action-row">
               <span class="char-count" id="char-count">0 characters</span>
               <button class="btn-submit" id="btn-analyze" onclick="analyzeComment()">
@@ -540,167 +929,223 @@
               </button>
             </div>
           </div>
-
-          <!-- Pipeline Execution DAG -->
-          <div class="card dag-container">
-            <div class="card-title">
-              <span>Execution Pipeline Trace (DAG)</span>
-              <span id="trace-summary" style="font-size: 12px; font-weight: normal; color: var(--text-muted);">Awaiting submission</span>
-            </div>
-
-            <div class="dag-steps">
-              <div class="dag-node" id="dag-cleaner">
-                <div class="dag-node-info">
-                  <div class="dag-num">1</div>
-                  <div>
-                    <div class="dag-name">Text Preprocessing</div>
-                    <div class="dag-desc">Conservative unicode normalization & URL/mention masking (TextCleaner)</div>
-                  </div>
-                </div>
-                <div class="dag-status" id="status-cleaner">IDLE</div>
-              </div>
-
-              <div class="dag-node" id="dag-classifier">
-                <div class="dag-node-info">
-                  <div class="dag-num">2</div>
-                  <div>
-                    <div class="dag-name">Hate Classification</div>
-                    <div class="dag-desc">Multitask XLM-R / Mock Classifier (Hate vs Non-Hate & Category)</div>
-                  </div>
-                </div>
-                <div class="dag-status" id="status-classifier">IDLE</div>
-              </div>
-
-              <div class="dag-node" id="dag-router">
-                <div class="dag-node-info">
-                  <div class="dag-num">3</div>
-                  <div>
-                    <div class="dag-name">Vector Retrieval & Routing</div>
-                    <div class="dag-desc">Top-1 similarity evaluated against threshold &tau; (FallbackRouter)</div>
-                  </div>
-                </div>
-                <div class="dag-status" id="status-router">IDLE</div>
-              </div>
-
-              <div class="dag-node" id="dag-generation">
-                <div class="dag-node-info">
-                  <div class="dag-num">4</div>
-                  <div>
-                    <div class="dag-name">Generation Fan-Out</div>
-                    <div class="dag-desc">Concurrent 5-Model Fan-Out (OpenAI, Anthropic, Gemini, Mistral, Cohere)</div>
-                  </div>
-                </div>
-                <div class="dag-status" id="status-generation">IDLE</div>
-              </div>
-
-              <div class="dag-node" id="dag-ranking">
-                <div class="dag-node-info">
-                  <div class="dag-num">5</div>
-                  <div>
-                    <div class="dag-name">Evaluation & Ranking</div>
-                    <div class="dag-desc">Multi-criteria scoring & mandatory safety/relevance hard gates</div>
-                  </div>
-                </div>
-                <div class="dag-status" id="status-ranking">IDLE</div>
-              </div>
-
-              <div class="dag-node" id="dag-final_gate">
-                <div class="dag-node-info">
-                  <div class="dag-num">6</div>
-                  <div>
-                    <div class="dag-name">Final Safety Gate</div>
-                    <div class="dag-desc">Independent defense-in-depth safety filter & candidate integrity check</div>
-                  </div>
-                </div>
-                <div class="dag-status" id="status-final_gate">IDLE</div>
-              </div>
-            </div>
-          </div>
         </div>
 
-        <!-- Right Column: Results & Provenance -->
-        <div>
-          <div class="card" id="results-card">
-            <div class="card-title">
-              <span>Pipeline Outcome & Response</span>
-              <span id="exec-time" style="font-size: 12px; font-weight: normal; color: var(--text-muted);">-- ms</span>
+        <!-- Pipeline Outcome & Response Panel -->
+        <div class="card results-card" id="results-card">
+          <div class="card-title">
+            <span>Pipeline Outcome & Response</span>
+            <span id="exec-time" class="card-subtitle" style="font-family: var(--font-mono);">-- ms</span>
+          </div>
+
+          <!-- Standby Empty State -->
+          <div id="results-placeholder" class="results-standby">
+            <div class="standby-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+            <div class="standby-title">Pipeline Standby</div>
+            <p class="standby-desc">Submit a comment or choose a benchmark preset to execute the end-to-end classification, dense retrieval, and generation fan-out trace.</p>
+          </div>
+
+          <!-- Executed Results Content -->
+          <div id="results-content" style="display: none;">
+            <!-- Outcome Banner -->
+            <div class="result-banner" id="outcome-banner">
+              <span id="outcome-badge" class="badge">--</span>
+              <span id="outcome-text">--</span>
             </div>
 
-            <div id="results-placeholder" style="padding: 40px 20px; text-align: center; color: var(--text-dim);">
-              <div style="font-size: 32px; margin-bottom: 12px;">⚡</div>
-              Submit a comment or click a sample preset above to execute the pipeline trace.
+            <!-- Counter-Speech Response Box -->
+            <div class="response-box" id="response-box">
+              <div class="response-label" id="response-type-label">Response Text</div>
+              <div class="response-text" id="response-text-content">--</div>
             </div>
 
-            <div id="results-content" style="display: none;">
-              <!-- Outcome Banner -->
-              <div class="result-banner" id="outcome-banner">
-                <span id="outcome-badge" class="badge">--</span>
-                <span id="outcome-text">--</span>
+            <!-- Metadata Grid -->
+            <div class="meta-pills" id="meta-pills">
+              <div class="meta-pill">
+                <span>Is Hate</span>
+                <strong id="meta-is-hate">--</strong>
               </div>
-
-              <!-- Counter-Speech Response Box -->
-              <div class="response-box" id="response-box">
-                <div class="response-label" id="response-type-label">Response Text</div>
-                <div class="response-text" id="response-text-content">--</div>
+              <div class="meta-pill">
+                <span>Category</span>
+                <strong id="meta-category">--</strong>
               </div>
-
-              <!-- Metadata Pills -->
-              <div class="meta-pills" id="meta-pills">
-                <div class="meta-pill">Is Hate: <strong id="meta-is-hate">--</strong></div>
-                <div class="meta-pill">Category: <strong id="meta-category">--</strong></div>
-                <div class="meta-pill">Confidence: <strong id="meta-confidence">--</strong></div>
-                <div class="meta-pill">Source: <strong id="meta-source">--</strong></div>
-                <div class="meta-pill">Quality: <strong id="meta-quality">--</strong></div>
-                <div class="meta-pill">Human Audited: <strong id="meta-human-audited">false</strong></div>
+              <div class="meta-pill">
+                <span>Confidence</span>
+                <strong id="meta-confidence">--</strong>
               </div>
-
-              <!-- Disclaimer -->
-              <div class="disclaimer-box" id="disclaimer-content">
-                --
+              <div class="meta-pill">
+                <span>Source</span>
+                <strong id="meta-source">--</strong>
               </div>
-
-              <!-- Full JSON Drawer -->
-              <details>
-                <summary>Inspect Raw JSON Telemetry & Provenance</summary>
-                <pre><code id="json-telemetry">{}</code></pre>
-              </details>
+              <div class="meta-pill">
+                <span>Quality</span>
+                <strong id="meta-quality">--</strong>
+              </div>
+              <div class="meta-pill">
+                <span>Human Audited</span>
+                <strong id="meta-human-audited">false</strong>
+              </div>
+              <div class="meta-pill">
+                <span>Model ID</span>
+                <strong id="meta-model-id">--</strong>
+              </div>
+              <div class="meta-pill">
+                <span>Execution Mode</span>
+                <strong id="meta-exec-mode">--</strong>
+              </div>
+            </div>
+
+            <!-- Component-Level Execution Provenance -->
+            <div class="component-provenance-row" style="display: flex; gap: 6px; margin-top: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+              <span class="badge badge-live" id="comp-cls"><span class="dot"></span> Classifier: Real XLM-R</span>
+              <span class="badge badge-live" id="comp-kb"><span class="dot"></span> Retriever: Real BGE-M3 + FAISS</span>
+              <span class="badge badge-mock" id="comp-gen"><span class="dot"></span> Generator: Mock Simulation</span>
+              <span class="badge badge-mock" id="comp-eval"><span class="dot"></span> Evaluator: Mock Simulation</span>
             </div>
+
+            <!-- Disclaimer Box -->
+            <div class="disclaimer-box" id="disclaimer-content">
+              --
+            </div>
+
+            <!-- JSON Telemetry Drawer -->
+            <details>
+              <summary>Inspect Raw JSON Telemetry & Provenance</summary>
+              <pre><code id="json-telemetry">{}</code></pre>
+            </details>
           </div>
         </div>
 
       </div>
+
+      <!-- Full-Width Execution Pipeline Trace (DAG) -->
+      <div class="card dag-card">
+        <div class="card-title">
+          <span>Execution Pipeline Trace (DAG)</span>
+          <span id="trace-summary" class="trace-summary">Awaiting submission</span>
+        </div>
+
+        <div class="dag-steps">
+          <!-- Step 1: Text Preprocessing -->
+          <div class="dag-node" id="dag-cleaner">
+            <div class="dag-node-header">
+              <div class="dag-node-info">
+                <div class="dag-num">1</div>
+                <div class="dag-name">Text Preprocessing</div>
+              </div>
+              <div class="dag-status" id="status-cleaner">IDLE</div>
+            </div>
+            <div class="dag-desc">Conservative unicode normalization & URL/mention masking (TextCleaner)</div>
+          </div>
+
+          <!-- Step 2: Hate Classification -->
+          <div class="dag-node" id="dag-classifier">
+            <div class="dag-node-header">
+              <div class="dag-node-info">
+                <div class="dag-num">2</div>
+                <div class="dag-name">Hate Classification</div>
+              </div>
+              <div class="dag-status" id="status-classifier">IDLE</div>
+            </div>
+            <div class="dag-desc">Multitask XLM-R neural classification (Real XLM-R: Hate vs Non-Hate & 6 Categories)</div>
+          </div>
+
+          <!-- Step 3: Vector Retrieval & Routing -->
+          <div class="dag-node" id="dag-router">
+            <div class="dag-node-header">
+              <div class="dag-node-info">
+                <div class="dag-num">3</div>
+                <div class="dag-name">Vector Retrieval & Routing</div>
+              </div>
+              <div class="dag-status" id="status-router">IDLE</div>
+            </div>
+            <div class="dag-desc">Top-1 cosine similarity against threshold &tau; = 0.80 querying committed 300-record KB V2 (BGE-M3 + FAISS)</div>
+          </div>
+
+          <!-- Step 4: Generation Fan-Out -->
+          <div class="dag-node" id="dag-generation">
+            <div class="dag-node-header">
+              <div class="dag-node-info">
+                <div class="dag-num">4</div>
+                <div class="dag-name">Generation Fan-Out</div>
+              </div>
+              <div class="dag-status" id="status-generation">IDLE</div>
+            </div>
+            <div class="dag-desc">5-Model Concurrent Fan-Out (Gemma 4 26B, GLM-4.7-Flash, GPT-OSS-20B, Qwen 3.8 27B, GPT-OSS-120B)</div>
+          </div>
+
+          <!-- Step 5: Evaluation & Ranking -->
+          <div class="dag-node" id="dag-ranking">
+            <div class="dag-node-header">
+              <div class="dag-node-info">
+                <div class="dag-num">5</div>
+                <div class="dag-name">Evaluation & Ranking</div>
+              </div>
+              <div class="dag-status" id="status-ranking">IDLE</div>
+            </div>
+            <div class="dag-desc">Multi-criteria scoring & mandatory hard gates via dedicated LLM Judge (Gemini Flash-Lite)</div>
+          </div>
+
+          <!-- Step 6: Final Safety Gate -->
+          <div class="dag-node" id="dag-final_gate">
+            <div class="dag-node-header">
+              <div class="dag-node-info">
+                <div class="dag-num">6</div>
+                <div class="dag-name">Final Safety Gate</div>
+              </div>
+              <div class="dag-status" id="status-final_gate">IDLE</div>
+            </div>
+            <div class="dag-desc">Independent defense-in-depth safety filter & candidate integrity check</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- TAB 2: Knowledge Base & Review Queue -->
+    <!-- TAB 2: Knowledge Base & AI Quality Review -->
     <div id="tab-kb" class="tab-pane" style="display: none;">
       <div class="card">
         <div class="card-title">
           <span>Knowledge Base Metrics & CSHSM Review Queue</span>
-          <span class="badge badge-mock">28 Sampled Candidates</span>
+          <span class="badge badge-subtle">28 Sampled Candidates</span>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
-          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-            <div style="font-size: 12px; color: var(--text-dim);">Source Candidates</div>
-            <div style="font-size: 24px; font-weight: 700; color: #fff;">19,436</div>
-            <div style="font-size: 11px; color: var(--text-muted);">CONAN & Multitarget-CONAN</div>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Historical Source Pool</div>
+            <div class="metric-value">19,436</div>
+            <div class="metric-sub">English CONAN & Multitarget-CONAN</div>
           </div>
-          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-            <div style="font-size: 12px; color: var(--text-dim);">Review Queue Sample</div>
-            <div style="font-size: 24px; font-weight: 700; color: var(--accent-indigo);">28</div>
-            <div style="font-size: 11px; color: var(--text-muted);">Stratified Across 4 Categories</div>
+          <div class="metric-card">
+            <div class="metric-label">Review Queue Sample</div>
+            <div class="metric-value" style="color: var(--accent-indigo);">28</div>
+            <div class="metric-sub">Legacy Review Dataset (M12.1)</div>
           </div>
-          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-            <div style="font-size: 12px; color: var(--text-dim);">Human Approved KB</div>
-            <div style="font-size: 24px; font-weight: 700; color: var(--accent-amber);">0</div>
-            <div style="font-size: 11px; color: var(--text-muted);">Pending Human Audit Session</div>
+          <div class="metric-card">
+            <div class="metric-label">Human Approved KB</div>
+            <div class="metric-value" style="color: var(--accent-amber);">0</div>
+            <div class="metric-sub">Pending Human Audit Session</div>
           </div>
-          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-            <div style="font-size: 12px; color: var(--text-dim);">AI Assessment Triage</div>
-            <div style="font-size: 24px; font-weight: 700; color: var(--accent-emerald);">23 Accept / 3 Rev / 2 Rej</div>
-            <div style="font-size: 11px; color: var(--text-muted);">reports/m12_1_ai_quality_review.json</div>
+          <div class="metric-card">
+            <div class="metric-label">Active Knowledge Base</div>
+            <div class="metric-value" style="color: var(--accent-emerald);">300</div>
+            <div class="metric-sub">Committed KB V2 (FAISS + BGE-M3)</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Fallback Mock Schema</div>
+            <div class="metric-value" style="color: var(--accent-cyan);">2</div>
+            <div class="metric-sub">In-Memory (Only If Flagged)</div>
           </div>
         </div>
+        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.4;">
+          <strong>Knowledge Base Provenance Disclosure:</strong> The active hybrid demonstration queries the committed 300-record Romanized Kannada-English Knowledge Base V2 FAISS index using local BGE-M3 dense embeddings (<code>data/counter_speech_kb/embeddings_v2</code>). The 2-record in-memory mock schema is reserved as a testing fallback.
+        </p>
 
         <div class="table-container">
           <table>
@@ -729,26 +1174,26 @@
         <div class="card-title">
           <span>CSHSM Frozen Architecture & Research Invariants</span>
         </div>
-        <div style="font-size: 14px; color: var(--text-muted); line-height: 1.7;">
-          <p style="margin-bottom: 14px;">
+        <div class="arch-content">
+          <p>
             The CSHSM (Counter-Speech Generation for Hate Content on Social Media) system implements a hybrid adaptive routing architecture designed to balance factual precision, retrieval reliability, and generation flexibility under strict safety gating.
           </p>
 
-          <h3 style="color: #fff; font-size: 15px; margin: 18px 0 8px 0;">1. Non-Hate Early Exit</h3>
-          <p style="margin-bottom: 12px;">When input text is classified as non-hate by the multitask classifier, the pipeline halts immediately without executing vector retrieval or generation fan-out, returning <code>NON_HATE_EARLY_EXIT</code>.</p>
+          <h3>1. Non-Hate Early Exit</h3>
+          <p>When input text is classified as non-hate by the multitask classifier, the pipeline halts immediately without executing vector retrieval or generation fan-out, returning <code>NON_HATE_EARLY_EXIT</code>.</p>
 
-          <h3 style="color: #fff; font-size: 15px; margin: 18px 0 8px 0;">2. High-Similarity Retrieval vs Generation Fan-Out</h3>
-          <p style="margin-bottom: 12px;">If hate is detected, top-1 cosine similarity <em>s<sub>1</sub></em> is evaluated against calibrated threshold <em>&tau;</em>:</p>
-          <ul style="margin-left: 20px; margin-bottom: 12px;">
+          <h3>2. High-Similarity Retrieval vs Generation Fan-Out</h3>
+          <p>If hate is detected, top-1 cosine similarity <em>s<sub>1</sub></em> is evaluated against calibrated threshold <em>&tau; = 0.80</em>:</p>
+          <ul>
             <li>If <em>s<sub>1</sub> &ge; &tau;</em>: Routes to <code>RETRIEVAL</code>. Candidate is verified through M11 final safety gate. Retains <code>quality_status="filtered_candidate"</code>.</li>
             <li>If <em>s<sub>1</sub> &lt; &tau;</em> or error: Routes to <code>FALLBACK_GENERATION</code>. Executes concurrent 5-model fan-out, structural validation, M10 multi-criteria ranking, and M11 safety gating.</li>
           </ul>
 
-          <h3 style="color: #fff; font-size: 15px; margin: 18px 0 8px 0;">3. Defense-in-Depth Safety Invariant</h3>
-          <p style="margin-bottom: 12px;">Under no circumstances does an unreviewed candidate get automatically approved. Both retrieved and generated candidates pass through the independent final safety gate (<code>safety_filter</code>). Any violation immediately triggers safe fallback (<code>"I cannot respond to this respectfully."</code>).</p>
+          <h3>3. Defense-in-Depth Safety Invariant</h3>
+          <p>Under no circumstances does an unreviewed candidate get automatically approved. Both retrieved and generated candidates pass through the independent final safety gate (<code>safety_filter</code>). Any violation immediately triggers safe fallback (<code>"I cannot respond to this respectfully."</code>).</p>
 
-          <h3 style="color: #fff; font-size: 15px; margin: 18px 0 8px 0;">4. Research Environment Mode</h3>
-          <p>Running on Flask 3.1.3 at ₹0 external API cost. Model adapters, judge evaluators, and dense vector embeddings operate in verified deterministic mock mode.</p>
+          <h3>4. Research Environment Mode</h3>
+          <p>Running on Flask 3.1.3 in Milestone 8 Hybrid Demonstration Mode. The pipeline executes offline with real Multitask XLM-R neural classification, real BAAI/bge-m3 dense embedder and FAISS IndexFlatIP vector search over the committed 300-record Knowledge Base V2, and deterministic mock components for 5-model generation fan-out and candidate evaluation.</p>
         </div>
       </div>
     </div>
@@ -757,8 +1202,8 @@
 
   <!-- Footer -->
   <footer>
-    <div class="container">
-      CSHSM Prototype • Final-Year Research Project • Running on Flask 3.1.3 • Strict Mock Safety Policy
+    <div class="container footer-content">
+      <span>&copy; 2026 CSHSM. All rights reserved.</span>
     </div>
   </footer>
 
@@ -768,7 +1213,9 @@
       document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).style.display = 'block';
-      event.target.classList.add('active');
+      if (window.event && window.event.target) {
+        window.event.target.classList.add('active');
+      }
 
       if (tabId === 'tab-kb') {
         loadReviewQueue();
@@ -778,8 +1225,8 @@
     // Presets
     const PRESETS = {
       non_hate: "Have a wonderful, peaceful, and blessed day with your family!",
-      retrieval: "Sample religious hostility query",
-      generation: "This community is destroying traditional cultural values and should not be permitted here.",
+      retrieval: "Hennu makkalu ge higher studies yaake, madve aadmele mane nodkobeku ashte.",
+      generation: "Every single member of that community is a criminal and should be deported immediately.",
       toxic: "You are an idiot and I hope you die.",
       empty: "   "
     };
@@ -823,10 +1270,15 @@
       nodes.forEach(name => {
         const el = document.getElementById(`dag-${name}`);
         const status = document.getElementById(`status-${name}`);
-        el.className = 'dag-node';
-        status.innerText = 'PENDING';
-        status.style.color = 'var(--text-dim)';
+        if (el) el.className = 'dag-node';
+        if (status) {
+          status.innerText = 'PENDING';
+          status.title = 'PENDING';
+          status.style.color = 'var(--text-dim)';
+        }
       });
+      const traceSummary = document.getElementById('trace-summary');
+      if (traceSummary) traceSummary.innerText = 'Awaiting submission';
     }
 
     // Update DAG based on component_statuses
@@ -837,6 +1289,7 @@
         if (!el || !statusEl) continue;
 
         statusEl.innerText = status;
+        statusEl.title = status;
 
         if (['SUCCESS', 'PASS_UNAPPROVED', 'SELECTED', 'PASSTHROUGH', 'RETRIEVE'].includes(status)) {
           el.className = 'dag-node active-pass';
@@ -844,7 +1297,7 @@
         } else if (status.startsWith('SKIPPED') || status === 'FALLBACK_GENERATION') {
           el.className = 'dag-node active-skip';
           statusEl.style.color = status === 'FALLBACK_GENERATION' ? 'var(--accent-indigo)' : 'var(--text-dim)';
-        } else if (status.startsWith('REJECTED') || status.startsWith('ERROR') || status === 'EMPTY_INPUT') {
+        } else if (status.startsWith('REJECTED') || status.startsWith('ERROR') || status === 'EMPTY_INPUT' || status.includes('FILTERED')) {
           el.className = 'dag-node active-fail';
           statusEl.style.color = 'var(--accent-rose)';
         }
@@ -861,6 +1314,8 @@
       btn.disabled = true;
       btnText.innerText = 'Analyzing...';
       resetDAG();
+      const traceSummary = document.getElementById('trace-summary');
+      if (traceSummary) traceSummary.innerText = 'Executing pipeline...';
 
       const startTime = performance.now();
 
@@ -880,6 +1335,9 @@
         }
 
         const data = await res.json();
+        if (traceSummary) {
+          traceSummary.innerText = `Completed in ${elapsed} ms (${data.outcome})`;
+        }
         renderResults(data);
       } catch (err) {
         alert('Request failed: ' + err.message);
@@ -935,6 +1393,110 @@
       document.getElementById('meta-source').innerText = data.source_origin || 'None';
       document.getElementById('meta-quality').innerText = data.quality_status || '--';
       document.getElementById('meta-human-audited').innerText = String(data.human_audited);
+      document.getElementById('meta-model-id').innerText = data.model_id || (data.candidate_id ? data.candidate_id : '--');
+      // Execution Mode & Component-Level Provenance
+      const isClsReal = data.provenance && data.provenance.classifier_output ? (data.provenance.classifier_output.is_mock === false) : false;
+      const isKbReal = data.provenance && data.provenance.routing_decision && data.provenance.routing_decision.provenance ? (data.provenance.routing_decision.provenance.is_mock === false) : false;
+
+      // Extract generation provenance safely
+      const fanOut = data.provenance && data.provenance.fan_out_result;
+      const genRecords = (fanOut && Array.isArray(fanOut.execution_records)) ? fanOut.execution_records : 
+                         ((fanOut && Array.isArray(fanOut.raw_candidates)) ? fanOut.raw_candidates : []);
+      const isGenSkipped = Boolean(data.component_statuses && data.component_statuses.generation === 'SKIPPED');
+      const genLiveCount = genRecords.filter(r => r && r.is_mock === false).length;
+      const genMockCount = genRecords.filter(r => r && r.is_mock === true).length;
+      const hasGenTelemetry = genRecords.length > 0;
+      const isGenAllLive = hasGenTelemetry && genLiveCount > 0 && genMockCount === 0;
+      const isGenPartialLive = hasGenTelemetry && genLiveCount > 0 && genMockCount > 0;
+      const isGenMock = hasGenTelemetry && genMockCount > 0 && genLiveCount === 0;
+
+      // Extract evaluator provenance safely
+      const ranking = data.provenance && data.provenance.ranking_result;
+      const isEvalSkipped = Boolean(data.component_statuses && data.component_statuses.ranking === 'SKIPPED');
+      const isEvalLive = Boolean(ranking && ranking.is_mock === false);
+      const isEvalMock = Boolean(ranking && ranking.is_mock === true);
+
+      // Determine Execution Mode label
+      let execModeText = 'Hybrid Demonstration';
+      if (data.outcome === 'NON_HATE_EARLY_EXIT') {
+        execModeText = isClsReal ? 'Real Classifier (Early Exit)' : 'Mock Early Exit';
+      } else if (data.source_origin === 'RETRIEVAL') {
+        execModeText = (isClsReal && isKbReal) ? 'Real Retrieval (XLM-R + FAISS)' : (isClsReal ? 'Hybrid (Real XLM-R)' : 'Mock Retrieval');
+      } else if (data.source_origin === 'GENERATION') {
+        if (isClsReal && isKbReal && isGenAllLive && isEvalLive) {
+          execModeText = 'All-Live Pipeline';
+        } else if (isClsReal && isKbReal && (isGenAllLive || isGenPartialLive || isEvalLive)) {
+          execModeText = 'Partial-Live Pipeline';
+        } else if (isClsReal && isKbReal) {
+          execModeText = 'Hybrid (Real XLM-R + FAISS)';
+        } else if (isClsReal) {
+          execModeText = 'Hybrid (Real XLM-R)';
+        } else {
+          execModeText = 'Mock Simulation';
+        }
+      } else {
+        if (isClsReal && isKbReal) {
+          execModeText = 'Hybrid (Real XLM-R + FAISS)';
+        } else if (isClsReal) {
+          execModeText = 'Hybrid (Real XLM-R)';
+        } else {
+          execModeText = 'Mock Simulation';
+        }
+      }
+      document.getElementById('meta-exec-mode').innerText = execModeText;
+
+      // Update component badges
+      const clsBadge = document.getElementById('comp-cls');
+      const kbBadge = document.getElementById('comp-kb');
+      const genBadge = document.getElementById('comp-gen');
+      const evalBadge = document.getElementById('comp-eval');
+
+      if (clsBadge) {
+        clsBadge.className = isClsReal ? 'badge badge-live' : 'badge badge-mock';
+        clsBadge.innerHTML = `<span class="dot"></span> Classifier: ${isClsReal ? 'Real XLM-R' : 'Mock Simulation'}`;
+      }
+
+      if (kbBadge) {
+        if (data.component_statuses && data.component_statuses.router === 'SKIPPED') {
+          kbBadge.className = 'badge';
+          kbBadge.innerHTML = '<span class="dot"></span> Retriever: Standby (Not Needed)';
+        } else {
+          kbBadge.className = isKbReal ? 'badge badge-live' : 'badge badge-mock';
+          kbBadge.innerHTML = `<span class="dot"></span> Retriever: ${isKbReal ? 'Real BGE-M3 + FAISS' : 'Mock Simulation'}`;
+        }
+      }
+
+      if (genBadge) {
+        if (isGenSkipped) {
+          genBadge.className = 'badge';
+          genBadge.innerHTML = '<span class="dot"></span> Generator: Standby (Not Needed)';
+        } else if (isGenAllLive) {
+          genBadge.className = 'badge badge-live';
+          genBadge.innerHTML = `<span class="dot"></span> Generator: Live Fan-Out (${genLiveCount} Models)`;
+        } else if (isGenPartialLive) {
+          genBadge.className = 'badge badge-live';
+          genBadge.innerHTML = `<span class="dot"></span> Generator: Partial-Live (${genLiveCount}/${genRecords.length} Live)`;
+        } else {
+          // Defaults safely to Mock Simulation for mock execution or missing telemetry
+          genBadge.className = 'badge badge-mock';
+          genBadge.innerHTML = '<span class="dot"></span> Generator: Mock Simulation';
+        }
+      }
+
+      if (evalBadge) {
+        if (isEvalSkipped) {
+          evalBadge.className = 'badge';
+          evalBadge.innerHTML = '<span class="dot"></span> Evaluator: Standby (Not Needed)';
+        } else if (isEvalLive) {
+          evalBadge.className = 'badge badge-live';
+          const judgeName = ranking?.evaluator_id?.includes('gemini') ? 'Live Gemini Flash-Lite' : 'Live LLM Judge';
+          evalBadge.innerHTML = `<span class="dot"></span> Evaluator: ${judgeName}`;
+        } else {
+          // Defaults safely to Mock Simulation for mock execution or missing telemetry
+          evalBadge.className = 'badge badge-mock';
+          evalBadge.innerHTML = '<span class="dot"></span> Evaluator: Mock Simulation';
+        }
+      }
 
       // Disclaimer
       document.getElementById('disclaimer-content').innerText = data.disclaimer || 'Unapproved candidate.';
@@ -961,9 +1523,9 @@
 
           tr.innerHTML = `
             <td><code>${c.kb_id}</code></td>
-            <td><strong>${c.category}</strong><br><span style="font-size: 11px; color: var(--text-dim);">${c.target || ''}</span></td>
-            <td style="max-width: 280px; font-size: 12px; color: #e5e7eb;">${escapeHtml(c.hate_text)}</td>
-            <td style="max-width: 320px; font-size: 12px; color: #93c5fd;">${escapeHtml(c.counter_speech)}</td>
+            <td><strong>${c.category}</strong><br><span style="font-size: 10.5px; color: var(--text-dim);">${c.target || ''}</span></td>
+            <td style="max-width: 280px; font-size: 11.5px; color: #e2e8f0;">${escapeHtml(c.hate_text)}</td>
+            <td style="max-width: 320px; font-size: 11.5px; color: #93c5fd;">${escapeHtml(c.counter_speech)}</td>
             <td>
               <span class="rec-badge rec-${rec}">${rec.replace(/_/g, ' ')}</span>
               ${caveats ? `<br><span style="font-size: 10px; color: var(--text-muted);">${escapeHtml(caveats)}</span>` : ''}

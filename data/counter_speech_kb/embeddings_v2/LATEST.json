@@ -1,0 +1,26 @@
+{
+  "run_id": "bge_m3_20261102_091706_12d7314e",
+  "run_dir": "runs\\bge_m3_20261102_091706_12d7314e",
+  "scope": "development_provisional",
+  "is_mock": false,
+  "model_identifier": "BAAI/bge-m3",
+  "vector_count": 300,
+  "manifest_count": 300,
+  "matrix_shape": [
+    300,
+    1024
+  ],
+  "committed_at": "2026-11-02T09:17:06.922615+00:00",
+  "commit_marker": "COMMITTED",
+  "artifacts": {
+    "vector_file": "bge_m3_dense.npy",
+    "vector_sha256": "52dda57e2cee699d664f3d1da8e9e934d65bdf82f5cb51c4637a98960e174ee3",
+    "manifest_file": "bge_m3_manifest.jsonl",
+    "manifest_sha256": "5a0bb29681907e248a56a1b813c7a62e3d8828399102bedfda25d88c7e9c3749",
+    "report_file": "m6_embedding_report.json",
+    "commit_marker": "COMMITTED",
+    "latest_pointer": "LATEST.json",
+    "authoritative_run_dir": "data/counter_speech_kb/embeddings_v2\\runs\\bge_m3_20261102_091706_12d7314e",
+    "report_sha256": "36eb17229f5fb74de87e6267642bd41af1d657d891a0a3893792bb7b5f8d4be7"
+  }
+}

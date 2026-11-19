@@ -137,17 +137,36 @@ class XLMROracleClassifier(BaseClassifier):
       rather than silently classifying inputs as non-hate.
     """
 
-    CATEGORIES = ["religion", "caste", "gender", "race", "nationality", "disability"]
+    CATEGORIES = ["Gender", "Political", "Religion", "Geo-political", "Violence", "Others"]
+    DEFAULT_CHECKPOINT = "models/xlmr_best.pt"
 
     def __init__(
         self,
         model_path: Optional[str] = None,
         model_name: str = "xlm-roberta-base",
-        device: str = "cpu"
+        device: Optional[str] = None
     ):
-        self.model_path = model_path
+        if model_path is None:
+            if os.path.isfile(self.DEFAULT_CHECKPOINT):
+                self.model_path = self.DEFAULT_CHECKPOINT
+            else:
+                proj_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+                candidate = os.path.join(proj_root, self.DEFAULT_CHECKPOINT)
+                self.model_path = candidate if os.path.isfile(candidate) else self.DEFAULT_CHECKPOINT
+        else:
+            self.model_path = model_path
+
         self.model_name = model_name
-        self.device = device
+
+        if device is None or device == "auto":
+            try:
+                import torch
+                self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            except Exception:
+                self.device = "cpu"
+        else:
+            self.device = device
+
         self._model = None
         self._tokenizer = None
 
@@ -177,8 +196,10 @@ class XLMROracleClassifier(BaseClassifier):
             from src.models.multitask_xlmr import MultitaskXLMR
             self._tokenizer = AutoTokenizer.from_pretrained(self.model_name)
             self._model = MultitaskXLMR(model_name=self.model_name, num_categories=len(self.CATEGORIES))
-            state_dict = torch.load(self.model_path, map_location=self.device)
-            self._model.load_state_dict(state_dict)
+            state_dict = torch.load(self.model_path, map_location=self.device, weights_only=False)
+            if isinstance(state_dict, dict) and "model_state_dict" in state_dict:
+                state_dict = state_dict["model_state_dict"]
+            self._model.load_state_dict(state_dict, strict=True)
             self._model.to(self.device)
             self._model.eval()
         except Exception as exc:
@@ -190,6 +211,16 @@ class XLMROracleClassifier(BaseClassifier):
         if self._model is None or self._tokenizer is None:
             raise RuntimeError(
                 "XLMROracleClassifier is not loaded. Cannot run inference."
+            )
+
+        if not text or not text.strip():
+            return ClassifierOutput(
+                is_hate=False,
+                category=None,
+                confidence=1.0,
+                model_id=f"xlmr-{self.model_name}",
+                is_mock=False,
+                metadata={"reason": "empty_input"}
             )
 
         import torch

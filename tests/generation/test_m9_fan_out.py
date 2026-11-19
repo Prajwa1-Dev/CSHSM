@@ -14,7 +14,9 @@ from src.generation.adapters import (
     AnthropicAdapter,
     GoogleGeminiAdapter,
     MistralAdapter,
-    CohereAdapter
+    CohereAdapter,
+    CloudflareWorkersAIAdapter,
+    GroqAdapter
 )
 from src.generation.fan_out import (
     GenerationRequest,
@@ -22,7 +24,9 @@ from src.generation.fan_out import (
     AdapterExecutionRecord,
     FanOutResult,
     GenerationFanOut,
-    create_default_fan_out
+    create_default_fan_out,
+    is_cloudflare_configured,
+    is_groq_configured
 )
 
 
@@ -459,7 +463,7 @@ def test_default_fan_out_has_five_mocks():
 
 
 def test_existing_all_live_mode_unchanged():
-    fan_out = create_default_fan_out(use_mock=False)
+    fan_out = create_default_fan_out(use_mock=False, use_legacy_models=True)
     assert len(fan_out.adapters) == 5
     expected_providers = ["openai", "anthropic", "google", "mistral", "cohere"]
     for idx, adapter in enumerate(fan_out.adapters):
@@ -526,3 +530,333 @@ def test_hybrid_fan_out_missing_gemini_credentials_fails_closed(monkeypatch):
     assert gemini_rec.status == "UNCONFIGURED_CREDENTIALS"
     assert gemini_rec.error_category == "AUTH_ERROR"
     assert "Missing credentials" in gemini_rec.error_message
+
+
+# =====================================================================
+# 11. Finalized 5-Generator Roster & Timeout Tests
+# =====================================================================
+
+def test_finalized_five_generator_mock_slots():
+    fan_out = create_default_fan_out(use_mock=True)
+    assert len(fan_out.adapters) == 5
+    expected_models = [
+        "mock-gemma4-26b-it",
+        "mock-glm-4.7-flash",
+        "mock-gpt-oss-20b",
+        "mock-qwen-3.8-27b",
+        "mock-gpt-oss-120b"
+    ]
+    for idx, expected in enumerate(expected_models):
+        assert fan_out.adapters[idx].model_id == expected
+        assert fan_out.adapters[idx].is_mock is True
+        assert fan_out.adapters[idx].provider == "mock"
+
+
+def test_finalized_five_generator_live_slots():
+    fan_out = create_default_fan_out(use_mock=False)
+    assert len(fan_out.adapters) == 5
+    assert fan_out.adapters[0].provider == "cloudflare"
+    assert fan_out.adapters[0].model_id == "@cf/google/gemma-4-26b-a4b-it"
+    assert fan_out.adapters[1].provider == "cloudflare"
+    assert fan_out.adapters[1].model_id == "@cf/zai-org/glm-4.7-flash"
+    assert fan_out.adapters[2].provider == "groq"
+    assert fan_out.adapters[2].model_id == "openai/gpt-oss-20b"
+    assert fan_out.adapters[3].provider == "groq"
+    assert fan_out.adapters[3].model_id == "qwen/qwen3.8-27b"
+    assert fan_out.adapters[4].provider == "groq"
+    assert fan_out.adapters[4].model_id == "openai/gpt-oss-120b"
+
+
+def test_cloudflare_adapter_unconfigured_credentials_fails_closed(monkeypatch):
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    adapter = CloudflareWorkersAIAdapter(model_id="@cf/google/gemma-4-26b-a4b-it")
+    out = adapter.generate(prompt="Sample hate text")
+    assert out.status == "UNCONFIGURED_CREDENTIALS"
+    assert out.error_category == "AUTH_ERROR"
+    assert out.raw_text is None
+    assert "Missing credentials" in out.error_message
+
+
+def test_groq_adapter_unconfigured_credentials_fails_closed(monkeypatch):
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    adapter = GroqAdapter(model_id="openai/gpt-oss-20b")
+    out = adapter.generate(prompt="Sample hate text")
+    assert out.status == "UNCONFIGURED_CREDENTIALS"
+    assert out.error_category == "AUTH_ERROR"
+    assert out.raw_text is None
+    assert "Missing credentials" in out.error_message
+
+
+def test_fan_out_hard_timeout_shutdown_isolation():
+    # Verify ThreadPoolExecutor shutdown does not hang waiting on slow/unresponsive threads
+    slow_adapter = MockModelAdapter(
+        model_id="mock-slow-slot",
+        delay_sec=10.0,
+        timeout=10.0
+    )
+    fast_adapter = MockModelAdapter(
+        model_id="mock-fast-slot",
+        canned_response="Fast counter-speech response.",
+        delay_sec=0.0
+    )
+    fan_out = GenerationFanOut(adapters=[slow_adapter, fast_adapter], overall_timeout=0.4)
+    t0 = time.perf_counter()
+    res = fan_out.execute(GenerationRequest(query_text="Sample query"))
+    elapsed = time.perf_counter() - t0
+
+    # Must terminate promptly without waiting for the 10.0s thread
+    assert elapsed < 2.0, f"Shutdown hung! Elapsed: {elapsed:.2f}s"
+    assert res.total_slots == 2
+    assert res.failed_slots >= 1
+    slow_records = [r for r in res.execution_records if r.model_id == "mock-slow-slot"]
+    assert len(slow_records) == 1
+    assert slow_records[0].status == "TIMEOUT"
+
+
+# =====================================================================
+# Milestone G4: Resilient Per-Provider Live Execution Tests
+# =====================================================================
+
+def test_is_cloudflare_configured(monkeypatch):
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    assert is_cloudflare_configured() is False
+
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "dummy_token")
+    assert is_cloudflare_configured() is False
+
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", "dummy_account")
+    assert is_cloudflare_configured() is True
+
+
+def test_is_groq_configured(monkeypatch):
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    assert is_groq_configured() is False
+
+    monkeypatch.setenv("GROQ_API_KEY", "dummy_groq_key")
+    assert is_groq_configured() is True
+
+
+def test_fan_out_all_mock_mode():
+    fan_out = create_default_fan_out(use_mock=True)
+    assert len(fan_out.adapters) == 5
+    for a in fan_out.adapters:
+        assert isinstance(a, MockModelAdapter)
+        assert a.is_mock is True
+        assert a.provider == "mock"
+
+    expected_models = [
+        "mock-gemma4-26b-it",
+        "mock-glm-4.7-flash",
+        "mock-gpt-oss-20b",
+        "mock-qwen-3.8-27b",
+        "mock-gpt-oss-120b"
+    ]
+    assert [a.model_id for a in fan_out.adapters] == expected_models
+
+
+def test_fan_out_all_live_configured(monkeypatch):
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "dummy_token")
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", "dummy_account")
+    monkeypatch.setenv("GROQ_API_KEY", "dummy_groq_key")
+
+    fan_out = create_default_fan_out(use_mock=False)
+    assert len(fan_out.adapters) == 5
+    for a in fan_out.adapters:
+        assert a.is_mock is False
+
+    assert isinstance(fan_out.adapters[0], CloudflareWorkersAIAdapter)
+    assert fan_out.adapters[0].model_id == "@cf/google/gemma-4-26b-a4b-it"
+
+    assert isinstance(fan_out.adapters[1], CloudflareWorkersAIAdapter)
+    assert fan_out.adapters[1].model_id == "@cf/zai-org/glm-4.7-flash"
+
+    assert isinstance(fan_out.adapters[2], GroqAdapter)
+    assert fan_out.adapters[2].model_id == "openai/gpt-oss-20b"
+
+    assert isinstance(fan_out.adapters[3], GroqAdapter)
+    assert fan_out.adapters[3].model_id == "qwen/qwen3.8-27b"
+
+    assert isinstance(fan_out.adapters[4], GroqAdapter)
+    assert fan_out.adapters[4].model_id == "openai/gpt-oss-120b"
+
+
+def test_fan_out_partial_live_groq_only(monkeypatch):
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    monkeypatch.setenv("GROQ_API_KEY", "dummy_groq_key")
+
+    fan_out = create_default_fan_out(use_mock=False, allow_mock_fallback=True)
+    assert len(fan_out.adapters) == 5
+
+    # Cloudflare slots fell back to mock because credentials were missing
+    assert isinstance(fan_out.adapters[0], MockModelAdapter)
+    assert fan_out.adapters[0].is_mock is True
+    assert fan_out.adapters[0].model_id == "mock-gemma4-26b-it"
+
+    assert isinstance(fan_out.adapters[1], MockModelAdapter)
+    assert fan_out.adapters[1].is_mock is True
+    assert fan_out.adapters[1].model_id == "mock-glm-4.7-flash"
+
+    # Groq slots are live
+    assert isinstance(fan_out.adapters[2], GroqAdapter)
+    assert fan_out.adapters[2].is_mock is False
+    assert fan_out.adapters[2].model_id == "openai/gpt-oss-20b"
+
+    assert isinstance(fan_out.adapters[3], GroqAdapter)
+    assert fan_out.adapters[3].is_mock is False
+    assert fan_out.adapters[3].model_id == "qwen/qwen3.8-27b"
+
+    assert isinstance(fan_out.adapters[4], GroqAdapter)
+    assert fan_out.adapters[4].is_mock is False
+    assert fan_out.adapters[4].model_id == "openai/gpt-oss-120b"
+
+
+def test_fan_out_partial_live_cloudflare_only(monkeypatch):
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "dummy_token")
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", "dummy_account")
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+
+    fan_out = create_default_fan_out(use_mock=False, allow_mock_fallback=True)
+    assert len(fan_out.adapters) == 5
+
+    # Cloudflare slots are live
+    assert isinstance(fan_out.adapters[0], CloudflareWorkersAIAdapter)
+    assert fan_out.adapters[0].is_mock is False
+    assert fan_out.adapters[0].model_id == "@cf/google/gemma-4-26b-a4b-it"
+
+    assert isinstance(fan_out.adapters[1], CloudflareWorkersAIAdapter)
+    assert fan_out.adapters[1].is_mock is False
+    assert fan_out.adapters[1].model_id == "@cf/zai-org/glm-4.7-flash"
+
+    # Groq slots fell back to mock
+    for idx in (2, 3, 4):
+        assert isinstance(fan_out.adapters[idx], MockModelAdapter)
+        assert fan_out.adapters[idx].is_mock is True
+
+
+def test_fan_out_unconfigured_fails_closed_without_mock_fallback(monkeypatch):
+    # Missing credentials with allow_mock_fallback=False must NOT silently use mock
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+
+    fan_out = create_default_fan_out(use_mock=False, allow_mock_fallback=False)
+    for a in fan_out.adapters:
+        assert a.is_mock is False
+
+    req = GenerationRequest(query_text="Sample hate speech text", category="Religion")
+    result = fan_out.execute(req)
+
+    assert result.total_slots == 5
+    assert result.successful_slots == 0
+    assert result.failed_slots == 5
+    assert result.status == "TOTAL_FAILURE"
+    assert result.safe_fallback_triggered is True
+    assert result.fallback_response == fan_out.fallback_message
+
+    for rec in result.execution_records:
+        assert rec.is_mock is False
+        assert rec.status == "UNCONFIGURED_CREDENTIALS"
+        assert rec.error_category == "AUTH_ERROR"
+
+
+def test_fan_out_explicit_provider_toggles(monkeypatch):
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "dummy_token")
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", "dummy_account")
+    monkeypatch.setenv("GROQ_API_KEY", "dummy_groq_key")
+
+    # Explicit toggle: Cloudflare live, Groq mock
+    fo1 = create_default_fan_out(use_live_cloudflare=True, use_live_groq=False)
+    assert fo1.adapters[0].is_mock is False
+    assert fo1.adapters[1].is_mock is False
+    assert fo1.adapters[2].is_mock is True
+    assert fo1.adapters[3].is_mock is True
+    assert fo1.adapters[4].is_mock is True
+
+    # Explicit toggle: Cloudflare mock, Groq live
+    fo2 = create_default_fan_out(use_live_cloudflare=False, use_live_groq=True)
+    assert fo2.adapters[0].is_mock is True
+    assert fo2.adapters[1].is_mock is True
+    assert fo2.adapters[2].is_mock is False
+    assert fo2.adapters[3].is_mock is False
+    assert fo2.adapters[4].is_mock is False
+
+
+def test_fan_out_resilient_partial_provider_failure():
+    # Slot 0: TimeoutError
+    # Slot 1: Runtime error (e.g. 500 error)
+    # Slots 2, 3, 4: Successful responses
+    adapters = [
+        MockModelAdapter(
+            model_id="mock-failing-1",
+            provider="cloudflare",
+            exception_to_raise=TimeoutError("Connection timed out after 25s")
+        ),
+        MockModelAdapter(
+            model_id="mock-failing-2",
+            provider="cloudflare",
+            exception_to_raise=RuntimeError("Provider HTTP 500 internal error")
+        ),
+        MockModelAdapter(
+            model_id="mock-working-3",
+            provider="groq",
+            canned_response="Constructive counter-speech 1: Empathy reduces hostility."
+        ),
+        MockModelAdapter(
+            model_id="mock-working-4",
+            provider="groq",
+            canned_response="Constructive counter-speech 2: Facts and respect bridge divides."
+        ),
+        MockModelAdapter(
+            model_id="mock-working-5",
+            provider="groq",
+            canned_response="Constructive counter-speech 3: Mutual human dignity is paramount."
+        )
+    ]
+    fan_out = GenerationFanOut(adapters=adapters, overall_timeout=70.0)
+    req = GenerationRequest(query_text="Hate speech context for resiliency testing", category="Gender")
+    res = fan_out.execute(req)
+
+    assert res.total_slots == 5
+    assert res.successful_slots == 3
+    assert res.failed_slots == 2
+    assert res.status == "PARTIAL_SUCCESS"
+    assert res.safe_fallback_triggered is False
+    assert len(res.safe_candidates) == 3
+    assert len(res.execution_records) == 5
+
+    rec0 = res.execution_records[0]
+    assert rec0.status == "TIMEOUT" or rec0.status == "ADAPTER_ERROR"
+    assert rec0.candidate_id is None
+
+    rec1 = res.execution_records[1]
+    assert rec1.status == "ADAPTER_ERROR"
+    assert rec1.candidate_id is None
+
+    for idx in (2, 3, 4):
+        rec = res.execution_records[idx]
+        assert rec.status == "SUCCESS"
+        assert rec.candidate_id is not None
+
+
+def test_fan_out_immutable_provenance_and_truthful_mock_flag():
+    adapters = [
+        MockModelAdapter(model_id="mock-slot-0", provider="mock", canned_response="Response 1 for testing."),
+        MockModelAdapter(model_id="mock-slot-1", provider="mock", canned_response="Response 2 for testing.")
+    ]
+    fan_out = GenerationFanOut(adapters=adapters)
+    res = fan_out.execute(GenerationRequest(query_text="Test query", category="Political"))
+
+    # Assert provenance records exactly match adapter properties
+    prov_adapters = res.provenance["adapters"]
+    assert len(prov_adapters) == 2
+    for idx, p in enumerate(prov_adapters):
+        assert p["slot"] == idx
+        assert p["is_mock"] is True
+        assert p["provider"] == "mock"
+        assert p["model_id"] == f"mock-slot-{idx}"
+
+    for cand in res.safe_candidates:
+        assert cand.is_mock is True

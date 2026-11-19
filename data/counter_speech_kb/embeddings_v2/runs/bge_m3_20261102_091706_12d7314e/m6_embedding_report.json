@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-11-02T09:17:06.922615+00:00",
+  "run_id": "bge_m3_20261102_091706_12d7314e",
+  "run_dir": "runs\\bge_m3_20261102_091706_12d7314e",
+  "model_identifier": "BAAI/bge-m3",
+  "is_mock": false,
+  "embedding_dimension": 1024,
+  "normalization": "L2",
+  "strategy": "hate_text",
+  "kb_scope": "development_provisional",
+  "approval_status": "unapproved",
+  "batch_size": 16,
+  "input_file": "data/counter_speech_kb/cshsm_kannada_english_kb_v2.jsonl",
+  "input_file_sha256": "c910ee498810c3f784e97d1916c39fb2ebeb59a30f3689e41d1d9d971c6051a6",
+  "raw_record_count": 300,
+  "skipped_record_count": 0,
+  "embedded_record_count": 300,
+  "matrix_shape": [
+    300,
+    1024
+  ],
+  "artifacts": {
+    "vector_file": "bge_m3_dense.npy",
+    "vector_sha256": "52dda57e2cee699d664f3d1da8e9e934d65bdf82f5cb51c4637a98960e174ee3",
+    "manifest_file": "bge_m3_manifest.jsonl",
+    "manifest_sha256": "5a0bb29681907e248a56a1b813c7a62e3d8828399102bedfda25d88c7e9c3749",
+    "report_file": "m6_embedding_report.json",
+    "commit_marker": "COMMITTED",
+    "latest_pointer": "LATEST.json",
+    "authoritative_run_dir": "data/counter_speech_kb/embeddings_v2\\runs\\bge_m3_20261102_091706_12d7314e"
+  },
+  "disclaimer": "PROVISIONAL CANDIDATES \u2014 Embedded for retrieval development only; counter-speech remains unapproved by M5.4.",
+  "mock_notice": null,
+  "publication_status": "committed"
+}

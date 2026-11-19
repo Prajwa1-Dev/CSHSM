@@ -1,0 +1,505 @@
+{
+  "milestone": "M4",
+  "title": "M4 Semantic Retrieval Validation & Empirical Evaluation Report",
+  "timestamp": "2026-11-02T01:25:00+00:00",
+  "model": {
+    "identifier": "BAAI/bge-m3",
+    "embedding_dimension": 1024,
+    "normalization": "L2_unit_sphere",
+    "execution_device": "cuda",
+    "offline_mode_enforced": true
+  },
+  "index": {
+    "backend": "faiss",
+    "index_type": "IndexFlatIP",
+    "total_indexed_vectors": 24,
+    "mathematical_metric": "cosine_similarity_via_inner_product",
+    "max_faiss_vs_exact_discrepancy": 1e-06
+  },
+  "kb_provenance": {
+    "scope": "development_provisional",
+    "run_id": "bge_m3_20261101_172555_3bb3db8f",
+    "vector_file": "data/counter_speech_kb/embeddings/runs/bge_m3_20261101_172555_3bb3db8f/bge_m3_dense.npy",
+    "vector_sha256": "1cffb1bb8fd3a9d8cde20289f6a83395b7b95a7a5e8289636318adeab8624300",
+    "manifest_file": "data/counter_speech_kb/embeddings/runs/bge_m3_20261101_172555_3bb3db8f/bge_m3_manifest.jsonl",
+    "manifest_sha256": "54ccbe38d25d989cd52630e3fe018c82b5146f562120859fdcdff398b7bac947",
+    "approved_demo_records": 24,
+    "quarantined_simulated_records": 1171,
+    "cross_pool_id_overlap": 0
+  },
+  "category_distribution": {
+    "Gender": 4,
+    "Political": 4,
+    "Religion": 4,
+    "Geo-political": 4,
+    "Violence": 4,
+    "Others": 4
+  },
+  "benchmark_summary": {
+    "total_queries_tested": 24,
+    "positive_in_domain_queries": 18,
+    "negative_out_of_domain_queries": 6,
+    "top1_target_accuracy": "100.0% (18/18)",
+    "positive_score_distribution": {
+      "min": 0.7636,
+      "max": 0.9169,
+      "mean": 0.8415,
+      "median": 0.8343
+    },
+    "negative_score_distribution": {
+      "min": 0.3160,
+      "max": 0.6563,
+      "mean": 0.5082,
+      "median": 0.5310
+    },
+    "score_separation_margin": 0.1073,
+    "active_threshold_tau": 0.80,
+    "active_threshold_positive_recall": "83.3% (15/18)",
+    "active_threshold_fallback_rate": "16.7% (3/18)",
+    "active_threshold_false_retrieval_rate": "0.0% (0/6)"
+  },
+  "threshold_sensitivity_sweep": [
+    {
+      "threshold": 0.65,
+      "positive_recall_pct": 100.0,
+      "fallback_rate_pct": 0.0,
+      "false_retrieval_pct": 16.7,
+      "assessment": "Permissive: 1 out-of-domain negative query false retrieval."
+    },
+    {
+      "threshold": 0.70,
+      "positive_recall_pct": 100.0,
+      "fallback_rate_pct": 0.0,
+      "false_retrieval_pct": 0.0,
+      "assessment": "Full separation: 100% positive recall, zero false retrievals."
+    },
+    {
+      "threshold": 0.72,
+      "positive_recall_pct": 100.0,
+      "fallback_rate_pct": 0.0,
+      "false_retrieval_pct": 0.0,
+      "assessment": "Robust separation: 6.4% margin above highest negative query."
+    },
+    {
+      "threshold": 0.75,
+      "positive_recall_pct": 100.0,
+      "fallback_rate_pct": 0.0,
+      "false_retrieval_pct": 0.0,
+      "assessment": "Optimal calibration candidate: 100% recall with 9.4% negative safety buffer."
+    },
+    {
+      "threshold": 0.78,
+      "positive_recall_pct": 94.4,
+      "fallback_rate_pct": 5.6,
+      "false_retrieval_pct": 0.0,
+      "assessment": "Conservative: 1 valid paraphrase falls back to generation."
+    },
+    {
+      "threshold": 0.80,
+      "positive_recall_pct": 83.3,
+      "fallback_rate_pct": 16.7,
+      "false_retrieval_pct": 0.0,
+      "assessment": "Active baseline: zero false retrievals, 3 valid paraphrases fall back to generation."
+    },
+    {
+      "threshold": 0.82,
+      "positive_recall_pct": 66.7,
+      "fallback_rate_pct": 33.3,
+      "false_retrieval_pct": 0.0,
+      "assessment": "Strict: rejects one third of genuine paraphrases."
+    },
+    {
+      "threshold": 0.85,
+      "positive_recall_pct": 38.9,
+      "fallback_rate_pct": 61.1,
+      "false_retrieval_pct": 0.0,
+      "assessment": "Excessive: rejects majority of genuine paraphrases."
+    }
+  ],
+  "query_evaluations": [
+    {
+      "id": 1,
+      "category": "Gender",
+      "query": "Women shouldn't be allowed in leadership positions or tech companies, they only belong in the kitchen.",
+      "target_kb_id": "DEMO-KB-00001",
+      "retrieved_kb_id": "DEMO-KB-00001",
+      "retrieved_category": "Gender",
+      "similarity_score": 0.8013,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00001", "score": 0.8013},
+        {"kb_id": "DEMO-KB-00003", "score": 0.7048},
+        {"kb_id": "DEMO-KB-00021", "score": 0.5929}
+      ]
+    },
+    {
+      "id": 2,
+      "category": "Gender",
+      "query": "Trans people have a severe mental disorder and need to be banned from all public spaces.",
+      "target_kb_id": "DEMO-KB-00002",
+      "retrieved_kb_id": "DEMO-KB-00002",
+      "retrieved_category": "Gender",
+      "similarity_score": 0.8544,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00002", "score": 0.8544},
+        {"kb_id": "DEMO-KB-00006", "score": 0.6049},
+        {"kb_id": "DEMO-KB-00016", "score": 0.5819}
+      ]
+    },
+    {
+      "id": 3,
+      "category": "Gender",
+      "query": "Why waste money on higher education for girls when their only purpose is to marry and cook?",
+      "target_kb_id": "DEMO-KB-00003",
+      "retrieved_kb_id": "DEMO-KB-00003",
+      "retrieved_category": "Gender",
+      "similarity_score": 0.7636,
+      "target_matched": true,
+      "action_at_tau_0_80": "FALLBACK_GENERATION",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00003", "score": 0.7636},
+        {"kb_id": "DEMO-KB-00001", "score": 0.6336},
+        {"kb_id": "DEMO-KB-00004", "score": 0.5283}
+      ]
+    },
+    {
+      "id": 4,
+      "category": "Political",
+      "query": "Anyone who supports the political opposition is a treasonous traitor who should be stripped of citizenship.",
+      "target_kb_id": "DEMO-KB-00005",
+      "retrieved_kb_id": "DEMO-KB-00005",
+      "retrieved_category": "Political",
+      "similarity_score": 0.9169,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00005", "score": 0.9169},
+        {"kb_id": "DEMO-KB-00008", "score": 0.6484},
+        {"kb_id": "DEMO-KB-00006", "score": 0.6473}
+      ]
+    },
+    {
+      "id": 5,
+      "category": "Political",
+      "query": "College activists protesting against the government need to be thrown in jail and beaten up.",
+      "target_kb_id": "DEMO-KB-00006",
+      "retrieved_kb_id": "DEMO-KB-00006",
+      "retrieved_category": "Political",
+      "similarity_score": 0.8908,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00006", "score": 0.8908},
+        {"kb_id": "DEMO-KB-00018", "score": 0.6491},
+        {"kb_id": "DEMO-KB-00017", "score": 0.6319}
+      ]
+    },
+    {
+      "id": 6,
+      "category": "Political",
+      "query": "Liberal professors and intellectuals are dangerous parasites destroying the moral fabric of our society.",
+      "target_kb_id": "DEMO-KB-00007",
+      "retrieved_kb_id": "DEMO-KB-00007",
+      "retrieved_category": "Political",
+      "similarity_score": 0.8505,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00007", "score": 0.8505},
+        {"kb_id": "DEMO-KB-00013", "score": 0.6687},
+        {"kb_id": "DEMO-KB-00004", "score": 0.6465}
+      ]
+    },
+    {
+      "id": 7,
+      "category": "Religion",
+      "query": "Every single Muslim is an undercover terrorist waiting to execute a holy war against our nation.",
+      "target_kb_id": "DEMO-KB-00009",
+      "retrieved_kb_id": "DEMO-KB-00009",
+      "retrieved_category": "Religion",
+      "similarity_score": 0.8312,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00009", "score": 0.8312},
+        {"kb_id": "DEMO-KB-00011", "score": 0.6183},
+        {"kb_id": "DEMO-KB-00007", "score": 0.5904}
+      ]
+    },
+    {
+      "id": 8,
+      "category": "Religion",
+      "query": "Hindu idol worshippers with their primitive superstitious customs have ruined our civilized society.",
+      "target_kb_id": "DEMO-KB-00010",
+      "retrieved_kb_id": "DEMO-KB-00010",
+      "retrieved_category": "Religion",
+      "similarity_score": 0.8294,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00010", "score": 0.8294},
+        {"kb_id": "DEMO-KB-00007", "score": 0.6381},
+        {"kb_id": "DEMO-KB-00004", "score": 0.6330}
+      ]
+    },
+    {
+      "id": 9,
+      "category": "Religion",
+      "query": "International banking cartels and mainstream media are secretly controlled by the Jews.",
+      "target_kb_id": "DEMO-KB-00012",
+      "retrieved_kb_id": "DEMO-KB-00012",
+      "retrieved_category": "Religion",
+      "similarity_score": 0.8759,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00012", "score": 0.8759},
+        {"kb_id": "DEMO-KB-00007", "score": 0.5107},
+        {"kb_id": "DEMO-KB-00009", "score": 0.5089}
+      ]
+    },
+    {
+      "id": 10,
+      "category": "Geo-political",
+      "query": "Illegal immigrants and refugees are diseased parasites who commit violent crimes and steal our tax money.",
+      "target_kb_id": "DEMO-KB-00013",
+      "retrieved_kb_id": "DEMO-KB-00013",
+      "retrieved_category": "Geo-political",
+      "similarity_score": 0.9165,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00013", "score": 0.9165},
+        {"kb_id": "DEMO-KB-00007", "score": 0.7017},
+        {"kb_id": "DEMO-KB-00015", "score": 0.6664}
+      ]
+    },
+    {
+      "id": 11,
+      "category": "Geo-political",
+      "query": "Migrants moving in from nearby provinces are just freeloading thieves ruining our hometown.",
+      "target_kb_id": "DEMO-KB-00014",
+      "retrieved_kb_id": "DEMO-KB-00014",
+      "retrieved_category": "Geo-political",
+      "similarity_score": 0.8465,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00014", "score": 0.8465},
+        {"kb_id": "DEMO-KB-00015", "score": 0.6685},
+        {"kb_id": "DEMO-KB-00013", "score": 0.6593}
+      ]
+    },
+    {
+      "id": 12,
+      "category": "Geo-political",
+      "query": "All foreign migrant workers are taking jobs from citizens and should be immediately deported.",
+      "target_kb_id": "DEMO-KB-00015",
+      "retrieved_kb_id": "DEMO-KB-00015",
+      "retrieved_category": "Geo-political",
+      "similarity_score": 0.9002,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00015", "score": 0.9002},
+        {"kb_id": "DEMO-KB-00016", "score": 0.6851},
+        {"kb_id": "DEMO-KB-00013", "score": 0.6212}
+      ]
+    },
+    {
+      "id": 13,
+      "category": "Violence",
+      "query": "Those street protestors should all be crushed with heavy bulldozers so they shut up forever.",
+      "target_kb_id": "DEMO-KB-00017",
+      "retrieved_kb_id": "DEMO-KB-00017",
+      "retrieved_category": "Violence",
+      "similarity_score": 0.8318,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00017", "score": 0.8318},
+        {"kb_id": "DEMO-KB-00006", "score": 0.7142},
+        {"kb_id": "DEMO-KB-00016", "score": 0.6349}
+      ]
+    },
+    {
+      "id": 14,
+      "category": "Violence",
+      "query": "The court system is useless, we should grab guns and publicly lynch every one of these criminals.",
+      "target_kb_id": "DEMO-KB-00018",
+      "retrieved_kb_id": "DEMO-KB-00018",
+      "retrieved_category": "Violence",
+      "similarity_score": 0.8145,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00018", "score": 0.8145},
+        {"kb_id": "DEMO-KB-00016", "score": 0.6458},
+        {"kb_id": "DEMO-KB-00006", "score": 0.6323}
+      ]
+    },
+    {
+      "id": 15,
+      "category": "Violence",
+      "query": "There will never be peace until we completely wipe out and exterminate every last person in that tribe.",
+      "target_kb_id": "DEMO-KB-00019",
+      "retrieved_kb_id": "DEMO-KB-00019",
+      "retrieved_category": "Violence",
+      "similarity_score": 0.7832,
+      "target_matched": true,
+      "action_at_tau_0_80": "FALLBACK_GENERATION",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00019", "score": 0.7832},
+        {"kb_id": "DEMO-KB-00016", "score": 0.6037},
+        {"kb_id": "DEMO-KB-00009", "score": 0.5749}
+      ]
+    },
+    {
+      "id": 16,
+      "category": "Others",
+      "query": "Lower-caste people are genetically inferior and should be banned from college admissions.",
+      "target_kb_id": "DEMO-KB-00021",
+      "retrieved_kb_id": "DEMO-KB-00021",
+      "retrieved_category": "Others",
+      "similarity_score": 0.8369,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00021", "score": 0.8369},
+        {"kb_id": "DEMO-KB-00002", "score": 0.6417},
+        {"kb_id": "DEMO-KB-00006", "score": 0.6066}
+      ]
+    },
+    {
+      "id": 17,
+      "category": "Others",
+      "query": "People born with physical or mental handicaps are worthless parasites consuming taxpayer resources.",
+      "target_kb_id": "DEMO-KB-00022",
+      "retrieved_kb_id": "DEMO-KB-00022",
+      "retrieved_category": "Others",
+      "similarity_score": 0.7960,
+      "target_matched": true,
+      "action_at_tau_0_80": "FALLBACK_GENERATION",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00022", "score": 0.7960},
+        {"kb_id": "DEMO-KB-00013", "score": 0.6880},
+        {"kb_id": "DEMO-KB-00008", "score": 0.6134}
+      ]
+    },
+    {
+      "id": 18,
+      "category": "Others",
+      "query": "Dark-skinned people are biologically uncivilized and only fit for manual street cleaning labor.",
+      "target_kb_id": "DEMO-KB-00023",
+      "retrieved_kb_id": "DEMO-KB-00023",
+      "retrieved_category": "Others",
+      "similarity_score": 0.8074,
+      "target_matched": true,
+      "action_at_tau_0_80": "RETRIEVE",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00023", "score": 0.8074},
+        {"kb_id": "DEMO-KB-00002", "score": 0.6018},
+        {"kb_id": "DEMO-KB-00022", "score": 0.5958}
+      ]
+    },
+    {
+      "id": 19,
+      "category": "Negative_Hate",
+      "query": "Cyclists on our city roads are arrogant jerks who intentionally block traffic and cause accidents.",
+      "target_kb_id": null,
+      "retrieved_kb_id": "DEMO-KB-00014",
+      "retrieved_category": "Geo-political",
+      "similarity_score": 0.6563,
+      "target_matched": false,
+      "action_at_tau_0_80": "FALLBACK_GENERATION",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00014", "score": 0.6563},
+        {"kb_id": "DEMO-KB-00017", "score": 0.6278},
+        {"kb_id": "DEMO-KB-00018", "score": 0.5898}
+      ]
+    },
+    {
+      "id": 20,
+      "category": "Negative_Hate",
+      "query": "Elderly drivers over 70 are dangerous hazards who shouldn't have driver licenses.",
+      "target_kb_id": null,
+      "retrieved_kb_id": "DEMO-KB-00008",
+      "retrieved_category": "Political",
+      "similarity_score": 0.5490,
+      "target_matched": false,
+      "action_at_tau_0_80": "FALLBACK_GENERATION",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00008", "score": 0.5490},
+        {"kb_id": "DEMO-KB-00022", "score": 0.5367},
+        {"kb_id": "DEMO-KB-00017", "score": 0.5284}
+      ]
+    },
+    {
+      "id": 21,
+      "category": "Negative_Hate",
+      "query": "Modern video game players are anti-social degenerates ruining their lives in their basements.",
+      "target_kb_id": null,
+      "retrieved_kb_id": "DEMO-KB-00007",
+      "retrieved_category": "Political",
+      "similarity_score": 0.5560,
+      "target_matched": false,
+      "action_at_tau_0_80": "FALLBACK_GENERATION",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00007", "score": 0.5560},
+        {"kb_id": "DEMO-KB-00002", "score": 0.5385},
+        {"kb_id": "DEMO-KB-00006", "score": 0.5186}
+      ]
+    },
+    {
+      "id": 22,
+      "category": "Negative_General",
+      "query": "The municipal water supply has been contaminated due to pipe maintenance delays in sector 4.",
+      "target_kb_id": null,
+      "retrieved_kb_id": "DEMO-KB-00014",
+      "retrieved_category": "Geo-political",
+      "similarity_score": 0.5130,
+      "target_matched": false,
+      "action_at_tau_0_80": "FALLBACK_GENERATION",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00014", "score": 0.5130},
+        {"kb_id": "DEMO-KB-00017", "score": 0.5055},
+        {"kb_id": "DEMO-KB-00008", "score": 0.4900}
+      ]
+    },
+    {
+      "id": 23,
+      "category": "Negative_General",
+      "query": "Artificial intelligence language models are undergoing unprecedented algorithmic improvements.",
+      "target_kb_id": null,
+      "retrieved_kb_id": "DEMO-KB-00020",
+      "retrieved_category": "Violence",
+      "similarity_score": 0.4586,
+      "target_matched": false,
+      "action_at_tau_0_80": "FALLBACK_GENERATION",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00020", "score": 0.4586},
+        {"kb_id": "DEMO-KB-00001", "score": 0.4357},
+        {"kb_id": "DEMO-KB-00010", "score": 0.4300}
+      ]
+    },
+    {
+      "id": 24,
+      "category": "Negative_General",
+      "query": "What are the best tourist destinations to visit during autumn in Northern Europe?",
+      "target_kb_id": null,
+      "retrieved_kb_id": "DEMO-KB-00014",
+      "retrieved_category": "Geo-political",
+      "similarity_score": 0.3160,
+      "target_matched": false,
+      "action_at_tau_0_80": "FALLBACK_GENERATION",
+      "top3_candidates": [
+        {"kb_id": "DEMO-KB-00014", "score": 0.3160},
+        {"kb_id": "DEMO-KB-00013", "score": 0.3150},
+        {"kb_id": "DEMO-KB-00015", "score": 0.3142}
+      ]
+    }
+  ]
+}
