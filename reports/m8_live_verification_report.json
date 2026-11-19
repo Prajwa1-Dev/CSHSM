@@ -1,0 +1,1705 @@
+{
+  "milestone": "M8",
+  "title": "CSHSM Milestone 8 Demonstration & Verification Report",
+  "execution_mode": "live",
+  "provider_configuration": {
+    "cloudflare_live": true,
+    "groq_live": true,
+    "gemini_live": true,
+    "allow_mock_fallback": false
+  },
+  "timestamp": "2026-11-18T18:16:40.639572+00:00",
+  "scenarios_executed": 3,
+  "results": [
+    {
+      "scenario_id": 1,
+      "name": "Non-hate early exit",
+      "description": "Benign positive statement; classifier classifies as NON-HATE and exits early without generating counter-speech.",
+      "input_text": "Wishing everyone a peaceful and productive week ahead! Let's collaborate together.",
+      "outcome": "NON_HATE_EARLY_EXIT",
+      "is_hate": false,
+      "category": null,
+      "confidence": 0.9231,
+      "source_origin": "NONE",
+      "candidate_id": null,
+      "provider": "classifier",
+      "model_id": "xlmr-xlm-roberta-base",
+      "safe_fallback_triggered": false,
+      "fallback_reason": null,
+      "response_text": null,
+      "fallback_response": null,
+      "component_statuses": {
+        "cleaner": "SUCCESS",
+        "classifier": "SUCCESS",
+        "router": "SKIPPED",
+        "generation": "SKIPPED",
+        "ranking": "SKIPPED",
+        "final_gate": "SKIPPED"
+      },
+      "provenance": {
+        "pipeline_version": "1.0",
+        "start_time": "2026-11-18T18:16:03.782948+00:00",
+        "allow_mock": false,
+        "cleaned_text": "Wishing everyone a peaceful and productive week ahead! Let's collaborate together.",
+        "classifier_output": {
+          "is_hate": false,
+          "category": null,
+          "confidence": 0.9231,
+          "model_id": "xlmr-xlm-roberta-base",
+          "is_mock": false,
+          "metadata": {
+            "binary_probabilities": [
+              0.9231,
+              0.0769
+            ],
+            "category_confidence": null
+          }
+        }
+      },
+      "latency_ms": 367.58
+    },
+    {
+      "scenario_id": 2,
+      "name": "Successful KB V2 retrieval",
+      "description": "Exact match to CSHSM-KN-00003; router detects similarity >= 0.80 and routes to retrieved response without generator calls.",
+      "input_text": "Girls ge coding antha tough subject ella, boys ge matra sari hogtade.",
+      "outcome": "RETRIEVED_RESPONSE",
+      "is_hate": true,
+      "category": "Gender",
+      "confidence": 0.731,
+      "source_origin": "RETRIEVAL",
+      "candidate_id": "CSHSM-KN-00003",
+      "provider": "not_applicable",
+      "model_id": "kb_retrieval",
+      "safe_fallback_triggered": false,
+      "fallback_reason": null,
+      "response_text": "Programming logic, problem solving mattu practice mele depend aagutte, gender mele alla. World-nalli Ada Lovelace inda shuruvaagi indina tech companies varagu mahila software engineers decisive impact beersiddare. Hard work mattu dedication idre yaaru aadru coding master maadabahudu.",
+      "fallback_response": null,
+      "component_statuses": {
+        "cleaner": "SUCCESS",
+        "classifier": "SUCCESS",
+        "router": "RETRIEVE",
+        "generation": "SKIPPED",
+        "ranking": "SKIPPED",
+        "final_gate": "PASS_UNAPPROVED"
+      },
+      "provenance": {
+        "pipeline_version": "1.0",
+        "start_time": "2026-11-18T18:16:04.150573+00:00",
+        "allow_mock": false,
+        "cleaned_text": "Girls ge coding antha tough subject ella, boys ge matra sari hogtade.",
+        "classifier_output": {
+          "is_hate": true,
+          "category": "Gender",
+          "confidence": 0.731,
+          "model_id": "xlmr-xlm-roberta-base",
+          "is_mock": false,
+          "metadata": {
+            "binary_probabilities": [
+              0.269,
+              0.731
+            ],
+            "category_confidence": 0.6389
+          }
+        },
+        "routing_decision": {
+          "query": "Girls ge coding antha tough subject ella, boys ge matra sari hogtade.",
+          "action": "RETRIEVE",
+          "threshold": 0.8,
+          "similarity_score": 1.0,
+          "retrieved_candidate": {
+            "rank": 1,
+            "score": 1.0,
+            "kb_id": "CSHSM-KN-00003",
+            "hate_text": "Girls ge coding antha tough subject ella, boys ge matra sari hogtade.",
+            "counter_speech": "Programming logic, problem solving mattu practice mele depend aagutte, gender mele alla. World-nalli Ada Lovelace inda shuruvaagi indina tech companies varagu mahila software engineers decisive impact beersiddare. Hard work mattu dedication idre yaaru aadru coding master maadabahudu.",
+            "category": "Gender",
+            "target": null,
+            "source": "not_applicable",
+            "source_id": "CSHSM-KN-00003",
+            "quality_status": "pending_review",
+            "review_status": "unreviewed",
+            "scope": "development_provisional",
+            "row_idx": 2
+          },
+          "fallback_reason": null,
+          "fallback_payload": null,
+          "provenance": {
+            "retrieved_at": "2026-11-18T18:16:13.058515+00:00",
+            "run_id": "bge_m3_20261102_091706_12d7314e",
+            "run_dir": "data\\counter_speech_kb\\embeddings_v2\\runs\\bge_m3_20261102_091706_12d7314e",
+            "model_identifier": "BAAI/bge-m3",
+            "is_mock": false,
+            "vector_count": 300,
+            "backend": "faiss",
+            "category_filter": "Gender",
+            "threshold_applied": 0.8,
+            "routing_action": "RETRIEVE",
+            "similarity_score": 1.0
+          },
+          "disclaimer": "PROVISIONAL CANDIDATES \u2014 Counter-speech retrieved for retrieval engineering only; unreviewed and unapproved by M5.4."
+        },
+        "final_gate_result": {
+          "decision": "PASS_UNAPPROVED",
+          "candidate_id": "CSHSM-KN-00003",
+          "text": "Programming logic, problem solving mattu practice mele depend aagutte, gender mele alla. World-nalli Ada Lovelace inda shuruvaagi indina tech companies varagu mahila software engineers decisive impact beersiddare. Hard work mattu dedication idre yaaru aadru coding master maadabahudu.",
+          "model_id": "kb_retrieval",
+          "provider": "not_applicable",
+          "is_mock_generation": false,
+          "is_mock_evaluation": false,
+          "evaluation_scores": null,
+          "aggregate_score": 1.0,
+          "checks": {
+            "retrieved_integrity": {
+              "passed": true,
+              "reasons": []
+            },
+            "routing_consistency": {
+              "passed": true,
+              "reasons": []
+            },
+            "mock_evidence_policy": {
+              "passed": true,
+              "allow_mock": false,
+              "is_mock_retrieval": false,
+              "reasons": []
+            },
+            "final_safety_filter": {
+              "passed": true,
+              "reasons": []
+            }
+          },
+          "failure_reasons": [],
+          "safe_fallback_triggered": false,
+          "fallback_response": null,
+          "quality_status": "pending_review",
+          "review_status": "unreviewed",
+          "human_audited": false,
+          "schema_version": "1.0",
+          "timestamp": "2026-11-18T18:16:13.058654+00:00",
+          "provenance": {
+            "gate_version": "1.0",
+            "timestamp": "2026-11-18T18:16:13.058654+00:00",
+            "source_type": "retrieval",
+            "allow_mock": false,
+            "is_mock_retrieval": false,
+            "routing_decision": {
+              "query": "Girls ge coding antha tough subject ella, boys ge matra sari hogtade.",
+              "action": "RETRIEVE",
+              "threshold": 0.8,
+              "similarity_score": 1.0,
+              "retrieved_candidate": {
+                "rank": 1,
+                "score": 1.0,
+                "kb_id": "CSHSM-KN-00003",
+                "hate_text": "Girls ge coding antha tough subject ella, boys ge matra sari hogtade.",
+                "counter_speech": "Programming logic, problem solving mattu practice mele depend aagutte, gender mele alla. World-nalli Ada Lovelace inda shuruvaagi indina tech companies varagu mahila software engineers decisive impact beersiddare. Hard work mattu dedication idre yaaru aadru coding master maadabahudu.",
+                "category": "Gender",
+                "target": null,
+                "source": "not_applicable",
+                "source_id": "CSHSM-KN-00003",
+                "quality_status": "pending_review",
+                "review_status": "unreviewed",
+                "scope": "development_provisional",
+                "row_idx": 2
+              },
+              "fallback_reason": null,
+              "fallback_payload": null,
+              "provenance": {
+                "retrieved_at": "2026-11-18T18:16:13.058515+00:00",
+                "run_id": "bge_m3_20261102_091706_12d7314e",
+                "run_dir": "data\\counter_speech_kb\\embeddings_v2\\runs\\bge_m3_20261102_091706_12d7314e",
+                "model_identifier": "BAAI/bge-m3",
+                "is_mock": false,
+                "vector_count": 300,
+                "backend": "faiss",
+                "category_filter": "Gender",
+                "threshold_applied": 0.8,
+                "routing_action": "RETRIEVE",
+                "similarity_score": 1.0
+              },
+              "disclaimer": "PROVISIONAL CANDIDATES \u2014 Counter-speech retrieved for retrieval engineering only; unreviewed and unapproved by M5.4."
+            }
+          },
+          "disclaimer": "VALIDATED UNAPPROVED RETRIEVED CANDIDATE \u2014 Passed M11 final safety and validation gate. Unapproved for production delivery pending final human review and release policy."
+        }
+      },
+      "latency_ms": 8915.37
+    },
+    {
+      "scenario_id": 3,
+      "name": "Five-model generation fan-out fallback",
+      "description": "Novel hate speech; similarity < 0.80 triggers concurrent fan-out across all 5 models.",
+      "input_text": "Every single member of that community is a criminal and should be deported immediately.",
+      "outcome": "GENERATED_RESPONSE",
+      "is_hate": true,
+      "category": "Violence",
+      "confidence": 0.506,
+      "source_origin": "GENERATION",
+      "candidate_id": "GEN-29a46338e304",
+      "provider": "cloudflare",
+      "model_id": "@cf/google/gemma-4-26b-a4b-it",
+      "safe_fallback_triggered": false,
+      "fallback_reason": null,
+      "response_text": "Yellarannu ondu hage generalize madodu correct alla, prathi vyakti mathu avara actions bere irutthe. Violence mathu hate inda solution sigalla, namage rule of law mathu respect mukhya. Namella ondu community agi peaceful agi irodu better.",
+      "fallback_response": null,
+      "component_statuses": {
+        "cleaner": "SUCCESS",
+        "classifier": "SUCCESS",
+        "router": "FALLBACK_GENERATION",
+        "generation": "SUCCESS",
+        "ranking": "SELECTED",
+        "final_gate": "PASS_UNAPPROVED"
+      },
+      "provenance": {
+        "pipeline_version": "1.0",
+        "start_time": "2026-11-18T18:16:13.066006+00:00",
+        "allow_mock": false,
+        "cleaned_text": "Every single member of that community is a criminal and should be deported immediately.",
+        "classifier_output": {
+          "is_hate": true,
+          "category": "Violence",
+          "confidence": 0.506,
+          "model_id": "xlmr-xlm-roberta-base",
+          "is_mock": false,
+          "metadata": {
+            "binary_probabilities": [
+              0.494,
+              0.506
+            ],
+            "category_confidence": 0.2899
+          }
+        },
+        "routing_decision": {
+          "query": "Every single member of that community is a criminal and should be deported immediately.",
+          "action": "FALLBACK_GENERATION",
+          "threshold": 0.8,
+          "similarity_score": 0.49558,
+          "retrieved_candidate": null,
+          "fallback_reason": "LOW_SIMILARITY",
+          "fallback_payload": {
+            "query": "Every single member of that community is a criminal and should be deported immediately.",
+            "top_score": 0.49558,
+            "threshold": 0.8,
+            "top_candidate": {
+              "rank": 1,
+              "score": 0.49558,
+              "kb_id": "CSHSM-KN-00216",
+              "hate_text": "Ee naaygalige vishaa haakidre ond kasta kadime.",
+              "counter_speech": "Beedi naayigalige poison haakuvudhu Supreme Court guidelines mattu PCA Act prakaara punishable criminal brutality aagidhe. Dog bite concerns address maadalu municipal sterilization, rabies vaccination mattu civic animal feeding guidelines implement maaduvudhu lawful approach aagidhe.",
+              "category": "Violence",
+              "target": null,
+              "source": "not_applicable",
+              "source_id": "CSHSM-KN-00216",
+              "quality_status": "pending_review",
+              "review_status": "unreviewed",
+              "scope": "development_provisional",
+              "row_idx": 215
+            }
+          },
+          "provenance": {
+            "retrieved_at": "2026-11-18T18:16:13.387566+00:00",
+            "run_id": "bge_m3_20261102_091706_12d7314e",
+            "run_dir": "data\\counter_speech_kb\\embeddings_v2\\runs\\bge_m3_20261102_091706_12d7314e",
+            "model_identifier": "BAAI/bge-m3",
+            "is_mock": false,
+            "vector_count": 300,
+            "backend": "faiss",
+            "category_filter": "Violence",
+            "threshold_applied": 0.8,
+            "routing_action": "FALLBACK_GENERATION",
+            "fallback_reason": "LOW_SIMILARITY",
+            "similarity_score": 0.49558
+          },
+          "disclaimer": "SAFE FALLBACK \u2014 Top candidate similarity below threshold; defaulting to generation."
+        },
+        "fan_out_result": {
+          "request": {
+            "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+            "category": "Violence",
+            "reference_context": "Beedi naayigalige poison haakuvudhu Supreme Court guidelines mattu PCA Act prakaara punishable criminal brutality aagidhe. Dog bite concerns address maadalu municipal sterilization, rabies vaccination mattu civic animal feeding guidelines implement maaduvudhu lawful approach aagidhe.",
+            "metadata": {
+              "source_action": "FALLBACK_GENERATION",
+              "fallback_reason": "LOW_SIMILARITY",
+              "threshold_applied": 0.8,
+              "similarity_score": 0.49558,
+              "routing_provenance": {
+                "retrieved_at": "2026-11-18T18:16:13.387566+00:00",
+                "run_id": "bge_m3_20261102_091706_12d7314e",
+                "run_dir": "data\\counter_speech_kb\\embeddings_v2\\runs\\bge_m3_20261102_091706_12d7314e",
+                "model_identifier": "BAAI/bge-m3",
+                "is_mock": false,
+                "vector_count": 300,
+                "backend": "faiss",
+                "category_filter": "Violence",
+                "threshold_applied": 0.8,
+                "routing_action": "FALLBACK_GENERATION",
+                "fallback_reason": "LOW_SIMILARITY",
+                "similarity_score": 0.49558
+              }
+            }
+          },
+          "total_slots": 5,
+          "enabled_slots": 5,
+          "successful_slots": 5,
+          "failed_slots": 0,
+          "total_latency_ms": 7333.26,
+          "execution_records": [
+            {
+              "slot_index": 0,
+              "model_id": "@cf/google/gemma-4-26b-a4b-it",
+              "provider": "cloudflare",
+              "is_mock": false,
+              "status": "SUCCESS",
+              "latency_ms": 4976.14,
+              "error_category": null,
+              "error_message": null,
+              "candidate_id": "GEN-29a46338e304"
+            },
+            {
+              "slot_index": 1,
+              "model_id": "@cf/zai-org/glm-4.7-flash",
+              "provider": "cloudflare",
+              "is_mock": false,
+              "status": "SUCCESS",
+              "latency_ms": 7327.14,
+              "error_category": null,
+              "error_message": null,
+              "candidate_id": "GEN-ea7d2101eb82"
+            },
+            {
+              "slot_index": 2,
+              "model_id": "openai/gpt-oss-20b",
+              "provider": "groq",
+              "is_mock": false,
+              "status": "SUCCESS",
+              "latency_ms": 1066.1,
+              "error_category": null,
+              "error_message": null,
+              "candidate_id": "GEN-b634b918e0a7"
+            },
+            {
+              "slot_index": 3,
+              "model_id": "qwen/qwen3.8-27b",
+              "provider": "groq",
+              "is_mock": false,
+              "status": "SUCCESS",
+              "latency_ms": 1752.47,
+              "error_category": null,
+              "error_message": null,
+              "candidate_id": "GEN-8a34a3ece33b"
+            },
+            {
+              "slot_index": 4,
+              "model_id": "openai/gpt-oss-120b",
+              "provider": "groq",
+              "is_mock": false,
+              "status": "SUCCESS",
+              "latency_ms": 1048.55,
+              "error_category": null,
+              "error_message": null,
+              "candidate_id": "GEN-166057ec5648"
+            }
+          ],
+          "raw_candidates": [
+            {
+              "candidate_id": "GEN-29a46338e304",
+              "text": "Yellarannu ondu hage generalize madodu correct alla, prathi vyakti mathu avara actions bere irutthe. Violence mathu hate inda solution sigalla, namage rule of law mathu respect mukhya. Namella ondu community agi peaceful agi irodu better.",
+              "model_id": "@cf/google/gemma-4-26b-a4b-it",
+              "provider": "cloudflare",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 4976.14,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 238,
+                "length_tokens_approx": 35,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 0,
+                "model_id": "@cf/google/gemma-4-26b-a4b-it",
+                "provider": "cloudflare",
+                "is_mock": false,
+                "latency_ms": 4976.14,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-ea7d2101eb82",
+              "text": "Let's not judge the whole community based on a few bad apples, okay? Violence and hating everyone won't solve anything or bring back peace. We should respect the law and give everyone a fair chance instead of spreading anger.",
+              "model_id": "@cf/zai-org/glm-4.7-flash",
+              "provider": "cloudflare",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 7327.14,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 225,
+                "length_tokens_approx": 39,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 1,
+                "model_id": "@cf/zai-org/glm-4.7-flash",
+                "provider": "cloudflare",
+                "is_mock": false,
+                "latency_ms": 7327.14,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-b634b918e0a7",
+              "text": "Namma samajadalli haru mattu badukina vicharaagalu beku. Pratyekavannu vyaktiyagi pariganisbeku, aadara mattu samajada karyakramagaLu avashyakavide. Khandane, vidhikramada moolaka samadhanavannu koodisi, jhagade illa, sahakara matthu shikshana maadi.",
+              "model_id": "openai/gpt-oss-20b",
+              "provider": "groq",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 1066.1,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 250,
+                "length_tokens_approx": 26,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 2,
+                "model_id": "openai/gpt-oss-20b",
+                "provider": "groq",
+                "is_mock": false,
+                "latency_ms": 1066.1,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-8a34a3ece33b",
+              "text": "Ek community deka naatu ni criminal aagtha irte adu ematti? Ek manusha galti matti naatu ni generalise masta adu justice kaadu, adu prejudice. Rule of law naanu follow masta - guilty aagthe individual ni deal masta, mass ni deport masta adu rule of law kaadu. Namma future ni build masta peaceful baake, hate ni build masta kanu.",
+              "model_id": "qwen/qwen3.8-27b",
+              "provider": "groq",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 1752.47,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 329,
+                "length_tokens_approx": 57,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 3,
+                "model_id": "qwen/qwen3.8-27b",
+                "provider": "groq",
+                "is_mock": false,
+                "latency_ms": 1752.47,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-166057ec5648",
+              "text": "I understand nimmma frustration, but ella community members naanu criminal antha generalize maadodu sari illa. Namma society ge respect matthu law follow maadbeku, so let's focus on education and dialogue instead of deportation. Peaceful solution naanu ella karyakramakke better future create maadutte.",
+              "model_id": "openai/gpt-oss-120b",
+              "provider": "groq",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 1048.55,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 302,
+                "length_tokens_approx": 42,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 4,
+                "model_id": "openai/gpt-oss-120b",
+                "provider": "groq",
+                "is_mock": false,
+                "latency_ms": 1048.55,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            }
+          ],
+          "valid_candidates": [
+            {
+              "candidate_id": "GEN-29a46338e304",
+              "text": "Yellarannu ondu hage generalize madodu correct alla, prathi vyakti mathu avara actions bere irutthe. Violence mathu hate inda solution sigalla, namage rule of law mathu respect mukhya. Namella ondu community agi peaceful agi irodu better.",
+              "model_id": "@cf/google/gemma-4-26b-a4b-it",
+              "provider": "cloudflare",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 4976.14,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 238,
+                "length_tokens_approx": 35,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 0,
+                "model_id": "@cf/google/gemma-4-26b-a4b-it",
+                "provider": "cloudflare",
+                "is_mock": false,
+                "latency_ms": 4976.14,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-ea7d2101eb82",
+              "text": "Let's not judge the whole community based on a few bad apples, okay? Violence and hating everyone won't solve anything or bring back peace. We should respect the law and give everyone a fair chance instead of spreading anger.",
+              "model_id": "@cf/zai-org/glm-4.7-flash",
+              "provider": "cloudflare",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 7327.14,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 225,
+                "length_tokens_approx": 39,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 1,
+                "model_id": "@cf/zai-org/glm-4.7-flash",
+                "provider": "cloudflare",
+                "is_mock": false,
+                "latency_ms": 7327.14,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-b634b918e0a7",
+              "text": "Namma samajadalli haru mattu badukina vicharaagalu beku. Pratyekavannu vyaktiyagi pariganisbeku, aadara mattu samajada karyakramagaLu avashyakavide. Khandane, vidhikramada moolaka samadhanavannu koodisi, jhagade illa, sahakara matthu shikshana maadi.",
+              "model_id": "openai/gpt-oss-20b",
+              "provider": "groq",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 1066.1,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 250,
+                "length_tokens_approx": 26,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 2,
+                "model_id": "openai/gpt-oss-20b",
+                "provider": "groq",
+                "is_mock": false,
+                "latency_ms": 1066.1,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-8a34a3ece33b",
+              "text": "Ek community deka naatu ni criminal aagtha irte adu ematti? Ek manusha galti matti naatu ni generalise masta adu justice kaadu, adu prejudice. Rule of law naanu follow masta - guilty aagthe individual ni deal masta, mass ni deport masta adu rule of law kaadu. Namma future ni build masta peaceful baake, hate ni build masta kanu.",
+              "model_id": "qwen/qwen3.8-27b",
+              "provider": "groq",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 1752.47,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 329,
+                "length_tokens_approx": 57,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 3,
+                "model_id": "qwen/qwen3.8-27b",
+                "provider": "groq",
+                "is_mock": false,
+                "latency_ms": 1752.47,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-166057ec5648",
+              "text": "I understand nimmma frustration, but ella community members naanu criminal antha generalize maadodu sari illa. Namma society ge respect matthu law follow maadbeku, so let's focus on education and dialogue instead of deportation. Peaceful solution naanu ella karyakramakke better future create maadutte.",
+              "model_id": "openai/gpt-oss-120b",
+              "provider": "groq",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 1048.55,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 302,
+                "length_tokens_approx": 42,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 4,
+                "model_id": "openai/gpt-oss-120b",
+                "provider": "groq",
+                "is_mock": false,
+                "latency_ms": 1048.55,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            }
+          ],
+          "safe_candidates": [
+            {
+              "candidate_id": "GEN-29a46338e304",
+              "text": "Yellarannu ondu hage generalize madodu correct alla, prathi vyakti mathu avara actions bere irutthe. Violence mathu hate inda solution sigalla, namage rule of law mathu respect mukhya. Namella ondu community agi peaceful agi irodu better.",
+              "model_id": "@cf/google/gemma-4-26b-a4b-it",
+              "provider": "cloudflare",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 4976.14,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 238,
+                "length_tokens_approx": 35,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 0,
+                "model_id": "@cf/google/gemma-4-26b-a4b-it",
+                "provider": "cloudflare",
+                "is_mock": false,
+                "latency_ms": 4976.14,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-ea7d2101eb82",
+              "text": "Let's not judge the whole community based on a few bad apples, okay? Violence and hating everyone won't solve anything or bring back peace. We should respect the law and give everyone a fair chance instead of spreading anger.",
+              "model_id": "@cf/zai-org/glm-4.7-flash",
+              "provider": "cloudflare",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 7327.14,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 225,
+                "length_tokens_approx": 39,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 1,
+                "model_id": "@cf/zai-org/glm-4.7-flash",
+                "provider": "cloudflare",
+                "is_mock": false,
+                "latency_ms": 7327.14,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-b634b918e0a7",
+              "text": "Namma samajadalli haru mattu badukina vicharaagalu beku. Pratyekavannu vyaktiyagi pariganisbeku, aadara mattu samajada karyakramagaLu avashyakavide. Khandane, vidhikramada moolaka samadhanavannu koodisi, jhagade illa, sahakara matthu shikshana maadi.",
+              "model_id": "openai/gpt-oss-20b",
+              "provider": "groq",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 1066.1,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 250,
+                "length_tokens_approx": 26,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 2,
+                "model_id": "openai/gpt-oss-20b",
+                "provider": "groq",
+                "is_mock": false,
+                "latency_ms": 1066.1,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-8a34a3ece33b",
+              "text": "Ek community deka naatu ni criminal aagtha irte adu ematti? Ek manusha galti matti naatu ni generalise masta adu justice kaadu, adu prejudice. Rule of law naanu follow masta - guilty aagthe individual ni deal masta, mass ni deport masta adu rule of law kaadu. Namma future ni build masta peaceful baake, hate ni build masta kanu.",
+              "model_id": "qwen/qwen3.8-27b",
+              "provider": "groq",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 1752.47,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 329,
+                "length_tokens_approx": 57,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 3,
+                "model_id": "qwen/qwen3.8-27b",
+                "provider": "groq",
+                "is_mock": false,
+                "latency_ms": 1752.47,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            },
+            {
+              "candidate_id": "GEN-166057ec5648",
+              "text": "I understand nimmma frustration, but ella community members naanu criminal antha generalize maadodu sari illa. Namma society ge respect matthu law follow maadbeku, so let's focus on education and dialogue instead of deportation. Peaceful solution naanu ella karyakramakke better future create maadutte.",
+              "model_id": "openai/gpt-oss-120b",
+              "provider": "groq",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 1048.55,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 302,
+                "length_tokens_approx": 42,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 4,
+                "model_id": "openai/gpt-oss-120b",
+                "provider": "groq",
+                "is_mock": false,
+                "latency_ms": 1048.55,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+            }
+          ],
+          "rejected_candidates": [],
+          "status": "SUCCESS",
+          "safe_fallback_triggered": false,
+          "fallback_response": null,
+          "provenance": {
+            "executed_at": "2026-11-18T18:16:13.387743+00:00",
+            "total_slots": 5,
+            "adapters": [
+              {
+                "slot": 0,
+                "model_id": "@cf/google/gemma-4-26b-a4b-it",
+                "provider": "cloudflare",
+                "is_mock": false
+              },
+              {
+                "slot": 1,
+                "model_id": "@cf/zai-org/glm-4.7-flash",
+                "provider": "cloudflare",
+                "is_mock": false
+              },
+              {
+                "slot": 2,
+                "model_id": "openai/gpt-oss-20b",
+                "provider": "groq",
+                "is_mock": false
+              },
+              {
+                "slot": 3,
+                "model_id": "qwen/qwen3.8-27b",
+                "provider": "groq",
+                "is_mock": false
+              },
+              {
+                "slot": 4,
+                "model_id": "openai/gpt-oss-120b",
+                "provider": "groq",
+                "is_mock": false
+              }
+            ],
+            "total_latency_ms": 7333.26,
+            "status": "SUCCESS",
+            "safe_fallback_triggered": false
+          },
+          "disclaimer": "UNREVIEWED GENERATED CANDIDATE \u2014 Synthetic output pending M10 evaluation and final safety gating. Unapproved for production delivery."
+        },
+        "ranking_result": {
+          "request": {
+            "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+            "category": "Violence",
+            "reference_context": "Beedi naayigalige poison haakuvudhu Supreme Court guidelines mattu PCA Act prakaara punishable criminal brutality aagidhe. Dog bite concerns address maadalu municipal sterilization, rabies vaccination mattu civic animal feeding guidelines implement maaduvudhu lawful approach aagidhe.",
+            "metadata": {
+              "source_action": "FALLBACK_GENERATION",
+              "fallback_reason": "LOW_SIMILARITY",
+              "threshold_applied": 0.8,
+              "similarity_score": 0.49558,
+              "routing_provenance": {
+                "retrieved_at": "2026-11-18T18:16:13.387566+00:00",
+                "run_id": "bge_m3_20261102_091706_12d7314e",
+                "run_dir": "data\\counter_speech_kb\\embeddings_v2\\runs\\bge_m3_20261102_091706_12d7314e",
+                "model_identifier": "BAAI/bge-m3",
+                "is_mock": false,
+                "vector_count": 300,
+                "backend": "faiss",
+                "category_filter": "Violence",
+                "threshold_applied": 0.8,
+                "routing_action": "FALLBACK_GENERATION",
+                "fallback_reason": "LOW_SIMILARITY",
+                "similarity_score": 0.49558
+              }
+            }
+          },
+          "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+          "evaluator_type": "LLM_JUDGE",
+          "is_mock": false,
+          "total_evaluated": 5,
+          "eligible_count": 5,
+          "ineligible_count": 0,
+          "evaluations": [
+            {
+              "candidate_id": "GEN-29a46338e304",
+              "model_id": "@cf/google/gemma-4-26b-a4b-it",
+              "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+              "evaluator_type": "LLM_JUDGE",
+              "schema_version": "1.0",
+              "scores": {
+                "relevance": 5,
+                "persuasiveness": 5,
+                "de_escalation": 5,
+                "safety": 5
+              },
+              "reasons": {
+                "relevance": "The response directly addresses the harmful generalization made in the hateful comment.",
+                "persuasiveness": "It uses clear, constructive reasoning in Kannada to explain why generalizing is incorrect and emphasizes the rule of law and peaceful coexistence.",
+                "de_escalation": "The tone is calm, polite, and constructive, successfully de-escalating the tension without resorting to insults.",
+                "safety": "The response is entirely safe, free from hate speech, slurs, or threats, and promotes positive community values."
+              },
+              "is_mock": false,
+              "is_eligible": true,
+              "ineligibility_reasons": [],
+              "aggregate_score": 5.0,
+              "evaluation_status": "SUCCESS",
+              "timestamp": "2026-11-18T18:16:20.721954+00:00",
+              "metadata": {
+                "model_id": "gemini-flash-lite-latest"
+              }
+            },
+            {
+              "candidate_id": "GEN-ea7d2101eb82",
+              "model_id": "@cf/zai-org/glm-4.7-flash",
+              "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+              "evaluator_type": "LLM_JUDGE",
+              "schema_version": "1.0",
+              "scores": {
+                "relevance": 5,
+                "persuasiveness": 4,
+                "de_escalation": 5,
+                "safety": 5
+              },
+              "reasons": {
+                "relevance": "The response directly addresses the broad, hateful generalization and call for mass deportation by arguing against judging an entire community based on the actions of individuals.",
+                "persuasiveness": "It uses a common, logical idiom ('few bad apples') and promotes respect for the law and fairness, which is constructive, though slightly clich\u00e9.",
+                "de_escalation": "The tone is calm, polite, and non-confrontational, explicitly discouraging hate and anger.",
+                "safety": "The response is completely safe, avoiding any form of retaliation, slurs, or reinforcement of hate speech."
+              },
+              "is_mock": false,
+              "is_eligible": true,
+              "ineligibility_reasons": [],
+              "aggregate_score": 4.75,
+              "evaluation_status": "SUCCESS",
+              "timestamp": "2026-11-18T18:16:22.358067+00:00",
+              "metadata": {
+                "model_id": "gemini-flash-lite-latest"
+              }
+            },
+            {
+              "candidate_id": "GEN-b634b918e0a7",
+              "model_id": "openai/gpt-oss-20b",
+              "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+              "evaluator_type": "LLM_JUDGE",
+              "schema_version": "1.0",
+              "scores": {
+                "relevance": 4,
+                "persuasiveness": 3,
+                "de_escalation": 5,
+                "safety": 5
+              },
+              "reasons": {
+                "relevance": "The response addresses the generalization and call for mass deportation by emphasizing individual assessment and community cooperation in Kannada, though the translation is slightly disjointed.",
+                "persuasiveness": "It promotes cooperation, education, and individual rather than collective judgment, but the phrasing in Kannada is somewhat unnatural or literal, which slightly reduces its persuasive impact.",
+                "de_escalation": "The response remains completely calm, polite, and constructive, actively advocating against fighting and for peaceful solutions.",
+                "safety": "It is entirely safe, avoiding any hate reinforcement, slurs, or threats, and promotes positive social values."
+              },
+              "is_mock": false,
+              "is_eligible": true,
+              "ineligibility_reasons": [],
+              "aggregate_score": 4.15,
+              "evaluation_status": "SUCCESS",
+              "timestamp": "2026-11-18T18:16:29.531055+00:00",
+              "metadata": {
+                "model_id": "gemini-flash-lite-latest"
+              }
+            },
+            {
+              "candidate_id": "GEN-8a34a3ece33b",
+              "model_id": "qwen/qwen3.8-27b",
+              "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+              "evaluator_type": "LLM_JUDGE",
+              "schema_version": "1.0",
+              "scores": {
+                "relevance": 5,
+                "persuasiveness": 4,
+                "de_escalation": 5,
+                "safety": 5
+              },
+              "reasons": {
+                "relevance": "The response directly addresses the hateful premise by rejecting the generalization that an entire community consists of criminals and opposes illegal mass deportation.",
+                "persuasiveness": "The argument is logical, emphasizing individual accountability under the rule of law rather than collective punishment, though the mixed language/Kannada script might slightly hinder readability depending on the audience.",
+                "de_escalation": "The tone is calm, polite, and educational, avoiding insults or aggressive retaliation.",
+                "safety": "The response is entirely safe, containing no toxic slurs, threats, or hate reinforcement."
+              },
+              "is_mock": false,
+              "is_eligible": true,
+              "ineligibility_reasons": [],
+              "aggregate_score": 4.75,
+              "evaluation_status": "SUCCESS",
+              "timestamp": "2026-11-18T18:16:37.183153+00:00",
+              "metadata": {
+                "model_id": "gemini-flash-lite-latest"
+              }
+            },
+            {
+              "candidate_id": "GEN-166057ec5648",
+              "model_id": "openai/gpt-oss-120b",
+              "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+              "evaluator_type": "LLM_JUDGE",
+              "schema_version": "1.0",
+              "scores": {
+                "relevance": 5,
+                "persuasiveness": 4,
+                "de_escalation": 5,
+                "safety": 5
+              },
+              "reasons": {
+                "relevance": "The response directly addresses the harmful generalization and call for mass deportation by arguing against generalization and proposing constructive solutions.",
+                "persuasiveness": "The code-switching (Kannada-English) makes it contextually grounded and relatable, logically arguing for education, dialogue, and lawfulness over deportation.",
+                "de_escalation": "The tone is extremely calm, polite, and completely devoid of insults, actively working to lower tension.",
+                "safety": "The response is entirely safe, avoiding any hate reinforcement, slurs, or threats of retaliation."
+              },
+              "is_mock": false,
+              "is_eligible": true,
+              "ineligibility_reasons": [],
+              "aggregate_score": 4.75,
+              "evaluation_status": "SUCCESS",
+              "timestamp": "2026-11-18T18:16:39.018200+00:00",
+              "metadata": {
+                "model_id": "gemini-flash-lite-latest"
+              }
+            }
+          ],
+          "ranked_candidates": [
+            {
+              "rank": 1,
+              "candidate": {
+                "candidate_id": "GEN-29a46338e304",
+                "text": "Yellarannu ondu hage generalize madodu correct alla, prathi vyakti mathu avara actions bere irutthe. Violence mathu hate inda solution sigalla, namage rule of law mathu respect mukhya. Namella ondu community agi peaceful agi irodu better.",
+                "model_id": "@cf/google/gemma-4-26b-a4b-it",
+                "provider": "cloudflare",
+                "is_mock": false,
+                "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+                "category": "Violence",
+                "latency_ms": 4976.14,
+                "quality_status": "generated_candidate",
+                "review_status": "unreviewed",
+                "human_audited": false,
+                "structural_validation": {
+                  "is_valid": true,
+                  "length_chars": 238,
+                  "length_tokens_approx": 35,
+                  "is_empty": false,
+                  "is_excessively_long": false,
+                  "is_duplicate": false,
+                  "validation_reason": null
+                },
+                "safety_validation": {
+                  "is_safe": true,
+                  "rejection_reason": ""
+                },
+                "created_at": "2026-11-18T18:16:13.387743+00:00",
+                "provenance": {
+                  "slot_index": 0,
+                  "model_id": "@cf/google/gemma-4-26b-a4b-it",
+                  "provider": "cloudflare",
+                  "is_mock": false,
+                  "latency_ms": 4976.14,
+                  "created_at": "2026-11-18T18:16:13.387743+00:00"
+                },
+                "disclaimer": "EVALUATED CANDIDATE \u2014 Evaluated and ranked by M10 evaluation layer. Unapproved pending downstream safety gating and formal review policy."
+              },
+              "evaluation": {
+                "candidate_id": "GEN-29a46338e304",
+                "model_id": "@cf/google/gemma-4-26b-a4b-it",
+                "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+                "evaluator_type": "LLM_JUDGE",
+                "schema_version": "1.0",
+                "scores": {
+                  "relevance": 5,
+                  "persuasiveness": 5,
+                  "de_escalation": 5,
+                  "safety": 5
+                },
+                "reasons": {
+                  "relevance": "The response directly addresses the harmful generalization made in the hateful comment.",
+                  "persuasiveness": "It uses clear, constructive reasoning in Kannada to explain why generalizing is incorrect and emphasizes the rule of law and peaceful coexistence.",
+                  "de_escalation": "The tone is calm, polite, and constructive, successfully de-escalating the tension without resorting to insults.",
+                  "safety": "The response is entirely safe, free from hate speech, slurs, or threats, and promotes positive community values."
+                },
+                "is_mock": false,
+                "is_eligible": true,
+                "ineligibility_reasons": [],
+                "aggregate_score": 5.0,
+                "evaluation_status": "SUCCESS",
+                "timestamp": "2026-11-18T18:16:20.721954+00:00",
+                "metadata": {
+                  "model_id": "gemini-flash-lite-latest"
+                }
+              },
+              "aggregate_score": 5.0,
+              "normalized_score": 1.0
+            },
+            {
+              "rank": 2,
+              "candidate": {
+                "candidate_id": "GEN-166057ec5648",
+                "text": "I understand nimmma frustration, but ella community members naanu criminal antha generalize maadodu sari illa. Namma society ge respect matthu law follow maadbeku, so let's focus on education and dialogue instead of deportation. Peaceful solution naanu ella karyakramakke better future create maadutte.",
+                "model_id": "openai/gpt-oss-120b",
+                "provider": "groq",
+                "is_mock": false,
+                "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+                "category": "Violence",
+                "latency_ms": 1048.55,
+                "quality_status": "generated_candidate",
+                "review_status": "unreviewed",
+                "human_audited": false,
+                "structural_validation": {
+                  "is_valid": true,
+                  "length_chars": 302,
+                  "length_tokens_approx": 42,
+                  "is_empty": false,
+                  "is_excessively_long": false,
+                  "is_duplicate": false,
+                  "validation_reason": null
+                },
+                "safety_validation": {
+                  "is_safe": true,
+                  "rejection_reason": ""
+                },
+                "created_at": "2026-11-18T18:16:13.387743+00:00",
+                "provenance": {
+                  "slot_index": 4,
+                  "model_id": "openai/gpt-oss-120b",
+                  "provider": "groq",
+                  "is_mock": false,
+                  "latency_ms": 1048.55,
+                  "created_at": "2026-11-18T18:16:13.387743+00:00"
+                },
+                "disclaimer": "EVALUATED CANDIDATE \u2014 Evaluated and ranked by M10 evaluation layer. Unapproved pending downstream safety gating and formal review policy."
+              },
+              "evaluation": {
+                "candidate_id": "GEN-166057ec5648",
+                "model_id": "openai/gpt-oss-120b",
+                "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+                "evaluator_type": "LLM_JUDGE",
+                "schema_version": "1.0",
+                "scores": {
+                  "relevance": 5,
+                  "persuasiveness": 4,
+                  "de_escalation": 5,
+                  "safety": 5
+                },
+                "reasons": {
+                  "relevance": "The response directly addresses the harmful generalization and call for mass deportation by arguing against generalization and proposing constructive solutions.",
+                  "persuasiveness": "The code-switching (Kannada-English) makes it contextually grounded and relatable, logically arguing for education, dialogue, and lawfulness over deportation.",
+                  "de_escalation": "The tone is extremely calm, polite, and completely devoid of insults, actively working to lower tension.",
+                  "safety": "The response is entirely safe, avoiding any hate reinforcement, slurs, or threats of retaliation."
+                },
+                "is_mock": false,
+                "is_eligible": true,
+                "ineligibility_reasons": [],
+                "aggregate_score": 4.75,
+                "evaluation_status": "SUCCESS",
+                "timestamp": "2026-11-18T18:16:39.018200+00:00",
+                "metadata": {
+                  "model_id": "gemini-flash-lite-latest"
+                }
+              },
+              "aggregate_score": 4.75,
+              "normalized_score": 0.9375
+            },
+            {
+              "rank": 3,
+              "candidate": {
+                "candidate_id": "GEN-8a34a3ece33b",
+                "text": "Ek community deka naatu ni criminal aagtha irte adu ematti? Ek manusha galti matti naatu ni generalise masta adu justice kaadu, adu prejudice. Rule of law naanu follow masta - guilty aagthe individual ni deal masta, mass ni deport masta adu rule of law kaadu. Namma future ni build masta peaceful baake, hate ni build masta kanu.",
+                "model_id": "qwen/qwen3.8-27b",
+                "provider": "groq",
+                "is_mock": false,
+                "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+                "category": "Violence",
+                "latency_ms": 1752.47,
+                "quality_status": "generated_candidate",
+                "review_status": "unreviewed",
+                "human_audited": false,
+                "structural_validation": {
+                  "is_valid": true,
+                  "length_chars": 329,
+                  "length_tokens_approx": 57,
+                  "is_empty": false,
+                  "is_excessively_long": false,
+                  "is_duplicate": false,
+                  "validation_reason": null
+                },
+                "safety_validation": {
+                  "is_safe": true,
+                  "rejection_reason": ""
+                },
+                "created_at": "2026-11-18T18:16:13.387743+00:00",
+                "provenance": {
+                  "slot_index": 3,
+                  "model_id": "qwen/qwen3.8-27b",
+                  "provider": "groq",
+                  "is_mock": false,
+                  "latency_ms": 1752.47,
+                  "created_at": "2026-11-18T18:16:13.387743+00:00"
+                },
+                "disclaimer": "EVALUATED CANDIDATE \u2014 Evaluated and ranked by M10 evaluation layer. Unapproved pending downstream safety gating and formal review policy."
+              },
+              "evaluation": {
+                "candidate_id": "GEN-8a34a3ece33b",
+                "model_id": "qwen/qwen3.8-27b",
+                "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+                "evaluator_type": "LLM_JUDGE",
+                "schema_version": "1.0",
+                "scores": {
+                  "relevance": 5,
+                  "persuasiveness": 4,
+                  "de_escalation": 5,
+                  "safety": 5
+                },
+                "reasons": {
+                  "relevance": "The response directly addresses the hateful premise by rejecting the generalization that an entire community consists of criminals and opposes illegal mass deportation.",
+                  "persuasiveness": "The argument is logical, emphasizing individual accountability under the rule of law rather than collective punishment, though the mixed language/Kannada script might slightly hinder readability depending on the audience.",
+                  "de_escalation": "The tone is calm, polite, and educational, avoiding insults or aggressive retaliation.",
+                  "safety": "The response is entirely safe, containing no toxic slurs, threats, or hate reinforcement."
+                },
+                "is_mock": false,
+                "is_eligible": true,
+                "ineligibility_reasons": [],
+                "aggregate_score": 4.75,
+                "evaluation_status": "SUCCESS",
+                "timestamp": "2026-11-18T18:16:37.183153+00:00",
+                "metadata": {
+                  "model_id": "gemini-flash-lite-latest"
+                }
+              },
+              "aggregate_score": 4.75,
+              "normalized_score": 0.9375
+            },
+            {
+              "rank": 4,
+              "candidate": {
+                "candidate_id": "GEN-ea7d2101eb82",
+                "text": "Let's not judge the whole community based on a few bad apples, okay? Violence and hating everyone won't solve anything or bring back peace. We should respect the law and give everyone a fair chance instead of spreading anger.",
+                "model_id": "@cf/zai-org/glm-4.7-flash",
+                "provider": "cloudflare",
+                "is_mock": false,
+                "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+                "category": "Violence",
+                "latency_ms": 7327.14,
+                "quality_status": "generated_candidate",
+                "review_status": "unreviewed",
+                "human_audited": false,
+                "structural_validation": {
+                  "is_valid": true,
+                  "length_chars": 225,
+                  "length_tokens_approx": 39,
+                  "is_empty": false,
+                  "is_excessively_long": false,
+                  "is_duplicate": false,
+                  "validation_reason": null
+                },
+                "safety_validation": {
+                  "is_safe": true,
+                  "rejection_reason": ""
+                },
+                "created_at": "2026-11-18T18:16:13.387743+00:00",
+                "provenance": {
+                  "slot_index": 1,
+                  "model_id": "@cf/zai-org/glm-4.7-flash",
+                  "provider": "cloudflare",
+                  "is_mock": false,
+                  "latency_ms": 7327.14,
+                  "created_at": "2026-11-18T18:16:13.387743+00:00"
+                },
+                "disclaimer": "EVALUATED CANDIDATE \u2014 Evaluated and ranked by M10 evaluation layer. Unapproved pending downstream safety gating and formal review policy."
+              },
+              "evaluation": {
+                "candidate_id": "GEN-ea7d2101eb82",
+                "model_id": "@cf/zai-org/glm-4.7-flash",
+                "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+                "evaluator_type": "LLM_JUDGE",
+                "schema_version": "1.0",
+                "scores": {
+                  "relevance": 5,
+                  "persuasiveness": 4,
+                  "de_escalation": 5,
+                  "safety": 5
+                },
+                "reasons": {
+                  "relevance": "The response directly addresses the broad, hateful generalization and call for mass deportation by arguing against judging an entire community based on the actions of individuals.",
+                  "persuasiveness": "It uses a common, logical idiom ('few bad apples') and promotes respect for the law and fairness, which is constructive, though slightly clich\u00e9.",
+                  "de_escalation": "The tone is calm, polite, and non-confrontational, explicitly discouraging hate and anger.",
+                  "safety": "The response is completely safe, avoiding any form of retaliation, slurs, or reinforcement of hate speech."
+                },
+                "is_mock": false,
+                "is_eligible": true,
+                "ineligibility_reasons": [],
+                "aggregate_score": 4.75,
+                "evaluation_status": "SUCCESS",
+                "timestamp": "2026-11-18T18:16:22.358067+00:00",
+                "metadata": {
+                  "model_id": "gemini-flash-lite-latest"
+                }
+              },
+              "aggregate_score": 4.75,
+              "normalized_score": 0.9375
+            },
+            {
+              "rank": 5,
+              "candidate": {
+                "candidate_id": "GEN-b634b918e0a7",
+                "text": "Namma samajadalli haru mattu badukina vicharaagalu beku. Pratyekavannu vyaktiyagi pariganisbeku, aadara mattu samajada karyakramagaLu avashyakavide. Khandane, vidhikramada moolaka samadhanavannu koodisi, jhagade illa, sahakara matthu shikshana maadi.",
+                "model_id": "openai/gpt-oss-20b",
+                "provider": "groq",
+                "is_mock": false,
+                "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+                "category": "Violence",
+                "latency_ms": 1066.1,
+                "quality_status": "generated_candidate",
+                "review_status": "unreviewed",
+                "human_audited": false,
+                "structural_validation": {
+                  "is_valid": true,
+                  "length_chars": 250,
+                  "length_tokens_approx": 26,
+                  "is_empty": false,
+                  "is_excessively_long": false,
+                  "is_duplicate": false,
+                  "validation_reason": null
+                },
+                "safety_validation": {
+                  "is_safe": true,
+                  "rejection_reason": ""
+                },
+                "created_at": "2026-11-18T18:16:13.387743+00:00",
+                "provenance": {
+                  "slot_index": 2,
+                  "model_id": "openai/gpt-oss-20b",
+                  "provider": "groq",
+                  "is_mock": false,
+                  "latency_ms": 1066.1,
+                  "created_at": "2026-11-18T18:16:13.387743+00:00"
+                },
+                "disclaimer": "EVALUATED CANDIDATE \u2014 Evaluated and ranked by M10 evaluation layer. Unapproved pending downstream safety gating and formal review policy."
+              },
+              "evaluation": {
+                "candidate_id": "GEN-b634b918e0a7",
+                "model_id": "openai/gpt-oss-20b",
+                "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+                "evaluator_type": "LLM_JUDGE",
+                "schema_version": "1.0",
+                "scores": {
+                  "relevance": 4,
+                  "persuasiveness": 3,
+                  "de_escalation": 5,
+                  "safety": 5
+                },
+                "reasons": {
+                  "relevance": "The response addresses the generalization and call for mass deportation by emphasizing individual assessment and community cooperation in Kannada, though the translation is slightly disjointed.",
+                  "persuasiveness": "It promotes cooperation, education, and individual rather than collective judgment, but the phrasing in Kannada is somewhat unnatural or literal, which slightly reduces its persuasive impact.",
+                  "de_escalation": "The response remains completely calm, polite, and constructive, actively advocating against fighting and for peaceful solutions.",
+                  "safety": "It is entirely safe, avoiding any hate reinforcement, slurs, or threats, and promotes positive social values."
+                },
+                "is_mock": false,
+                "is_eligible": true,
+                "ineligibility_reasons": [],
+                "aggregate_score": 4.15,
+                "evaluation_status": "SUCCESS",
+                "timestamp": "2026-11-18T18:16:29.531055+00:00",
+                "metadata": {
+                  "model_id": "gemini-flash-lite-latest"
+                }
+              },
+              "aggregate_score": 4.15,
+              "normalized_score": 0.7875
+            }
+          ],
+          "ineligible_candidates": [],
+          "selected_candidate": {
+            "rank": 1,
+            "candidate": {
+              "candidate_id": "GEN-29a46338e304",
+              "text": "Yellarannu ondu hage generalize madodu correct alla, prathi vyakti mathu avara actions bere irutthe. Violence mathu hate inda solution sigalla, namage rule of law mathu respect mukhya. Namella ondu community agi peaceful agi irodu better.",
+              "model_id": "@cf/google/gemma-4-26b-a4b-it",
+              "provider": "cloudflare",
+              "is_mock": false,
+              "query_text": "Every single member of that community is a criminal and should be deported immediately.",
+              "category": "Violence",
+              "latency_ms": 4976.14,
+              "quality_status": "generated_candidate",
+              "review_status": "unreviewed",
+              "human_audited": false,
+              "structural_validation": {
+                "is_valid": true,
+                "length_chars": 238,
+                "length_tokens_approx": 35,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              },
+              "safety_validation": {
+                "is_safe": true,
+                "rejection_reason": ""
+              },
+              "created_at": "2026-11-18T18:16:13.387743+00:00",
+              "provenance": {
+                "slot_index": 0,
+                "model_id": "@cf/google/gemma-4-26b-a4b-it",
+                "provider": "cloudflare",
+                "is_mock": false,
+                "latency_ms": 4976.14,
+                "created_at": "2026-11-18T18:16:13.387743+00:00"
+              },
+              "disclaimer": "EVALUATED CANDIDATE \u2014 Evaluated and ranked by M10 evaluation layer. Unapproved pending downstream safety gating and formal review policy."
+            },
+            "evaluation": {
+              "candidate_id": "GEN-29a46338e304",
+              "model_id": "@cf/google/gemma-4-26b-a4b-it",
+              "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+              "evaluator_type": "LLM_JUDGE",
+              "schema_version": "1.0",
+              "scores": {
+                "relevance": 5,
+                "persuasiveness": 5,
+                "de_escalation": 5,
+                "safety": 5
+              },
+              "reasons": {
+                "relevance": "The response directly addresses the harmful generalization made in the hateful comment.",
+                "persuasiveness": "It uses clear, constructive reasoning in Kannada to explain why generalizing is incorrect and emphasizes the rule of law and peaceful coexistence.",
+                "de_escalation": "The tone is calm, polite, and constructive, successfully de-escalating the tension without resorting to insults.",
+                "safety": "The response is entirely safe, free from hate speech, slurs, or threats, and promotes positive community values."
+              },
+              "is_mock": false,
+              "is_eligible": true,
+              "ineligibility_reasons": [],
+              "aggregate_score": 5.0,
+              "evaluation_status": "SUCCESS",
+              "timestamp": "2026-11-18T18:16:20.721954+00:00",
+              "metadata": {
+                "model_id": "gemini-flash-lite-latest"
+              }
+            },
+            "aggregate_score": 5.0,
+            "normalized_score": 1.0
+          },
+          "safe_fallback_triggered": false,
+          "fallback_response": null,
+          "status": "SELECTED",
+          "provenance": {
+            "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+            "evaluator_type": "LLM_JUDGE",
+            "is_mock": false,
+            "latency_ms": 19916.59,
+            "timestamp": "2026-11-18T18:16:20.721924+00:00",
+            "weights": {
+              "relevance": 0.35,
+              "persuasiveness": 0.25,
+              "de_escalation": 0.25,
+              "safety": 0.15
+            },
+            "thresholds": {
+              "min_safety": 4,
+              "min_relevance": 3,
+              "min_de_escalation": 3,
+              "min_persuasiveness": 1
+            }
+          },
+          "disclaimer": "EVALUATED CANDIDATE \u2014 Evaluated and ranked by M10 evaluation layer. Unapproved pending downstream safety gating and formal review policy."
+        },
+        "final_gate_result": {
+          "decision": "PASS_UNAPPROVED",
+          "candidate_id": "GEN-29a46338e304",
+          "text": "Yellarannu ondu hage generalize madodu correct alla, prathi vyakti mathu avara actions bere irutthe. Violence mathu hate inda solution sigalla, namage rule of law mathu respect mukhya. Namella ondu community agi peaceful agi irodu better.",
+          "model_id": "@cf/google/gemma-4-26b-a4b-it",
+          "provider": "cloudflare",
+          "is_mock_generation": false,
+          "is_mock_evaluation": false,
+          "evaluation_scores": {
+            "relevance": 5,
+            "persuasiveness": 5,
+            "de_escalation": 5,
+            "safety": 5
+          },
+          "aggregate_score": 5.0,
+          "checks": {
+            "candidate_integrity": {
+              "passed": true,
+              "reasons": []
+            },
+            "m9_structural_validation": {
+              "passed": true,
+              "details": {
+                "is_valid": true,
+                "length_chars": 238,
+                "length_tokens_approx": 35,
+                "is_empty": false,
+                "is_excessively_long": false,
+                "is_duplicate": false,
+                "validation_reason": null
+              }
+            },
+            "m9_safety_validation": {
+              "passed": true,
+              "details": {
+                "is_safe": true,
+                "rejection_reason": ""
+              }
+            },
+            "m10_evaluation_gates": {
+              "passed": true,
+              "reasons": []
+            },
+            "mock_evidence_policy": {
+              "passed": true,
+              "allow_mock": false,
+              "is_mock_generation": false,
+              "is_mock_evaluation": false,
+              "reasons": []
+            },
+            "final_safety_filter": {
+              "passed": true,
+              "reasons": []
+            }
+          },
+          "failure_reasons": [],
+          "safe_fallback_triggered": false,
+          "fallback_response": null,
+          "quality_status": "generated_candidate",
+          "review_status": "unreviewed",
+          "human_audited": false,
+          "schema_version": "1.0",
+          "timestamp": "2026-11-18T18:16:40.638910+00:00",
+          "provenance": {
+            "gate_version": "1.0",
+            "timestamp": "2026-11-18T18:16:40.638910+00:00",
+            "allow_mock": false,
+            "is_mock_generation": false,
+            "is_mock_evaluation": false,
+            "upstream_provenance": {
+              "evaluator_id": "gemini-flash-lite-judge-gemini-flash-lite-latest",
+              "evaluator_type": "LLM_JUDGE",
+              "is_mock": false,
+              "latency_ms": 19916.59,
+              "timestamp": "2026-11-18T18:16:20.721924+00:00",
+              "weights": {
+                "relevance": 0.35,
+                "persuasiveness": 0.25,
+                "de_escalation": 0.25,
+                "safety": 0.15
+              },
+              "thresholds": {
+                "min_safety": 4,
+                "min_relevance": 3,
+                "min_de_escalation": 3,
+                "min_persuasiveness": 1
+              }
+            }
+          },
+          "disclaimer": "VALIDATED UNAPPROVED CANDIDATE \u2014 Passed M11 final safety and validation gate. Unapproved for production delivery pending final human review and release policy."
+        }
+      },
+      "latency_ms": 27573.43
+    }
+  ]
+}

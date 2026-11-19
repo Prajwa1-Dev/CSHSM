@@ -1,0 +1,241 @@
+{
+  "audit_version": "1.0",
+  "review_session": "CSHSM M12.1 AI Quality Assessment",
+  "timestamp": "2026-10-24T17:15:00Z",
+  "review_method": "ai_assisted",
+  "human_approved": false,
+  "disclaimer": "AI-assisted quality review recommendation for engineering triage only. This assessment does NOT constitute verified human approval. All records remain strictly unapproved (human_audited=false, quality_status='pending_review') and must not be published to approved_kb.jsonl without actual human sign-off.",
+  "summary": {
+    "total_reviewed": 28,
+    "acceptable_with_caveats": 23,
+    "revise": 3,
+    "reject": 2,
+    "human_approved_count": 0
+  },
+  "candidate_assessments": [
+    {
+      "kb_id": "KB-00003",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Factual economic argument supported by Oxford Migration Observatory research citation.",
+      "caveats": "Contains an external URL which may become stale or broken over time; informal punctuation spacing in source text.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00004",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "De-escalating civic argument decoupling patriotism from ancestral origin.",
+      "caveats": "Simple rhetorical framing; does not cite specific historical or constitutional examples.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00005",
+      "recommendation": "revise",
+      "reason": "Challenges antisemitic conspiracy theory by pointing to foreign intervention, but deflects the topic rather than directly dismantling the specific antisemitic trope.",
+      "caveats": "Typo in original source text ('consequesequences'); rhetorical deflection rather than direct reframing.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00006",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Empathic appeal to personal relationships (mothers, healthcare workers, educators).",
+      "caveats": "Appeals to traditional caretaking roles rather than universal gender equality principles.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00008",
+      "recommendation": "revise",
+      "reason": "Affirms universal shared humanity, but the response is overly brief ('Women are women the world over, full stop.') and does not unpack the racist visual trope in the prompt.",
+      "caveats": "Minimal argumentative substance; terse assertion.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00009",
+      "recommendation": "reject",
+      "reason": "Terse biological assertion ('Without women there would be no men.') that is dismissive rather than constructive against an aggressive misogynistic slur.",
+      "caveats": "Fails to de-escalate hostility or engage constructively with the target.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00011",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Constructive Socratic questioning inquiring what qualities the speaker values as a human being.",
+      "caveats": "Addresses hostile speaker directly, which may invite continued hostility if unmoderated.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00013",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Dignified, compassionate defense of Holocaust memory and historical victims.",
+      "caveats": "Contains informal punctuation and ellipsis in source text ('... I think this should be remembered forever!').",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00014",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Strong reframing of emotional intelligence and the joint historical contributions of men and women.",
+      "caveats": "Slightly colloquial opening ('Who is 'we'').",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00015",
+      "recommendation": "reject",
+      "reason": "Uses sarcastic mirror argument ('Which suggests that white people like to cordon off areas for themselves...') which escalates counter-hostility rather than providing constructive counter-speech.",
+      "caveats": "Sarcastic tone and trailing ellipsis violate de-escalation guidelines.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00019",
+      "recommendation": "revise",
+      "reason": "Direct, neutral request for evidence ('What's your proof for claiming this?'), but lacks substantive counter-narrative or factual grounding.",
+      "caveats": "Extremely brief; relies entirely on challenging the speaker's burden of proof.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00025",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Educational framing centered on empathy, diversity, and developmental understanding.",
+      "caveats": "Broad assertion without reference to specific pedagogical guidelines.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00028",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Clear conceptual distinction between legal tolerance/recognition and coerced participation.",
+      "caveats": "Minor spelling error in source text ('state inforcement').",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00030",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Accurately explains domestic minority demographic proportion versus global population figures.",
+      "caveats": "Opens with 'this is correct', which could superficially resemble agreement if unreframed.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00057",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Economic reframing redirecting blame from immigrants to affordable housing shortages.",
+      "caveats": "Character encoding artifact in source text (£ symbol replaced by question mark); informal grammar ('isnt').",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00060",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Socratic reframing highlighting benign activity (reading stories, teaching kindness).",
+      "caveats": "Brief question; avoids addressing the inflammatory slurs in the prompt.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00082",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Fact-based debunking of false conflation between sexual orientation and child abuse.",
+      "caveats": "Typo in source text ('molestors' instead of 'molesters').",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00087",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Socratic appeal to communal responsibility and societal indifference.",
+      "caveats": "Rhetorical question format; character encoding artifact (£ symbol).",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00151",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Constructive focus on universal human rights and humane standards of treatment in detention.",
+      "caveats": "Conversational phrasing ('It wouldn't be bad to...').",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00169",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Strong dual-layer reframing: animal cruelty is not faith-specific, and social media echo chambers amplify biased reporting.",
+      "caveats": "Minor spelling errors in source text ('rembember', 'belived').",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00170",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Principle of individual responsibility versus collective religious guilt, plus media literacy reminder.",
+      "caveats": "Simple syntax.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00183",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Socratic inquiry into racial prejudice, asserting shared humanity and cultural diversity.",
+      "caveats": "Simple phrasing; does not directly address the racial slur in the prompt.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00189",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Effective mathematical analogy (1 in 10 does not make all 10 guilty) refuting collective guilt.",
+      "caveats": "Rhetorical closing ('Are you serious?') could be perceived as slightly confrontational.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00957",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Empathic perspective-taking inviting the speaker to consider the mutual vulnerability felt by minority communities.",
+      "caveats": "Trailing ellipsis; gentle speculation ('Maybe the black community...').",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-00959",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Logical refutation of sweeping racial generalizations.",
+      "caveats": "Rhetorical tone ('who are you to judge').",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-05004",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Nuanced clarification distinguishing regulatory enforcement issues from religious faith practices.",
+      "caveats": "Specific to UK OFSTED institutional context.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-05008",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Factual contextualization noting that faith-based school segregation issues span multiple religious traditions.",
+      "caveats": "Typographical repetition in source text ('faith schools still that still').",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    },
+    {
+      "kb_id": "KB-05012",
+      "recommendation": "acceptable_with_caveats",
+      "reason": "Constructive media framing analysis: distinguishes enforcement resource scarcity from faith-targeted reporting.",
+      "caveats": "UK-specific administrative context.",
+      "review_method": "ai_assisted",
+      "human_approved": false
+    }
+  ]
+}

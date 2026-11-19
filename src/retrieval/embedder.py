@@ -1,4 +1,7 @@
 import os
+# Default to offline Hugging Face mode to ensure fast, socket-free local model loading
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 import re
 import json
 import math
@@ -7,6 +10,7 @@ import struct
 import shutil
 import hashlib
 import gc
+import uuid
 from datetime import datetime, timezone
 from abc import ABC, abstractmethod
 from typing import List, Dict, Tuple, Optional, Any
@@ -26,7 +30,8 @@ def save_npy_f32(filepath: str, data: List[List[float]], shape: Tuple[int, int])
     try:
         import numpy as np
         arr = np.array(data, dtype=np.float32)
-        np.save(filepath, arr)
+        with open(filepath, "wb") as f:
+           np.save(f, arr)
         return
     except ImportError:
         pass
@@ -114,6 +119,11 @@ class BaseEmbedder(ABC):
         """Compute dense vectors for a batch of strings, returned L2-normalized."""
         pass
 
+    def embed_text(self, text: str) -> List[float]:
+        """Compute dense vector for a single string; returned L2-normalized."""
+        results = self.embed_batch([text])
+        return results[0] if results else []
+
 
 class MockEmbedder(BaseEmbedder):
     """
@@ -171,16 +181,19 @@ class BGE_M3_Embedder(BaseEmbedder):
     def __init__(
         self,
         model_name: str = "BAAI/bge-m3",
-        device: str = "cpu",
+        device: Optional[str] = None,
         batch_size: int = 4,
         max_length: int = 512,
-        revision: Optional[str] = None
+        revision: Optional[str] = None,
+        local_files_only: bool = True
     ):
         self._model_name = model_name
-        self._device = device
+        self._device_arg = device
+        self._device = None
         self._batch_size = batch_size
         self._max_length = max_length
         self._revision = revision
+        self._local_files_only = local_files_only
         self._model = None
         self._dim = 1024
 
@@ -196,6 +209,18 @@ class BGE_M3_Embedder(BaseEmbedder):
     def is_mock(self) -> bool:
         return False
 
+    @property
+    def device(self) -> str:
+        if self._device is not None:
+            return self._device
+        if self._device_arg is not None:
+            return self._device_arg
+        try:
+            import torch
+            return "cuda" if torch.cuda.is_available() else "cpu"
+        except ImportError:
+            return "cpu"
+
     def _load_model(self):
         if self._model is not None:
             return
@@ -207,25 +232,61 @@ class BGE_M3_Embedder(BaseEmbedder):
                 "Install with: pip install sentence-transformers"
             ) from e
 
+        import torch
+        if self._device_arg is None or self._device_arg == "cuda":
+            self._device = "cuda" if torch.cuda.is_available() else "cpu"
+        else:
+            self._device = self._device_arg
+
         kwargs = {"device": self._device}
         if self._revision:
             kwargs["revision"] = self._revision
-        self._model = SentenceTransformer(self._model_name, **kwargs)
+
+        if self._local_files_only:
+            os.environ.setdefault("HF_HUB_OFFLINE", "1")
+            os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+            kwargs["model_kwargs"] = {"local_files_only": True}
+
+        try:
+            self._model = SentenceTransformer(self._model_name, **kwargs)
+        except Exception:
+            if "model_kwargs" in kwargs:
+                kwargs.pop("model_kwargs", None)
+            self._model = SentenceTransformer(self._model_name, **kwargs)
+
         self._model.max_seq_length = self._max_length
 
     def embed_batch(self, texts: List[str]) -> List[List[float]]:
+        if not texts:
+            return []
         self._load_model()
         import torch
+        cleaned_texts = [t if (t and t.strip()) else " " for t in texts]
         with torch.no_grad():
             outputs = self._model.encode(
-                texts,
+                cleaned_texts,
                 batch_size=self._batch_size,
                 normalize_embeddings=True,
                 show_progress_bar=False,
                 convert_to_numpy=True
             )
+            if self._device == "cuda":
+                torch.cuda.empty_cache()
             gc.collect()
             return outputs.tolist()
+
+    def embed_text(self, text: str) -> List[float]:
+        """Compute dense vector for a single string; returned L2-normalized."""
+        results = self.embed_batch([text])
+        return results[0] if results else []
+
+    def embed_query(self, query: str) -> List[float]:
+        """Convenience query embedding method."""
+        return self.embed_text(query)
+
+    def embed_document(self, doc: str) -> List[float]:
+        """Convenience document embedding method."""
+        return self.embed_text(doc)
 
 
 # =====================================================================
@@ -240,6 +301,9 @@ class EmbeddingPipeline:
 
     VALID_SCOPES = ["development_provisional", "approved_kb"]
     VALID_STRATEGIES = ["hate_text", "structured_category_hate"]
+    RUNS_SUBDIR = "runs"
+    LATEST_POINTER_FILE = "LATEST.json"
+    COMMIT_MARKER_FILE = "COMMITTED"
 
     def __init__(
         self,
@@ -295,7 +359,7 @@ class EmbeddingPipeline:
                     f"Approved KB mode fail-closed: Input file {input_path} contains zero valid entries."
                 )
             for idx, e in enumerate(entries):
-                if e.quality_status != "approved" or e.review_status != "approved":
+                if e.quality_status != "approved" or e.review_status not in ("approved", "human-approved"):
                     raise ValueError(
                         f"Approved KB mode fail-closed: Entry index {idx} ({e.kb_id}) has "
                         f"quality_status='{e.quality_status}', review_status='{e.review_status}'. "
@@ -325,7 +389,7 @@ class EmbeddingPipeline:
                     continue
                 try:
                     record = json.loads(line)
-                    entry = KBEntry(**record)
+                    entry = KBEntry.from_dict(record) if hasattr(KBEntry, "from_dict") else KBEntry(**record)
                     raw_entries.append(entry)
                 except Exception as e:
                     raise ValueError(f"Malformed JSONL at line {line_no + 1} of {input_path}: {e}") from e
@@ -408,46 +472,65 @@ class EmbeddingPipeline:
                     f"Integrity check failed: Row {row_idx} L2 norm is {norm:.6f}, expected 1.0"
                 )
 
-        # 7. Atomic persistence & backup
+        # 7. Pre-run backup before modifying any active published artifacts
         os.makedirs(self.output_dir, exist_ok=True)
         os.makedirs(self.reports_dir, exist_ok=True)
+        backup_dir = self._backup_existing_artifacts()
 
-        # Backup prior artifacts if existing
-        self._backup_existing_artifacts()
-
-        # Use distinct filenames for mock vs real embeddings to prevent accidental acceptance
+        # 8. Setup isolated versioned run directory under self.output_dir/runs/<run_id>
         prefix = "bge_m3_mock" if self.embedder.is_mock else "bge_m3"
-        vec_path = os.path.join(self.output_dir, f"{prefix}_dense.npy")
-        manifest_path = os.path.join(self.output_dir, f"{prefix}_manifest.jsonl")
-        report_path = os.path.join(self.reports_dir, "m6_embedding_report.json")
-        skipped_path = os.path.join(self.reports_dir, "m6_skipped_records.jsonl")
+        run_ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        run_uuid = uuid.uuid4().hex[:8]
+        run_id = f"{prefix}_{run_ts}_{run_uuid}"
+        runs_dir = os.path.join(self.output_dir, self.RUNS_SUBDIR)
+        os.makedirs(runs_dir, exist_ok=True)
+        run_dir = os.path.join(runs_dir, run_id)
+        os.makedirs(run_dir, exist_ok=True)
 
-        tmp_vec_path = vec_path + ".tmp"
-        tmp_manifest_path = manifest_path + ".tmp"
-        tmp_report_path = report_path + ".tmp"
+        run_vec_path = os.path.join(run_dir, f"{prefix}_dense.npy")
+        run_manifest_path = os.path.join(run_dir, f"{prefix}_manifest.jsonl")
+        run_report_path = os.path.join(run_dir, "m6_embedding_report.json")
+        run_skipped_path = os.path.join(run_dir, "m6_skipped_records.jsonl")
+        run_commit_path = os.path.join(run_dir, self.COMMIT_MARKER_FILE)
+        latest_pointer_path = os.path.join(self.output_dir, self.LATEST_POINTER_FILE)
+
+        tmp_vec = run_vec_path + ".tmp"
+        tmp_manifest = run_manifest_path + ".tmp"
+        tmp_skipped = run_skipped_path + ".tmp"
+        tmp_report = run_report_path + ".tmp"
+        tmp_commit = run_commit_path + ".tmp"
+        tmp_latest = latest_pointer_path + ".tmp"
 
         try:
-            # Write vector matrix
-            save_npy_f32(tmp_vec_path, all_embeddings, matrix_shape)
+            # 8a. Write vector matrix inside run_dir
+            save_npy_f32(tmp_vec, all_embeddings, matrix_shape)
+            os.replace(tmp_vec, run_vec_path)
 
-            # Write manifest
-            with open(tmp_manifest_path, "w", encoding="utf-8") as f:
+            # 8b. Write candidate manifest inside run_dir
+            with open(tmp_manifest, "w", encoding="utf-8") as f:
                 for rec in manifest_records:
+                    rec["run_id"] = run_id
                     f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            os.replace(tmp_manifest, run_manifest_path)
 
-            # Write skipped records if any
+            # 8c. Write skipped records inside run_dir if any
             if skipped_records:
-                with open(skipped_path, "w", encoding="utf-8") as f:
+                with open(tmp_skipped, "w", encoding="utf-8") as f:
                     for s in skipped_records:
-                        f.write(json.dumps(s) + "\n")
+                        f.write(json.dumps(s, ensure_ascii=False) + "\n")
+                os.replace(tmp_skipped, run_skipped_path)
 
-            # Compute output hashes
-            with open(tmp_vec_path, "rb") as f:
+            # 8d. Compute cryptographic hashes for all generated run files
+            with open(run_vec_path, "rb") as f:
                 vec_sha256 = hashlib.sha256(f.read()).hexdigest()
-            with open(tmp_manifest_path, "rb") as f:
+            with open(run_manifest_path, "rb") as f:
                 manifest_sha256 = hashlib.sha256(f.read()).hexdigest()
+            skipped_sha256 = None
+            if skipped_records and os.path.exists(run_skipped_path):
+                with open(run_skipped_path, "rb") as f:
+                    skipped_sha256 = hashlib.sha256(f.read()).hexdigest()
 
-            # Build metadata report
+            # 8e. Build and write metadata report inside run_dir
             now_iso = datetime.now(timezone.utc).isoformat()
             scope_disclaimer = (
                 "PROVISIONAL CANDIDATES — Embedded for retrieval development only; counter-speech remains unapproved by M5.4."
@@ -456,8 +539,24 @@ class EmbeddingPipeline:
             )
             mock_note = "MOCK EMBEDDINGS — Strictly for tests and engineering validation." if self.embedder.is_mock else None
 
+            artifacts_map = {
+                "vector_file": f"{prefix}_dense.npy",
+                "vector_sha256": vec_sha256,
+                "manifest_file": f"{prefix}_manifest.jsonl",
+                "manifest_sha256": manifest_sha256,
+                "report_file": "m6_embedding_report.json",
+                "commit_marker": self.COMMIT_MARKER_FILE,
+                "latest_pointer": self.LATEST_POINTER_FILE,
+                "authoritative_run_dir": run_dir,
+            }
+            if skipped_sha256 is not None:
+                artifacts_map["skipped_file"] = "m6_skipped_records.jsonl"
+                artifacts_map["skipped_sha256"] = skipped_sha256
+
             report = {
                 "timestamp": now_iso,
+                "run_id": run_id,
+                "run_dir": os.path.relpath(run_dir, self.output_dir),
                 "model_identifier": self.embedder.model_identifier,
                 "is_mock": self.embedder.is_mock,
                 "embedding_dimension": self.embedder.dimension,
@@ -472,51 +571,309 @@ class EmbeddingPipeline:
                 "skipped_record_count": len(skipped_records),
                 "embedded_record_count": total_to_embed,
                 "matrix_shape": list(matrix_shape),
-                "artifacts": {
-                    "vector_file": os.path.basename(vec_path),
-                    "vector_sha256": vec_sha256,
-                    "manifest_file": os.path.basename(manifest_path),
-                    "manifest_sha256": manifest_sha256
-                },
+                "artifacts": artifacts_map,
                 "disclaimer": scope_disclaimer,
-                "mock_notice": mock_note
+                "mock_notice": mock_note,
+                "publication_status": "committed"
             }
 
-            with open(tmp_report_path, "w", encoding="utf-8") as f:
+            with open(tmp_report, "w", encoding="utf-8") as f:
                 json.dump(report, f, indent=2)
+            os.replace(tmp_report, run_report_path)
 
-            # Atomic rename
-            os.replace(tmp_vec_path, vec_path)
-            os.replace(tmp_manifest_path, manifest_path)
-            os.replace(tmp_report_path, report_path)
+            with open(run_report_path, "rb") as f:
+                report_sha256 = hashlib.sha256(f.read()).hexdigest()
+            artifacts_map["report_sha256"] = report_sha256
+
+            # 9. Validate the complete artifact set on disk before committing
+            for p, name in [(run_vec_path, "vector"), (run_manifest_path, "manifest"), (run_report_path, "report")]:
+                if not os.path.exists(p) or os.path.getsize(p) == 0:
+                    raise RuntimeError(f"Artifact verification failed in {run_dir}: {name} is missing or empty.")
+            if skipped_records:
+                if not os.path.exists(run_skipped_path) or os.path.getsize(run_skipped_path) == 0:
+                    raise RuntimeError(f"Artifact verification failed in {run_dir}: skipped-records log is missing or empty.")
+
+            # 10. Seal the run with the COMMITTED marker (written last in run_dir)
+            commit_payload = {
+                "run_id": run_id,
+                "committed_at": now_iso,
+                "scope": self.scope,
+                "is_mock": self.embedder.is_mock,
+                "model_identifier": self.embedder.model_identifier,
+                "vector_count": len(all_embeddings),
+                "manifest_count": len(manifest_records),
+                "matrix_shape": list(matrix_shape),
+                "artifacts": artifacts_map
+            }
+            with open(tmp_commit, "w", encoding="utf-8") as f:
+                json.dump(commit_payload, f, indent=2)
+            os.replace(tmp_commit, run_commit_path)
+
+            # 11. Atomically update authoritative LATEST.json pointer
+            pointer_payload = {
+                "run_id": run_id,
+                "run_dir": os.path.relpath(run_dir, self.output_dir),
+                "scope": self.scope,
+                "is_mock": self.embedder.is_mock,
+                "model_identifier": self.embedder.model_identifier,
+                "vector_count": len(all_embeddings),
+                "manifest_count": len(manifest_records),
+                "matrix_shape": list(matrix_shape),
+                "committed_at": now_iso,
+                "commit_marker": self.COMMIT_MARKER_FILE,
+                "artifacts": artifacts_map
+            }
+            with open(tmp_latest, "w", encoding="utf-8") as f:
+                json.dump(pointer_payload, f, indent=2)
+            os.replace(tmp_latest, latest_pointer_path)
 
         except Exception as e:
-            # Clean up temporary files on error
-            for p in [tmp_vec_path, tmp_manifest_path, tmp_report_path]:
+            # Clean up temporary staging files on error
+            for p in [tmp_vec, tmp_manifest, tmp_skipped, tmp_report, tmp_commit, tmp_latest]:
                 if os.path.exists(p):
                     try:
                         os.remove(p)
                     except OSError:
                         pass
+            if os.path.exists(run_commit_path):
+                try:
+                    os.remove(run_commit_path)
+                except OSError:
+                    pass
             raise RuntimeError(f"Embedding pipeline failed and aborted safely: {e}") from e
+
+        # 12. Reversible canonical mirror publication (for backward compatibility)
+        try:
+            self._publish_canonical_mirror(run_dir, prefix, skipped_records, report)
+        except Exception as e:
+            if backup_dir and os.path.exists(backup_dir):
+                self._restore_from_backup(backup_dir)
+            raise RuntimeError(f"Canonical mirror publication failed; state rolled back: {e}") from e
 
         return report
 
-    def _backup_existing_artifacts(self):
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-        backup_dir = os.path.join(self.reports_dir, "backups", f"m6_pre_run_{timestamp}")
+    def _publish_canonical_mirror(
+        self,
+        run_dir: str,
+        prefix: str,
+        skipped_records: List[Dict[str, Any]],
+        report: Dict[str, Any]
+    ):
+        """
+        Updates canonical compatibility mirror files with rollback guard.
+        Authoritative publication remains the committed run_dir referenced by LATEST.json.
+        """
+        vec_path = os.path.join(self.output_dir, f"{prefix}_dense.npy")
+        manifest_path = os.path.join(self.output_dir, f"{prefix}_manifest.jsonl")
+        report_path = os.path.join(self.reports_dir, "m6_embedding_report.json")
+        skipped_path = os.path.join(self.reports_dir, "m6_skipped_records.jsonl")
 
+        tmp_vec = vec_path + ".tmp"
+        tmp_manifest = manifest_path + ".tmp"
+        tmp_report = report_path + ".tmp"
+        tmp_skipped = skipped_path + ".tmp"
+
+        src_vec = os.path.join(run_dir, f"{prefix}_dense.npy")
+        src_manifest = os.path.join(run_dir, f"{prefix}_manifest.jsonl")
+        src_report = os.path.join(run_dir, "m6_embedding_report.json")
+        src_skipped = os.path.join(run_dir, "m6_skipped_records.jsonl")
+
+        shutil.copy2(src_vec, tmp_vec)
+        shutil.copy2(src_manifest, tmp_manifest)
+        shutil.copy2(src_report, tmp_report)
+        if skipped_records and os.path.exists(src_skipped):
+            shutil.copy2(src_skipped, tmp_skipped)
+
+        os.replace(tmp_vec, vec_path)
+        os.replace(tmp_manifest, manifest_path)
+        if skipped_records and os.path.exists(src_skipped):
+            os.replace(tmp_skipped, skipped_path)
+        elif os.path.exists(skipped_path):
+            os.remove(skipped_path)
+        os.replace(tmp_report, report_path)
+
+    def _backup_existing_artifacts(self) -> Optional[str]:
+        """
+        Safely stages and archives existing published artifacts before any modification.
+        Aborts completely if copying fails, leaving active artifacts untouched.
+        """
         prefix = "bge_m3_mock" if self.embedder.is_mock else "bge_m3"
         files = [
             os.path.join(self.output_dir, f"{prefix}_dense.npy"),
             os.path.join(self.output_dir, f"{prefix}_manifest.jsonl"),
             os.path.join(self.reports_dir, "m6_embedding_report.json"),
+            os.path.join(self.reports_dir, "m6_skipped_records.jsonl"),
+            os.path.join(self.output_dir, self.LATEST_POINTER_FILE),
         ]
-        backed_up = False
-        for fpath in files:
-            if os.path.exists(fpath):
-                os.makedirs(backup_dir, exist_ok=True)
-                dest = os.path.join(backup_dir, os.path.basename(fpath))
+        existing_files = [f for f in files if os.path.exists(f)]
+        if not existing_files:
+            return None
+
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        backup_dir = os.path.join(self.reports_dir, "backups", f"m6_pre_run_{timestamp}")
+        staging_dir = backup_dir + ".tmp"
+
+        if os.path.exists(staging_dir):
+            shutil.rmtree(staging_dir, ignore_errors=True)
+        os.makedirs(staging_dir, exist_ok=True)
+
+        try:
+            for fpath in existing_files:
+                dest = os.path.join(staging_dir, os.path.basename(fpath))
                 shutil.copy2(fpath, dest)
-                backed_up = True
-        return backup_dir if backed_up else None
+
+            backup_manifest = {
+                "backup_timestamp": datetime.now(timezone.utc).isoformat(),
+                "backed_up_files": [os.path.basename(f) for f in existing_files],
+                "status": "complete"
+            }
+            with open(os.path.join(staging_dir, "BACKUP_COMPLETE.json"), "w", encoding="utf-8") as f:
+                json.dump(backup_manifest, f, indent=2)
+
+            if os.path.exists(backup_dir):
+                shutil.rmtree(backup_dir, ignore_errors=True)
+            os.replace(staging_dir, backup_dir)
+            return backup_dir
+
+        except Exception as e:
+            if os.path.exists(staging_dir):
+                shutil.rmtree(staging_dir, ignore_errors=True)
+            if os.path.exists(backup_dir):
+                shutil.rmtree(backup_dir, ignore_errors=True)
+            raise RuntimeError(f"Pre-run backup failed and aborted safely: {e}") from e
+
+    def _restore_from_backup(self, backup_dir: str):
+        """
+        Restores canonical compatibility mirror files from backup in case of mirror failure.
+        """
+        if not os.path.exists(backup_dir):
+            return
+        prefix = "bge_m3_mock" if self.embedder.is_mock else "bge_m3"
+        mapping = {
+            f"{prefix}_dense.npy": os.path.join(self.output_dir, f"{prefix}_dense.npy"),
+            f"{prefix}_manifest.jsonl": os.path.join(self.output_dir, f"{prefix}_manifest.jsonl"),
+            "m6_embedding_report.json": os.path.join(self.reports_dir, "m6_embedding_report.json"),
+            "m6_skipped_records.jsonl": os.path.join(self.reports_dir, "m6_skipped_records.jsonl"),
+            self.LATEST_POINTER_FILE: os.path.join(self.output_dir, self.LATEST_POINTER_FILE),
+        }
+        for fname, dst in mapping.items():
+            src = os.path.join(backup_dir, fname)
+            if os.path.exists(src):
+                tmp_dst = dst + ".tmp"
+                shutil.copy2(src, tmp_dst)
+                os.replace(tmp_dst, dst)
+            elif os.path.exists(dst):
+                try:
+                    os.remove(dst)
+                except OSError:
+                    pass
+
+    @classmethod
+    def resolve_latest_run(
+        cls,
+        output_dir: str,
+        expected_scope: Optional[str] = None,
+        allow_mock: bool = False
+    ) -> Dict[str, Any]:
+        """
+        Authoritative resolver for M7 and downstream milestones.
+        Reads LATEST.json, verifies the run directory and COMMITTED marker,
+        re-verifies cryptographic checksums, and enforces scope and mock invariants.
+        Fails closed on uncommitted, incomplete, or mismatched runs.
+        """
+        pointer_path = os.path.join(output_dir, cls.LATEST_POINTER_FILE)
+        if not os.path.exists(pointer_path):
+            raise FileNotFoundError(
+                f"No authoritative run pointer found at {pointer_path}. "
+                "No embedding runs have been committed."
+            )
+
+        with open(pointer_path, "r", encoding="utf-8") as f:
+            pointer = json.load(f)
+
+        run_rel_dir = pointer.get("run_dir")
+        if not run_rel_dir:
+            raise ValueError(f"Malformed pointer in {pointer_path}: missing 'run_dir'")
+
+        run_dir = os.path.normpath(os.path.join(output_dir, run_rel_dir))
+        if not os.path.exists(run_dir):
+            raise FileNotFoundError(f"Authoritative run directory not found: {run_dir}")
+
+        committed_path = os.path.join(run_dir, cls.COMMIT_MARKER_FILE)
+        if not os.path.exists(committed_path):
+            raise RuntimeError(
+                f"Run directory {run_dir} is uncommitted (missing {cls.COMMIT_MARKER_FILE}). "
+                "Refusing to consume incomplete run."
+            )
+
+        with open(committed_path, "r", encoding="utf-8") as f:
+            commit_data = json.load(f)
+
+        # Enforce scope isolation
+        run_scope = commit_data.get("scope")
+        if expected_scope is not None and run_scope != expected_scope:
+            raise ValueError(
+                f"Scope mismatch in run {commit_data.get('run_id')}: "
+                f"expected '{expected_scope}', got '{run_scope}'."
+            )
+
+        # Enforce mock protection
+        is_mock = commit_data.get("is_mock", False)
+        if not allow_mock and is_mock:
+            raise ValueError(
+                f"Refusing to consume mock embeddings in production scope. "
+                f"Run {commit_data.get('run_id')} is tagged is_mock=True."
+            )
+
+        # Verify artifacts and checksums
+        artifacts = commit_data.get("artifacts", {})
+        vec_file = artifacts.get("vector_file")
+        vec_hash = artifacts.get("vector_sha256")
+        manifest_file = artifacts.get("manifest_file")
+        manifest_hash = artifacts.get("manifest_sha256")
+        report_file = artifacts.get("report_file")
+        report_hash = artifacts.get("report_sha256")
+        skipped_file = artifacts.get("skipped_file")
+
+        if not vec_file or not manifest_file or not report_file:
+            raise ValueError(f"Incomplete artifact manifest in {committed_path}")
+
+        vec_full_path = os.path.join(run_dir, vec_file)
+        manifest_full_path = os.path.join(run_dir, manifest_file)
+        report_full_path = os.path.join(run_dir, report_file)
+        skipped_full_path = os.path.join(run_dir, skipped_file) if skipped_file else None
+
+        for path, expected_hash, name in [
+            (vec_full_path, vec_hash, "vector file"),
+            (manifest_full_path, manifest_hash, "manifest file"),
+            (report_full_path, report_hash, "report file"),
+        ]:
+            if not os.path.exists(path):
+                raise FileNotFoundError(f"Missing committed artifact: {name} at {path}")
+            with open(path, "rb") as f:
+                actual_hash = hashlib.sha256(f.read()).hexdigest()
+            if actual_hash != expected_hash:
+                raise RuntimeError(
+                    f"Integrity corruption detected in committed run {commit_data.get('run_id')}: "
+                    f"{name} SHA-256 mismatch. Expected {expected_hash}, got {actual_hash}."
+                )
+
+        if skipped_full_path and not os.path.exists(skipped_full_path):
+            raise FileNotFoundError(f"Missing committed skipped-records artifact at {skipped_full_path}")
+
+        return {
+            "run_id": commit_data.get("run_id"),
+            "run_dir": run_dir,
+            "scope": run_scope,
+            "is_mock": is_mock,
+            "model_identifier": commit_data.get("model_identifier"),
+            "vector_count": commit_data.get("vector_count"),
+            "manifest_count": commit_data.get("manifest_count"),
+            "matrix_shape": commit_data.get("matrix_shape"),
+            "vector_file": vec_full_path,
+            "manifest_file": manifest_full_path,
+            "report_file": report_full_path,
+            "skipped_file": skipped_full_path,
+            "committed_at": commit_data.get("committed_at"),
+            "artifacts": artifacts
+        }

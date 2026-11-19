@@ -1,4 +1,24 @@
 {
+  "leakage_audit": {
+    "status": "completed",
+    "verified": true,
+    "mode": "verified",
+    "reason": "HASTIKA test and validation reference splits verified; exact-match leakage audit executed against both splits.",
+    "hastika_splits": {
+      "test_path": "data/splits\\test.jsonl",
+      "test_present": true,
+      "test_count": 805,
+      "val_path": "data/splits\\val.jsonl",
+      "val_present": true,
+      "val_count": 796
+    },
+    "matches": {
+      "test_matches": 0,
+      "val_matches": 0,
+      "total_leakage_rejected": 0
+    },
+    "cross_split_observation": "Four cross-split comment pairs overlap under case-insensitive comparison in the restored HASTIKA splits, although original exact-text split check found zero. Leakage filter applied normalized exact matching against all reference entries."
+  },
   "stats": {
     "multitarget-conan": {
       "raw": 5003,

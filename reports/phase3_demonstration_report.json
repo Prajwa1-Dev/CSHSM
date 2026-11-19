@@ -1,0 +1,175 @@
+{
+  "timestamp": "2026-11-01T14:20:37.496623+00:00",
+  "classifier": {
+    "model_path": "models/xlmr_best.pt",
+    "device": "cuda",
+    "categories": [
+      "Gender",
+      "Political",
+      "Religion",
+      "Geo-political",
+      "Violence",
+      "Others"
+    ],
+    "is_mock": false
+  },
+  "retriever": {
+    "source": "data/counter_speech_kb/demo_approved_kb.jsonl",
+    "embedding_run": "bge_m3_mock_20261101_140449_891674d6",
+    "indexed_count": 24,
+    "backend": "exact_ip_fallback",
+    "is_mock_embedder": true
+  },
+  "generation": {
+    "live_adapter": "GoogleGeminiAdapter (gemini-flash-lite-latest)",
+    "mock_adapters": [
+      "mock-openai-gpt4o-mini",
+      "mock-anthropic-claude3-haiku",
+      "mock-mistral-small",
+      "mock-cohere-command-r"
+    ],
+    "total_slots": 5
+  },
+  "scenarios": [
+    {
+      "scenario_id": 1,
+      "name": "Non-hate early exit",
+      "description": "Benign positive statement; classifier must classify as NON-HATE and exit early without generating counter-speech.",
+      "input_text": "Wishing everyone a peaceful and productive week ahead! Let's collaborate together.",
+      "outcome": "NON_HATE_EARLY_EXIT",
+      "is_hate": false,
+      "category": null,
+      "confidence": 0.9231,
+      "source_origin": "NONE",
+      "candidate_id": null,
+      "provider": "classifier",
+      "model_id": "xlmr-xlm-roberta-base",
+      "quality_status": "non_hate_exit",
+      "safe_fallback_triggered": false,
+      "fallback_reason": null,
+      "response_text": null,
+      "fallback_response": null,
+      "component_statuses": {
+        "cleaner": "SUCCESS",
+        "classifier": "SUCCESS",
+        "router": "SKIPPED",
+        "generation": "SKIPPED",
+        "ranking": "SKIPPED",
+        "final_gate": "SKIPPED"
+      },
+      "latency_ms": 263.95
+    },
+    {
+      "scenario_id": 2,
+      "name": "Successful KB retrieval",
+      "description": "Exact match to DEMO-KB-00001; classifier predicts Gender hate; router detects similarity >= 0.80 and retrieves from KB.",
+      "input_text": "Women do not belong in leadership or engineering, their brains are built only for housework.",
+      "outcome": "RETRIEVED_RESPONSE",
+      "is_hate": true,
+      "category": "Gender",
+      "confidence": 0.7229,
+      "source_origin": "RETRIEVAL",
+      "candidate_id": "DEMO-KB-00001",
+      "provider": "ai_demonstration_corpus",
+      "model_id": "kb_retrieval",
+      "quality_status": "automatically_validated",
+      "safe_fallback_triggered": false,
+      "fallback_reason": null,
+      "response_text": "Research and leadership roles across engineering and science are successfully filled by women every day. Diverse teams consistently drive better innovation and problem-solving.",
+      "fallback_response": null,
+      "component_statuses": {
+        "cleaner": "SUCCESS",
+        "classifier": "SUCCESS",
+        "router": "RETRIEVE",
+        "generation": "SKIPPED",
+        "ranking": "SKIPPED",
+        "final_gate": "PASS_UNAPPROVED"
+      },
+      "latency_ms": 10.34
+    },
+    {
+      "scenario_id": 3,
+      "name": "Generation fan-out fallback",
+      "description": "Novel political hate speech not in KB; similarity < 0.80 triggers fan-out; real Gemini in Slot 3 generates live response.",
+      "input_text": "Every member of that political party is corrupt and should be thrown into prison without trial.",
+      "outcome": "GENERATED_RESPONSE",
+      "is_hate": true,
+      "category": "Political",
+      "confidence": 0.753,
+      "source_origin": "GENERATION",
+      "candidate_id": "GEN-c0e93fc47a8a",
+      "provider": "google",
+      "model_id": "gemini-flash-lite-latest",
+      "quality_status": "generated_candidate",
+      "safe_fallback_triggered": false,
+      "fallback_reason": null,
+      "response_text": "It is understandable to feel frustrated by instances of corruption in politics, but bypassing the judicial system and abandoning due process undermines the very foundation of democracy and the rule of law. Justice relies on fair trials and evidence, not sweeping generalizations about entire groups of people. A stronger democracy is built on accountability through legal channels and active civic engagement, not abandoning our core constitutional protections.",
+      "fallback_response": null,
+      "component_statuses": {
+        "cleaner": "SUCCESS",
+        "classifier": "SUCCESS",
+        "router": "FALLBACK_GENERATION",
+        "generation": "SUCCESS",
+        "ranking": "SELECTED",
+        "final_gate": "PASS_UNAPPROVED"
+      },
+      "latency_ms": 2307.67
+    },
+    {
+      "scenario_id": 4,
+      "name": "Safety rejection and safe fallback",
+      "description": "Candidate containing prohibited or toxic text is caught by defense-in-depth safety gate and triggers safe fallback.",
+      "input_text": "All members of that minority are evil subhumans who must be expelled.",
+      "outcome": "SAFE_FALLBACK",
+      "is_hate": true,
+      "category": "Religion",
+      "confidence": 0.6742,
+      "source_origin": "GENERATION",
+      "candidate_id": null,
+      "provider": null,
+      "model_id": null,
+      "quality_status": "fallback",
+      "safe_fallback_triggered": true,
+      "fallback_reason": "NO_SAFE_CANDIDATES: Fan-out produced 0 safe candidates. status=ALL_FILTERED, rejected=1",
+      "response_text": null,
+      "fallback_response": "I cannot respond to this respectfully.",
+      "component_statuses": {
+        "cleaner": "SUCCESS",
+        "classifier": "SUCCESS",
+        "router": "FALLBACK_GENERATION",
+        "generation": "ALL_FILTERED",
+        "ranking": "SKIPPED_NO_SAFE_CANDIDATES",
+        "final_gate": "SKIPPED_NO_SAFE_CANDIDATES"
+      },
+      "latency_ms": 10.75
+    },
+    {
+      "scenario_id": 5,
+      "name": "Empty input safe handling",
+      "description": "Whitespace only input; cleaner catches empty string and returns safe fallback without classifier crash.",
+      "input_text": "    ",
+      "outcome": "SAFE_FALLBACK",
+      "is_hate": false,
+      "category": null,
+      "confidence": 0.0,
+      "source_origin": "NONE",
+      "candidate_id": null,
+      "provider": null,
+      "model_id": null,
+      "quality_status": "fallback",
+      "safe_fallback_triggered": true,
+      "fallback_reason": "EMPTY_INPUT: Input text is empty, None, or whitespace only.",
+      "response_text": null,
+      "fallback_response": "I cannot respond to this respectfully.",
+      "component_statuses": {
+        "cleaner": "EMPTY_INPUT",
+        "classifier": "PENDING",
+        "router": "PENDING",
+        "generation": "PENDING",
+        "ranking": "PENDING",
+        "final_gate": "PENDING"
+      },
+      "latency_ms": 0.01
+    }
+  ]
+}

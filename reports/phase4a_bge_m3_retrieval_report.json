@@ -1,0 +1,236 @@
+{
+  "test_date": "2026-11-01T17:29:17Z",
+  "model": "BAAI/bge-m3",
+  "backend": "exact_ip_fallback",
+  "device": "cuda",
+  "total_test_cases": 6,
+  "category_match_accuracy_percent": 100.0,
+  "exact_kb_match_accuracy_percent": 100.0,
+  "average_bge_similarity": 0.8432,
+  "average_mock_similarity": 0.1708,
+  "average_latency_ms": 256.65,
+  "test_results": [
+    {
+      "category": "Gender",
+      "target_id": "DEMO-KB-00001",
+      "original_hate_text": "Women do not belong in leadership or engineering, their brains are built only for housework.",
+      "paraphrase_query": "Females are incapable of technical leadership or technical engineering roles.",
+      "bge_top_id": "DEMO-KB-00001",
+      "bge_top_category": "Gender",
+      "bge_top_score": 0.8005,
+      "category_match": true,
+      "exact_id_match": true,
+      "latency_ms": 302.86,
+      "vram_peak_mb": 2174.79,
+      "mock_baseline_score": 0.1769,
+      "all_bge_matches": [
+        {
+          "rank": 1,
+          "kb_id": "DEMO-KB-00001",
+          "score": 0.8005,
+          "category": "Gender",
+          "hate_text": "Women do not belong in leadership or engineering, their brains are built only for housework."
+        },
+        {
+          "rank": 2,
+          "kb_id": "DEMO-KB-00004",
+          "score": 0.5942,
+          "category": "Gender",
+          "hate_text": "Working women are destroying traditional culture and moral values in our country."
+        },
+        {
+          "rank": 3,
+          "kb_id": "DEMO-KB-00021",
+          "score": 0.5624,
+          "category": "Others",
+          "hate_text": "Lower-caste people are inherently inferior and should never be granted university seats or professional jobs."
+        }
+      ]
+    },
+    {
+      "category": "Political",
+      "target_id": "DEMO-KB-00005",
+      "original_hate_text": "Anyone voting for the opposition party is a traitor and should lose their right to citizenship.",
+      "paraphrase_query": "Citizens who cast their vote for opposition politicians are national traitors.",
+      "bge_top_id": "DEMO-KB-00005",
+      "bge_top_category": "Political",
+      "bge_top_score": 0.844,
+      "category_match": true,
+      "exact_id_match": true,
+      "latency_ms": 242.31,
+      "vram_peak_mb": 2174.79,
+      "mock_baseline_score": 0.1592,
+      "all_bge_matches": [
+        {
+          "rank": 1,
+          "kb_id": "DEMO-KB-00005",
+          "score": 0.844,
+          "category": "Political",
+          "hate_text": "Anyone voting for the opposition party is a traitor and should lose their right to citizenship."
+        },
+        {
+          "rank": 2,
+          "kb_id": "DEMO-KB-00008",
+          "score": 0.6246,
+          "category": "Political",
+          "hate_text": "Those criticizing government policy are foreign agents who deserve no legal protection or human rights."
+        },
+        {
+          "rank": 3,
+          "kb_id": "DEMO-KB-00007",
+          "score": 0.5736,
+          "category": "Political",
+          "hate_text": "These corrupt liberal intellectuals are parasites actively plotting to dismantle our civilization."
+        }
+      ]
+    },
+    {
+      "category": "Religion",
+      "target_id": "DEMO-KB-00009",
+      "original_hate_text": "All Muslims are violent radicals who are secretly planning to wage war on our homeland.",
+      "paraphrase_query": "Muslim communities are extremists secretly plotting warfare against our nation.",
+      "bge_top_id": "DEMO-KB-00009",
+      "bge_top_category": "Religion",
+      "bge_top_score": 0.8338,
+      "category_match": true,
+      "exact_id_match": true,
+      "latency_ms": 206.85,
+      "vram_peak_mb": 2174.79,
+      "mock_baseline_score": -0.0814,
+      "all_bge_matches": [
+        {
+          "rank": 1,
+          "kb_id": "DEMO-KB-00009",
+          "score": 0.8338,
+          "category": "Religion",
+          "hate_text": "All Muslims are violent radicals who are secretly planning to wage war on our homeland."
+        },
+        {
+          "rank": 2,
+          "kb_id": "DEMO-KB-00007",
+          "score": 0.6822,
+          "category": "Political",
+          "hate_text": "These corrupt liberal intellectuals are parasites actively plotting to dismantle our civilization."
+        },
+        {
+          "rank": 3,
+          "kb_id": "DEMO-KB-00011",
+          "score": 0.648,
+          "category": "Religion",
+          "hate_text": "Religious minorities are a dangerous virus threatening the purity of our historic faith."
+        }
+      ]
+    },
+    {
+      "category": "Geo-political",
+      "target_id": "DEMO-KB-00015",
+      "original_hate_text": "Foreign workers are stealing jobs from native citizens and should be rounded up and deported immediately.",
+      "paraphrase_query": "Migrant workers are taking local employment and should all be immediately deported.",
+      "bge_top_id": "DEMO-KB-00015",
+      "bge_top_category": "Geo-political",
+      "bge_top_score": 0.8896,
+      "category_match": true,
+      "exact_id_match": true,
+      "latency_ms": 258.79,
+      "vram_peak_mb": 2174.79,
+      "mock_baseline_score": 0.3353,
+      "all_bge_matches": [
+        {
+          "rank": 1,
+          "kb_id": "DEMO-KB-00015",
+          "score": 0.8896,
+          "category": "Geo-political",
+          "hate_text": "Foreign workers are stealing jobs from native citizens and should be rounded up and deported immediately."
+        },
+        {
+          "rank": 2,
+          "kb_id": "DEMO-KB-00016",
+          "score": 0.6927,
+          "category": "Geo-political",
+          "hate_text": "Refugees crossing the border should be met with armed military force and expelled without mercy."
+        },
+        {
+          "rank": 3,
+          "kb_id": "DEMO-KB-00004",
+          "score": 0.6237,
+          "category": "Gender",
+          "hate_text": "Working women are destroying traditional culture and moral values in our country."
+        }
+      ]
+    },
+    {
+      "category": "Violence",
+      "target_id": "DEMO-KB-00018",
+      "original_hate_text": "We must form armed vigilante mobs and lynch these criminals publicly instead of relying on courts.",
+      "paraphrase_query": "Citizens must organize vigilante groups to execute suspects in the street rather than waiting for judges.",
+      "bge_top_id": "DEMO-KB-00018",
+      "bge_top_category": "Violence",
+      "bge_top_score": 0.8464,
+      "category_match": true,
+      "exact_id_match": true,
+      "latency_ms": 274.11,
+      "vram_peak_mb": 2175.14,
+      "mock_baseline_score": -0.0687,
+      "all_bge_matches": [
+        {
+          "rank": 1,
+          "kb_id": "DEMO-KB-00018",
+          "score": 0.8464,
+          "category": "Violence",
+          "hate_text": "We must form armed vigilante mobs and lynch these criminals publicly instead of relying on courts."
+        },
+        {
+          "rank": 2,
+          "kb_id": "DEMO-KB-00006",
+          "score": 0.6173,
+          "category": "Political",
+          "hate_text": "Student activists protesting against the ruling party should be beaten and locked away indefinitely."
+        },
+        {
+          "rank": 3,
+          "kb_id": "DEMO-KB-00017",
+          "score": 0.59,
+          "category": "Violence",
+          "hate_text": "Those peaceful protestors should be run over with bulldozers so they never dare demonstrate again."
+        }
+      ]
+    },
+    {
+      "category": "Others",
+      "target_id": "DEMO-KB-00022",
+      "original_hate_text": "People with cognitive and physical disabilities are useless burdens consuming resources meant for productive citizens.",
+      "paraphrase_query": "Disabled individuals are just unproductive burdens draining public welfare.",
+      "bge_top_id": "DEMO-KB-00022",
+      "bge_top_category": "Others",
+      "bge_top_score": 0.8448,
+      "category_match": true,
+      "exact_id_match": true,
+      "latency_ms": 254.95,
+      "vram_peak_mb": 2174.88,
+      "mock_baseline_score": 0.5035,
+      "all_bge_matches": [
+        {
+          "rank": 1,
+          "kb_id": "DEMO-KB-00022",
+          "score": 0.8448,
+          "category": "Others",
+          "hate_text": "People with cognitive and physical disabilities are useless burdens consuming resources meant for productive citizens."
+        },
+        {
+          "rank": 2,
+          "kb_id": "DEMO-KB-00002",
+          "score": 0.6298,
+          "category": "Gender",
+          "hate_text": "Transgender individuals are mentally ill degenerates who should be removed from public society."
+        },
+        {
+          "rank": 3,
+          "kb_id": "DEMO-KB-00008",
+          "score": 0.619,
+          "category": "Political",
+          "hate_text": "Those criticizing government policy are foreign agents who deserve no legal protection or human rights."
+        }
+      ]
+    }
+  ]
+}

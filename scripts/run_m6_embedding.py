@@ -103,10 +103,13 @@ def main():
     try:
         report = pipeline.run(args.input)
         print("\n[M6] Embedding pipeline completed successfully.")
+        print(f"[M6] Run ID:       {report.get('run_id')}")
         print(f"[M6] Model:        {report['model_identifier']}")
         print(f"[M6] Is Mock:      {report['is_mock']}")
         print(f"[M6] Scope:        {report['kb_scope']} (Approval status: {report['approval_status']})")
         print(f"[M6] Shape:        {report['matrix_shape']}")
+        print(f"[M6] Run Dir:      {report['artifacts'].get('authoritative_run_dir', report.get('run_dir'))}")
+        print(f"[M6] Pointer:      {report['artifacts'].get('latest_pointer')}")
         print(f"[M6] Vector File:  {report['artifacts']['vector_file']}")
         print(f"[M6] Manifest:     {report['artifacts']['manifest_file']}")
         print(f"[M6] Report Saved: reports/m6_embedding_report.json")

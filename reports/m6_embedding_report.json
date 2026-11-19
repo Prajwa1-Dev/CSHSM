@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-11-19T11:01:32.140397+00:00",
+  "run_id": "bge_m3_mock_20261119_110132_ec509b2c",
+  "run_dir": "runs\\bge_m3_mock_20261119_110132_ec509b2c",
+  "model_identifier": "MOCK-EMBEDDER-TEST-ONLY",
+  "is_mock": true,
+  "embedding_dimension": 1024,
+  "normalization": "L2",
+  "strategy": "hate_text",
+  "kb_scope": "approved_kb",
+  "approval_status": "approved",
+  "batch_size": 4,
+  "input_file": "C:\\Users\\tejaswi\\AppData\\Local\\Temp\\pytest-of-tejaswi\\pytest-6\\test_disk_resolver_fails_close2\\test.jsonl",
+  "input_file_sha256": "f613f58d2b77b33b72b343a65d136c1e54bf1174932c681aaac205abf27a0f2a",
+  "raw_record_count": 1,
+  "skipped_record_count": 0,
+  "embedded_record_count": 1,
+  "matrix_shape": [
+    1,
+    1024
+  ],
+  "artifacts": {
+    "vector_file": "bge_m3_mock_dense.npy",
+    "vector_sha256": "f75dfb1fa28c1c561a90c2a46fc2a49e7c5d53d5cf6d0ad51eeb20efa23aecc6",
+    "manifest_file": "bge_m3_mock_manifest.jsonl",
+    "manifest_sha256": "cf9ca14a814495fa0314c6e96761257c3c25e7e8721c9ea22dd90321da7d174d",
+    "report_file": "m6_embedding_report.json",
+    "commit_marker": "COMMITTED",
+    "latest_pointer": "LATEST.json",
+    "authoritative_run_dir": "C:\\Users\\tejaswi\\AppData\\Local\\Temp\\pytest-of-tejaswi\\pytest-6\\test_disk_resolver_fails_close2\\embeddings\\runs\\bge_m3_mock_20261119_110132_ec509b2c"
+  },
+  "disclaimer": "APPROVED KB \u2014 Formally evaluated and approved counter-speech knowledge base.",
+  "mock_notice": "MOCK EMBEDDINGS \u2014 Strictly for tests and engineering validation.",
+  "publication_status": "committed"
+}
